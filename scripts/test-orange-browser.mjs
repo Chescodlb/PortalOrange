@@ -62,7 +62,41 @@ try {
   };
   const nav = () => evaluate(`Array.from(document.querySelectorAll('.primary-navigation .nav-link')).filter(x=>x.textContent.trim()!=='').map(x=>x.textContent.trim()).filter(x=>!['Más','More'].includes(x))`);
   await send('Page.enable'); await send('Runtime.enable');
-  if (process.argv.includes('--navigation-only')) {
+  if (process.argv.includes('--creation-only')) {
+    await login('formador.orange', env.ORANGE_DEMO_PASSWORD);
+    for (const section of ['library', 'courses']) {
+      await navigate('/local/orangeportal/index.php?section=' + section);
+      const target = await evaluate(`document.querySelector('.orange-create-course').href`);
+      await navigate(target);
+      await wait(`!!document.querySelector('#id_fullname')`);
+      if (section === 'library') {
+        await wait(`Array.from(document.querySelectorAll('h1,h2,h3')).some(h=>h.textContent.trim()==='Crear una nueva colección documental')`);
+        check(await evaluate(`document.querySelector('label[for="id_fullname"]').textContent.includes('colección')`), 'Biblioteca: nombres de colección en formulario');
+        check(await evaluate(`document.title.includes('colección')`), 'Biblioteca: título de colección');
+        check(await evaluate(`!(/\\bcurso(s)?\\b/i.test(document.querySelector('form.mform').innerText))`), 'Biblioteca: formulario sin términos de curso');
+        check(await evaluate(`!document.querySelector('select[name="showgrades"]') && !document.querySelector('select[name="enablecompletion"]') && !document.querySelector('[data-formatchooser-field="selector"]')`), 'Biblioteca: sin controles académicos');
+        check(await evaluate(`document.querySelector('input[name="format"]').value==='topics' && document.querySelector('input[name="enablecompletion"]').value==='0'`), 'Biblioteca: valores documentales nativos');
+      } else {
+        check(await evaluate(`Array.from(document.querySelectorAll('h1,h2,h3')).some(h=>h.textContent.includes('Crear un nuevo curso'))`), 'Cursos conserva el título de curso');
+      }
+      check(await evaluate(`!document.querySelector('.secondary-navigation .nav-link')`), section + ': sin barra Categoría/Más');
+      check(await evaluate(`!document.querySelector('.breadcrumb')?.textContent.includes('Administrar cursos y categorías')`), section + ': ruta sin administración de categorías');
+      const breadcrumb = await evaluate(`Array.from(document.querySelectorAll('.breadcrumb li')).map(li=>({text:li.textContent.trim(), href:li.querySelector('a')?.href || ''}))`);
+      const sectionLabel = section === 'library' ? 'Biblioteca' : 'Cursos';
+      check(breadcrumb.length === 2 && breadcrumb[0].text === sectionLabel &&
+        breadcrumb[0].href.includes('section=' + section) && !breadcrumb.some(item=>item.text.includes('Página Principal')),
+        section + ': breadcrumb empieza en la sección correcta');
+      await navigate(breadcrumb[0].href);
+      check(await evaluate(`location.pathname==='/local/orangeportal/index.php' && new URLSearchParams(location.search).get('section')===${JSON.stringify(section)}`), section + ': enlace del breadcrumb vuelve a su sección');
+      await navigate(target);
+      await wait(`!!document.querySelector('#id_fullname')`);
+      check(await evaluate(`!!document.querySelector('.primary-navigation .nav-link.active[href*="section=${section}"]')`), section + ': menú principal activo');
+      const options = await evaluate(`Array.from(document.querySelectorAll('select[name="category"] option')).filter(o=>o.value && o.value!=='0').map(o=>o.textContent)`);
+      check(options.length > 0 && options.every(t=>t.includes(section === 'library' ? 'Biblioteca' : 'Cursos')), section + ': categorías de su sección');
+      await screenshot('crear-' + section);
+    }
+    console.log('Verificaciones de creación: ' + results.length);
+  } else if (process.argv.includes('--navigation-only')) {
     const openMenu = async section => {
       await wait(`!!document.querySelector('.primary-navigation [aria-controls="orange-menu-${section}"]')`);
       await evaluate(`document.querySelector('.primary-navigation [aria-controls="orange-menu-${section}"]').click()`);

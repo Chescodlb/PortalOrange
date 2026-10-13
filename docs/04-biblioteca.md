@@ -60,3 +60,15 @@ Tener acceso a la colección permite consultar y descargar sus documentos. Crear
 ## Menú al abrir una colección documental
 
 Una colección se almacena como curso nativo de Moodle. Su menú contextual se adapta dentro de Biblioteca a **Documentos**, **Configuración** y **Accesos**, mostrando las opciones que Moodle permite al usuario. Documentos abre sus recursos; Configuración permite modificar la colección y Accesos abre Participantes para gestionar destinatarios, matrículas y grupos. Se retiran de esta barra las herramientas académicas como calificaciones e informes; los cursos de formación conservan su navegación normal. El plugin adapta los nodos mediante el hook `secondary_extend`, sin alterar roles, permisos ni archivos del core.
+
+## Formulario de nueva colección
+
+«Nueva colección documental» reutiliza el formulario nativo de Moodle con nombres de colección para el título, los campos y la ruta de navegación. El selector se limita a Biblioteca y sus subcategorías. En los accesos de creación del portal se oculta la navegación secundaria «Categoría / Más» mediante la API de página de Moodle, sin modificar el tema ni el core.
+
+El formulario de nueva colección muestra nombre, código corto, categoría, visibilidad, identificador opcional, descripción e imagen de portada, además de idioma, archivos, grupos y etiquetas. Las ayudas también usan terminología de Biblioteca. La imagen de portada admite imágenes; no es el lugar para cargar documentos.
+
+La ruta de navegación es **Biblioteca > Crear una nueva colección documental**. El primer enlace abre la raíz de Biblioteca. En esta pantalla el plugin adapta el nodo raíz que Moodle añade automáticamente para evitar un enlace «Página Principal» que redirija a otra sección.
+
+Las nuevas colecciones usan formato Temas con una sección documental, sin fechas de formación, anuncios, libro de calificaciones ni seguimiento de finalización. Estos valores se fijan en el servidor mediante el formulario nativo. Los documentos se añaden después como recursos Archivo, Carpeta, Página o Libro. Los cursos de formación conservan todos sus ajustes académicos. La edición de colecciones existentes mantiene por ahora el formulario nativo completo.
+
+Los marcos de competencias son una función académica nativa para organizar habilidades y relacionarlas con cursos y planes de aprendizaje. No son categorías documentales. La instalación local no contiene marcos ni competencias. Si se decide desactivar esta función en todo Moodle, se hace desde **Administración del sitio > Características avanzadas > Habilitar competencias**; no es necesario desactivarla globalmente para limpiar la creación de colecciones.

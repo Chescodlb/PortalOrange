@@ -82,6 +82,7 @@ class hooks {
             return;
         }
         $PAGE->requires->css('/local/orangeportal/styles.css');
+        course_creation::presentation();
         // Error pages may default PAGE->url to the site root; use the actual request.
         $path = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
         if (in_array($path, ['/', '/index.php', '/my/index.php', '/my/'])) {

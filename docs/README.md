@@ -14,5 +14,6 @@ El portal local está en http://localhost:8080. Los usuarios ficticios y la revi
 | Categorías, asignación y estado | [Incidencias](06-incidencias.md) | Portal Orange dentro de administración |
 | Noticias, Registro y Comunicado | [Notificaciones](07-notificaciones.md) | Portal Orange y mensajería nativa |
 | Resultados y lectura confirmada | [Informes](09-informes.md) | Informes nativos y panel de trazabilidad |
+| Avisos externos de incidencias | [Integración con Teams](10-integracion-teams.md) | Evaluación de plugins y configuración de Microsoft pendiente |
 
 La [decisión de implementación](implementacion.md) explica qué necesita código y por qué. Ningún archivo original de Moodle o Moove se ha modificado.

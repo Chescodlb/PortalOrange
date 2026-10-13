@@ -33,3 +33,11 @@ Configurar las condiciones en **Actividad > Finalización de actividad** y **Cur
 El portal genera una notificación individual de categoría Registro cuando Moodle emite el evento de curso completado o actualiza una calificación visible de actividad. No incluye notas ocultas en el aviso. Las finalizaciones de curso se consolidan mediante las tareas programadas de Moodle, por lo que requieren cron.
 
 La instalación local mantiene el correo desactivado. Para procesar tareas locales se puede activar el servicio cron indicado en README; Teams pertenece a una fase posterior.
+
+## Categorías al crear desde el portal
+
+Al pulsar «Nuevo curso» desde Cursos, el selector del formulario nativo muestra la raíz Cursos y sus subcategorías, respetando el permiso `moodle/course:create`. «Nueva colección documental» desde Biblioteca limita el selector a Biblioteca. No es necesario retirar al formador sus permisos de la otra sección.
+
+La ruta de navegación al crear un curso es **Cursos > Crear un nuevo curso**; el primer enlace vuelve a la raíz de Cursos. No muestra «Página Principal» ni lleva a Biblioteca.
+
+Moodle ofrece un selector conjunto de las categorías donde se tiene permiso; no dispone de un ajuste para separar estos dos accesos manteniendo ambos permisos. El plugin usa los hooks nativos del formulario y valida la categoría al guardar, sin modificar el core. La creación desde la administración general y la edición de cursos existentes conservan su comportamiento nativo.
