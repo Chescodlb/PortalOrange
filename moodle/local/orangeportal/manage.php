@@ -13,11 +13,11 @@ admin_externalpage_setup('orangeportalmanage');
 $url = orange_link('manage.php', ['kind' => $kind]);
 echo '';
 $form = null;
-if ($id || $new) {
+if ($id || $new || $_SERVER['REQUEST_METHOD'] === 'POST') {
     $form = new \local_orangeportal\form\notice(null, ['kind' => $kind]);
     if ($form->is_cancelled()) { redirect($url); }
     if ($data = $form->get_data()) {
-        $record = (object)['id' => $data->id, 'kind' => $data->kind, 'categoryid' => $data->categoryid,
+        $record = (object)['id' => $data->id, 'revision' => $data->revision, 'kind' => $data->kind, 'categoryid' => $data->categoryid,
             'title' => $data->title, 'content' => format_text($data->body['text'], $data->body['format'],
                 ['context' => context_system::instance(), 'filter' => false]),
             'impact' => $data->impact, 'state' => $data->state, 'published' => (int)$data->published];
@@ -37,10 +37,7 @@ if ($id || $new) {
 }
 echo $OUTPUT->header();
 echo orange_intro('ADMINISTRACIÓN', 'Publicaciones Orange', 'Crea avisos, selecciona destinatarios y controla su publicación.');
-echo html_writer::div(html_writer::link(orange_link('manage.php', ['kind' => 'incidents']), 'Incidencias') .
-    html_writer::link(orange_link('manage.php', ['kind' => 'notifications']), 'Notificaciones') .
-    html_writer::link(orange_link('categories.php', ['kind' => $kind]), 'Gestionar categorías') .
-    html_writer::link(orange_link('reports.php'), 'Confirmaciones y resultados'), 'orange-admin-links');
+echo orange_admin_navigation($kind, $kind);
 if ($form) { $form->display(); } else {
     echo html_writer::link(orange_link('manage.php', ['kind' => $kind, 'new' => 1]), 'Crear publicación', ['class' => 'btn btn-primary']);
     $table = new html_table();

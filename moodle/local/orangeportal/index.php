@@ -18,9 +18,10 @@ $descriptions = ['library' => 'Procedimientos, manuales y guías para tu operati
     'incidents' => 'Consulta los avisos que afectan a tu equipo y sigue su evolución.',
     'notifications' => 'Noticias, comunicados y alertas dirigidos a ti.'];
 echo orange_intro('ORANGE · PORTAL DE AGENTES', $titles[$section], $descriptions[$section]);
-if (service::manager()) {
-    $manageurl = in_array($section, ['library', 'courses']) ? new moodle_url('/course/management.php',
-        ['categoryid' => get_config('local_orangeportal', $section == 'library' ? 'librarycategory' : 'coursescategory')]) :
+if (in_array($section, ['library', 'courses']) ?
+        has_capability('moodle/category:manage', context_coursecat::instance((int)get_config('local_orangeportal',
+            $section == 'library' ? 'librarycategory' : 'coursescategory'))) : service::manager()) {
+    $manageurl = in_array($section, ['library', 'courses']) ? orange_link('categories.php', ['kind' => $section]) :
         orange_link('manage.php', ['kind' => $section]);
     echo html_writer::div(html_writer::link($manageurl, 'Gestionar ' . strtolower($titles[$section]),
         ['class' => 'btn btn-outline-secondary']), 'orange-toolbar');
@@ -44,7 +45,7 @@ $tree = ''; $cards = ''; $count = 0;
 if (in_array($section, ['library', 'courses'])) {
     $rootid = (int)get_config('local_orangeportal', $section == 'library' ? 'librarycategory' : 'coursescategory');
     $courses = orange_native_courses($rootid);
-    if ($section == 'library') { $tree = orange_library_tree($rootid, $category, $courses); }
+    $tree = orange_library_tree($rootid, $category, $courses, $section);
     foreach ($courses as $course) {
         $cat = $DB->get_record('course_categories', ['id' => $course->category]);
         if ($category && !in_array($category, explode('/', $cat->path))) { continue; }
@@ -70,7 +71,7 @@ if (in_array($section, ['library', 'courses'])) {
         if ($category && !in_array($notice->categoryid, $selectedids)) { continue; }
         if ($query && stripos($notice->title . ' ' . strip_tags($notice->content), $query) === false) { continue; }
         if ($status && $notice->state !== $status) { continue; }
-        $receipt = $DB->get_record('local_orange_receipt', ['noticeid' => $notice->id, 'userid' => $USER->id]);
+        $receipt = service::get_receipt($notice, (int)$USER->id);
         if ($pending && $receipt && $receipt->confirmed) { continue; }
         service::receipt($notice, 'received');
         $count++;

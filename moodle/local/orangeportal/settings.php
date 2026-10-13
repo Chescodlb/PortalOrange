@@ -1,6 +1,6 @@
 <?php
 defined('MOODLE_INTERNAL') || die();
-$ADMIN->add('localplugins', new admin_category('orangeportal', 'Portal Orange'));
+$ADMIN->add('root', new admin_category('orangeportal', 'Portal Orange'));
 $page = new admin_settingpage('local_orangeportal', 'Configuración Orange');
 $page->add(new admin_setting_configcheckbox('local_orangeportal/enabled', 'Navegación Orange',
     'Muestra las cuatro secciones y dirige la entrada a la página seleccionada en Navegación.', 0));

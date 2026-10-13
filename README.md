@@ -2,7 +2,22 @@
 
 Base local para Moodle 4.5.1 con Moove. El portal real es `https://campusabai.abaigroup.com/`. Esta instalación limpia permite empezar con el tema, pero solo será una réplica cuando se incorporen el código y los datos facilitados por sistemas.
 
-Repositorio: [Chescodlb/PortalOrange](https://github.com/Chescodlb/PortalOrange). Consulta [la guía de Git](docs/git.md) para conocer qué archivos se versionan y cómo reconstruir el entorno. Las personalizaciones Orange están en desarrollo y todavía no se han instalado ni activado.
+Repositorio: [Chescodlb/PortalOrange](https://github.com/Chescodlb/PortalOrange). Consulta [la guía de Git](docs/git.md) para conocer qué archivos se versionan y cómo reconstruir el entorno. La primera versión Orange está instalada en local y pendiente de revisión. No se harán nuevos commits sin aprobación ni push automático.
+
+## Portal Orange local
+
+La navegación contiene Biblioteca, Cursos, Incidencias y Notificaciones, con Administración para los perfiles autorizados. La biblioteca usa categorías y recursos nativos de Moodle; las evaluaciones y encuestas usan sus actividades estándar. Los avisos y sus confirmaciones se gestionan desde **Administración > Portal Orange** mediante el plugin propio `local_orangeportal`, sin modificar el core ni Moove.
+
+Consulta las [guías de administración por caso](docs/README.md), la [implementación y sus límites](docs/implementacion.md) y el [recorrido de prueba](docs/08-pruebas-y-revision.md). Los perfiles ficticios usan la clave `ORANGE_DEMO_PASSWORD` de `.env`.
+
+Para repetir la carga inicial en una instalación local, instalar primero español desde **Administración > Idioma > Paquetes de idioma** y extraer la matriz:
+
+```bash
+python3 scripts/extract-library-matrix.py '/ruta/Matriz de procesos v.12 - ORANGE.xlsx'
+bash scripts/configure-orange-local.sh
+```
+
+El inicializador crea un respaldo SQL, instala el plugin y configura ejemplos. Si se vuelve a ejecutar, conserva los contenidos existentes pero reaplica marca y navegación; no usarlo para el mantenimiento diario del cliente.
 
 ## Requisitos
 

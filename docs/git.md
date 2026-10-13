@@ -2,7 +2,7 @@
 
 Repositorio: https://github.com/Chescodlb/PortalOrange
 
-La rama principal es `main`. El repositorio remoto es público. Se versionan Docker, scripts, documentación, estilos y el plugin propio `moodle/local/orangeportal/`. Moodle y Moove se mantienen como dependencias descargables; sus archivos originales no se modifican.
+La rama principal es `main`. El repositorio remoto es público y aún no se ha hecho push. Se versionan Docker, scripts, documentación, estilos y el plugin propio `moodle/local/orangeportal/`. Moodle y Moove se mantienen como dependencias descargables; sus archivos originales no se modifican.
 
 ## Archivos que permanecen locales
 
@@ -23,11 +23,11 @@ git commit -m "Descripción del cambio"
 git push origin main
 ```
 
-Revisar siempre los archivos incluidos antes de subirlos. Para nuevas funcionalidades se pueden usar ramas y pull requests.
+El usuario debe revisar y aprobar los cambios antes de cada nuevo commit. El usuario hará el push. Revisar siempre los archivos incluidos antes de subirlos. Para nuevas funcionalidades se pueden usar ramas y pull requests.
 
 ## Estado del primer commit
 
-El entorno Docker ya funciona. La personalización Orange está en desarrollo: se incluye el código inicial del plugin para navegación y avisos, todavía sin instalar ni activar. No es una versión terminada. La instalación limpia continúa usando Moove.
+El commit inicial `805cf77` guardó el entorno y un esqueleto del plugin todavía sin instalar. Los cambios posteriores completan una primera versión instalada localmente y están sin commitear para su revisión. No se ha hecho push.
 
 ## Recuperación en otra máquina
 
@@ -36,4 +36,4 @@ El entorno Docker ya funciona. La personalización Orange está en desarrollo: s
 3. Ejecutar `bash scripts/init-fresh.sh` para una instalación limpia.
 4. Los documentos y datos existentes requieren una restauración independiente; no están en Git.
 
-Hasta completar el plugin, una instalación nueva puede detectarlo durante el instalador de Moodle. Para reproducir solo la base original, mover temporalmente `moodle/local/orangeportal/` fuera de `moodle/local/` antes de instalar.
+Una instalación nueva detecta el plugin durante el instalador de Moodle, pero la navegación Orange está desactivada por defecto hasta configurarla. Para reproducir únicamente la base original, mover temporalmente `moodle/local/orangeportal/` fuera de `moodle/local/` antes de instalar.

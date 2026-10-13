@@ -11,6 +11,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_sesskey();
     $action = required_param('action', PARAM_ALPHA);
     if ($action === 'confirm') {
+        if (required_param('revision', PARAM_INT) != $notice->revision) {
+            throw new invalid_parameter_exception('El aviso ha cambiado. Recarga antes de confirmar.');
+        }
         service::receipt($notice, 'confirmed');
     } else if ($action === 'state') {
         service::change_state($notice, required_param('state', PARAM_ALPHA));
@@ -22,12 +25,12 @@ $receipt = service::receipt($notice, 'readtime');
 echo $OUTPUT->header();
 $category = $DB->get_record('local_orange_category', ['id' => $notice->categoryid], '*', MUST_EXIST);
 echo html_writer::link(orange_link('index.php', ['section' => $notice->kind]), '← Volver al listado');
-echo orange_intro($category->name, $notice->title, 'Publicado el ' . userdate($notice->timecreated, '%d/%m/%Y'));
+echo orange_intro($category->name, $notice->title, 'Versión ' . $notice->revision . ' · Publicado el ' . userdate($notice->timecreated, '%d/%m/%Y'));
 echo html_writer::div(format_text($notice->content, FORMAT_HTML, ['context' => context_system::instance()]), 'orange-notice-content');
 if ($receipt) {
     echo html_writer::div('Recibido: ' . userdate($receipt->received) . ' · Leído: ' . userdate($receipt->readtime), 'orange-receipt');
     echo $receipt->confirmed ? $OUTPUT->notification('Lectura confirmada el ' . userdate($receipt->confirmed), 'success') :
-        orange_post_button($url, 'Confirmar que he leído este aviso', ['action' => 'confirm']);
+        orange_post_button($url, 'Confirmar que he leído este aviso', ['action' => 'confirm', 'revision' => $notice->revision]);
 } else { echo $OUTPUT->notification('Vista de gestión: esta consulta no registra una lectura de destinatario.', 'info'); }
 if ($notice->kind == 'incidents') {
     echo html_writer::tag('h3', 'Estado: ' . service::states()[$notice->state]);

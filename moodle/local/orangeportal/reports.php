@@ -9,6 +9,7 @@ $courseid = optional_param('courseid', 0, PARAM_INT);
 $noticeid = optional_param('noticeid', 0, PARAM_INT);
 echo $OUTPUT->header();
 echo orange_intro('ADMINISTRACIÓN', 'Resultados y confirmaciones', 'Seguimiento de formación y trazabilidad de avisos para usuarios autorizados.');
+echo orange_admin_navigation('reports');
 $courses = orange_native_courses((int)get_config('local_orangeportal', 'coursescategory'));
 $table = new html_table(); $table->head = ['Curso', 'Participantes activos', 'Finalizaciones', 'Nota media (%)', 'Informes Moodle'];
 foreach ($courses as $course) {
@@ -52,11 +53,25 @@ $notices = $noticeid ? [$DB->get_record('local_orange_notice', ['id' => $noticei
 foreach ($notices as $notice) {
     foreach ($users as $u) {
         if (!\local_orangeportal\service::assigned((int)$notice->id, (int)$u->id)) { continue; }
-        $r = $DB->get_record('local_orange_receipt', ['noticeid' => $notice->id, 'userid' => $u->id]);
+        $r = \local_orangeportal\service::get_receipt($notice, (int)$u->id);
         $table->data[] = [html_writer::link(orange_link('reports.php', ['noticeid' => $notice->id]), s($notice->title)),
             s(fullname($u)), $r && $r->received ? userdate($r->received) : 'Pendiente',
             $r && $r->readtime ? userdate($r->readtime) : 'Pendiente', $r && $r->confirmed ? userdate($r->confirmed) : 'Pendiente'];
     }
 }
 echo html_writer::table($table);
+if ($noticeid) {
+    $table = new html_table(); $table->head = ['Versión', 'Destinatario', 'Recibido', 'Leído', 'Confirmado'];
+    foreach ($DB->get_records('local_orange_receipt', ['noticeid' => $noticeid], 'revision DESC, userid') as $r) {
+        $u = core_user::get_user($r->userid);
+        $table->data[] = [$r->revision, s($u ? fullname($u) : 'Usuario eliminado'),
+            $r->received ? userdate($r->received) : 'Pendiente', $r->readtime ? userdate($r->readtime) : 'Pendiente',
+            $r->confirmed ? userdate($r->confirmed) : 'Pendiente'];
+    }
+    echo html_writer::tag('h3', 'Histórico de confirmaciones por versión'); echo html_writer::table($table);
+    foreach ($DB->get_records('local_orange_revision', ['noticeid' => $noticeid], 'revision DESC') as $revision) {
+        echo html_writer::tag('details', html_writer::tag('summary', 'Versión ' . $revision->revision . ': ' . s($revision->title)) .
+            format_text($revision->content, FORMAT_HTML, ['context' => context_system::instance()]));
+    }
+}
 echo $OUTPUT->footer();

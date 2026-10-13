@@ -8,6 +8,7 @@ class notice extends \moodleform {
         $m = $this->_form;
         $kind = $this->_customdata['kind'];
         $m->addElement('hidden', 'id', 0); $m->setType('id', PARAM_INT);
+        $m->addElement('hidden', 'revision', 1); $m->setType('revision', PARAM_INT);
         $m->addElement('hidden', 'kind', $kind); $m->setType('kind', PARAM_ALPHA);
         $m->addElement('text', 'title', 'Título', ['size' => 70, 'maxlength' => 255]);
         $m->setType('title', PARAM_TEXT); $m->addRule('title', 'Escribe un título', 'required', null, 'client');
@@ -18,7 +19,13 @@ class notice extends \moodleform {
         $m->setType('body', PARAM_RAW);
         $m->addElement('select', 'impact', 'Impacto', \local_orangeportal\service::impacts());
         $m->addElement('select', 'state', 'Estado compartido', \local_orangeportal\service::states());
+        // Frozen selects export their configured value, not the first option.
+        $m->setDefault('impact', 'normal');
+        $m->setDefault('state', 'open');
         if ($kind === 'notifications') {
+            // Read-only values must override stale or altered hidden POST fields.
+            $m->setConstant('state', 'open');
+            $m->setConstant('impact', 'normal');
             $m->freeze('state'); $m->freeze('impact');
         }
         $m->addElement('header', 'audience', 'Destinatarios');

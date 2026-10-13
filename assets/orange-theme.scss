@@ -3,8 +3,30 @@ body { font-family: Arial, Helvetica, sans-serif; background-color: #f5f5f6; }
 .navbar { background: #111 !important; border-bottom: 3px solid #ff7900; }
 .navbar .nav-link, .navbar .usermenu .dropdown-toggle, .navbar .icon, .navbar .navbar-brand { color: #fff !important; }
 .navbar .primary-navigation .navigation .nav-link:hover,
-.navbar .primary-navigation .navigation .nav-link.active { color: #ffb36d !important; background: transparent; border-bottom-color: #ff7900; }
+.navbar .primary-navigation .navigation .nav-link:focus,
+.navbar .primary-navigation .navigation .nav-link.active,
+.navbar .primary-navigation .navigation .nav-link.orange-nav-open,
+.navbar .primary-navigation .navigation .nav-link[aria-expanded="true"] {
+  color: #ff7900 !important;
+  background-color: #111 !important;
+  border-bottom-color: #ff7900 !important;
+  box-shadow: inset 0 -3px 0 #ff7900 !important;
+}
+.navbar .primary-navigation .navigation .nav-link:focus-visible {
+  outline: 2px solid #ff7900;
+  outline-offset: -2px;
+}
 .navbar .navbar-brand .logo { max-height: 48px; }
+.navbar .navbar-toggler-icon { filter: brightness(0) invert(1); }
+.navbar .editmode-switch-form label { color: #fff; }
+body.path-local-orangeportal #page-header { display: none; }
+// Las categorías se consultan desde los desplegables del menú superior.
+body.path-local-orangeportal .orange-sidebar { display: none; }
+body.path-local-orangeportal .orange-layout { display: block; }
+@media (max-width: 767px) {
+  .navbar .navbar-brand { display: flex !important; margin-left: 8px; }
+  .navbar .navbar-brand .logo { max-height: 40px; }
+}
 .navbar .dropdown-menu .icon { color: #222 !important; }
 .navbar .dropdown-menu .dropdown-item { color: #222; }
 .btn-primary { background: #ff7900; color: #111; border-color: #ff7900; font-weight: 700; }

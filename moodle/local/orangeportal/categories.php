@@ -3,37 +3,69 @@ require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/locallib.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_login();
-require_capability('local/orangeportal:manage', context_system::instance());
 $kind = optional_param('kind', 'incidents', PARAM_ALPHA);
 $id = optional_param('id', 0, PARAM_INT);
-if (!in_array($kind, ['incidents', 'notifications'])) { throw new invalid_parameter_exception('Sección desconocida'); }
-admin_externalpage_setup('orangeportalcategories');
-$cats = $DB->get_records('local_orange_category', ['kind' => $kind]);
-$excluded = $id ? \local_orangeportal\service::category_descendants($id, $cats) : [];
-$form = new \local_orangeportal\form\category(null, ['kind' => $kind, 'excluded' => $excluded]);
-if ($form->is_cancelled()) { redirect(orange_link('manage.php', ['kind' => $kind])); }
-if ($data = $form->get_data()) {
-    if ($data->parentid) { \local_orangeportal\service::validate_category($kind, (int)$data->parentid); }
-    $excluded = $data->id ? \local_orangeportal\service::category_descendants((int)$data->id, $cats) : [];
-    if (in_array($data->parentid, $excluded) || $data->kind !== $kind) {
-        throw new invalid_parameter_exception('No se puede crear un ciclo en el árbol');
-    }
-    $record = (object)['kind' => $kind, 'name' => trim($data->name), 'parentid' => $data->parentid];
-    if ($data->id) {
-        $DB->get_record('local_orange_category', ['id' => $data->id, 'kind' => $kind], '*', MUST_EXIST);
-        $record->id = $data->id; $DB->update_record('local_orange_category', $record);
-    } else { $DB->insert_record('local_orange_category', $record); }
-    redirect(orange_link('categories.php', ['kind' => $kind]), 'Categoría guardada', null, \core\output\notification::NOTIFY_SUCCESS);
+if (!in_array($kind, ['library', 'courses', 'incidents', 'notifications'])) { throw new invalid_parameter_exception('Sección desconocida'); }
+$native = in_array($kind, ['library', 'courses']);
+$url = orange_link('categories.php', ['kind' => $kind]);
+if ($native) {
+    $root = \local_orangeportal\native_categories::root($kind);
+    require_capability('moodle/category:manage', context_coursecat::instance($root->id));
+    $record = $id ? \local_orangeportal\native_categories::editable($kind, $id)->get_db_record() : null;
+    $options = \local_orangeportal\native_categories::options($kind, $id);
+    $excluded = [];
+} else {
+    require_capability('local/orangeportal:manage', context_system::instance());
+    $cats = $DB->get_records('local_orange_category', ['kind' => $kind]);
+    $record = $id ? $DB->get_record('local_orange_category', ['id' => $id, 'kind' => $kind], '*', MUST_EXIST) : null;
+    $excluded = $id ? \local_orangeportal\service::category_descendants($id, $cats) : [];
+    $options = [0 => 'Raíz'] + orange_category_options($kind);
+    foreach ($excluded as $excludedid) { unset($options[$excludedid]); }
 }
-if ($id) { $form->set_data($DB->get_record('local_orange_category', ['id' => $id, 'kind' => $kind], '*', MUST_EXIST)); }
+orange_page('Gestionar categorías', $kind, $url);
+$PAGE->set_primary_active_tab('siteadminnode');
+$PAGE->set_secondary_navigation(false);
+$form = new \local_orangeportal\form\category($url, ['kind' => $kind, 'excluded' => $excluded, 'options' => $options]);
+if ($form->is_cancelled()) { redirect($url); }
+if ($data = $form->get_data()) {
+    if ($data->kind !== $kind) { throw new invalid_parameter_exception('Sección no válida'); }
+    if ($native) {
+        \local_orangeportal\native_categories::save($kind, (int)$data->id, $data->name, (int)$data->parentid);
+    } else {
+        if ($data->parentid) { \local_orangeportal\service::validate_category($kind, (int)$data->parentid); }
+        $excluded = $data->id ? \local_orangeportal\service::category_descendants((int)$data->id, $cats) : [];
+        if (in_array($data->parentid, $excluded)) { throw new invalid_parameter_exception('No se puede crear un ciclo en el árbol'); }
+        $save = (object)['kind' => $kind, 'name' => trim($data->name), 'parentid' => $data->parentid];
+        if ($data->id) {
+            $DB->get_record('local_orange_category', ['id' => $data->id, 'kind' => $kind], '*', MUST_EXIST);
+            $save->id = $data->id; $DB->update_record('local_orange_category', $save);
+        } else { $DB->insert_record('local_orange_category', $save); }
+    }
+    redirect($url, 'Categoría guardada', null, \core\output\notification::NOTIFY_SUCCESS);
+}
+if ($record) {
+    if ($native) { $record->parentid = $record->parent == $root->id ? 0 : $record->parent; }
+    $form->set_data($record);
+}
 echo $OUTPUT->header();
-echo orange_intro('ADMINISTRACIÓN', 'Categorías de ' . ($kind == 'incidents' ? 'incidencias' : 'notificaciones'),
-    'Puedes crear, renombrar y reorganizar las categorías del árbol.');
-echo html_writer::div(html_writer::link(orange_link('categories.php', ['kind' => 'incidents']), 'Incidencias') .
-    html_writer::link(orange_link('categories.php', ['kind' => 'notifications']), 'Notificaciones'), 'orange-admin-links');
+$labels = ['library' => 'Biblioteca', 'courses' => 'Cursos', 'incidents' => 'Incidencias', 'notifications' => 'Notificaciones'];
+echo orange_intro('ADMINISTRACIÓN', 'Categorías de ' . $labels[$kind],
+    'Crea una categoría o elige una categoría superior para añadir una subcategoría.');
+echo orange_admin_navigation('categories', $kind);
+$categorylinks = '';
+foreach ($labels as $key => $label) {
+    if (in_array($key, ['library', 'courses'])) {
+        $rootid = (int)get_config('local_orangeportal', $key === 'library' ? 'librarycategory' : 'coursescategory');
+        if (!$rootid || !has_capability('moodle/category:manage', context_coursecat::instance($rootid))) { continue; }
+    } else if (!has_capability('local/orangeportal:manage', context_system::instance())) { continue; }
+    $attrs = ['class' => 'orange-admin-link' . ($kind === $key ? ' active' : '')];
+    if ($kind === $key) { $attrs['aria-current'] = 'page'; }
+    $categorylinks .= html_writer::link(orange_link('categories.php', ['kind' => $key]), $label, $attrs);
+}
+echo html_writer::tag('nav', $categorylinks, ['class' => 'orange-admin-links orange-category-tabs', 'aria-label' => 'Tipo de categorías']);
 $form->display();
 $table = new html_table(); $table->head = ['Categoría', 'Acciones'];
-foreach (orange_category_options($kind) as $catid => $name) {
+foreach (($native ? array_filter(\local_orangeportal\native_categories::options($kind), fn($id) => $id !== 0, ARRAY_FILTER_USE_KEY) : orange_category_options($kind)) as $catid => $name) {
     $table->data[] = [s($name), html_writer::link(orange_link('categories.php', ['kind' => $kind, 'id' => $catid]), 'Editar / mover')];
 }
 echo html_writer::table($table);

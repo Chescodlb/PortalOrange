@@ -53,14 +53,19 @@ class service {
             throw new \coding_exception('Invalid receipt stage');
         }
         $factory = \core\lock\lock_config::get_lock_factory('local_orangeportal');
-        $lock = $factory->get_lock('receipt_' . $notice->id . '_' . $USER->id, 10);
+        $lock = $factory->get_lock('notice_' . $notice->id, 10);
         if (!$lock) {
             throw new \moodle_exception('locktimeout');
         }
         try {
-            $r = $DB->get_record('local_orange_receipt', ['noticeid' => $notice->id, 'userid' => $USER->id]);
+            $current = $DB->get_record('local_orange_notice', ['id' => $notice->id], '*', MUST_EXIST);
+            self::require_view($current);
+            if ($current->revision != $notice->revision) {
+                throw new \invalid_parameter_exception('El contenido ha cambiado. Vuelve a abrir el aviso antes de confirmar.');
+            }
+            $r = self::get_receipt($notice, (int)$USER->id);
             if (!$r) {
-                $r = (object)['noticeid' => $notice->id, 'userid' => $USER->id,
+                $r = (object)['noticeid' => $notice->id, 'userid' => $USER->id, 'revision' => $notice->revision,
                     'received' => time(), 'readtime' => 0, 'confirmed' => 0];
                 $r->id = $DB->insert_record('local_orange_receipt', $r);
             }
@@ -75,6 +80,11 @@ class service {
         } finally {
             $lock->release();
         }
+    }
+    public static function get_receipt(\stdClass $notice, int $userid): ?\stdClass {
+        global $DB;
+        return $DB->get_record('local_orange_receipt', ['noticeid' => $notice->id, 'userid' => $userid,
+            'revision' => $notice->revision]) ?: null;
     }
     public static function change_state(\stdClass $notice, string $state): void {
         global $DB, $USER;
@@ -123,6 +133,12 @@ class service {
         }
     }
     public static function save_notice(\stdClass $data, array $targets): int {
+        $factory = \core\lock\lock_config::get_lock_factory('local_orangeportal');
+        $lock = $factory->get_lock('notice_' . (int)($data->id ?? 0), 10);
+        if (!$lock) { throw new \moodle_exception('locktimeout'); }
+        try { return self::save_notice_locked($data, $targets); } finally { $lock->release(); }
+    }
+    private static function save_notice_locked(\stdClass $data, array $targets): int {
         global $DB, $USER;
         require_capability('local/orangeportal:manage', \context_system::instance());
         if (!in_array($data->kind, ['incidents', 'notifications'])) {
@@ -148,21 +164,30 @@ class service {
         $tx = $DB->start_delegated_transaction();
         $data->timemodified = time();
         if (empty($data->id)) {
+            $data->revision = 1;
             $data->authorid = $USER->id;
             $data->timecreated = time();
             $data->id = $DB->insert_record('local_orange_notice', $data);
         } else {
             $old = $DB->get_record('local_orange_notice', ['id' => $data->id, 'kind' => $data->kind], '*', MUST_EXIST);
+            if (isset($data->revision) && $data->revision != $old->revision) {
+                throw new \invalid_parameter_exception('Otra persona ha editado el aviso. Recarga la publicación.');
+            }
+            $data->revision = $old->revision;
             if ($old->state !== $data->state) {
                 $DB->insert_record('local_orange_state_log', (object)['noticeid' => $data->id, 'userid' => $USER->id,
                     'oldstate' => $old->state, 'newstate' => $data->state, 'timecreated' => time()]);
             }
             // Require a fresh reading/confirmation when published text changes.
             if ($old->title !== $data->title || $old->content !== $data->content) {
-                $DB->delete_records('local_orange_receipt', ['noticeid' => $data->id]);
+                $data->revision++;
             }
             $DB->update_record('local_orange_notice', $data);
             $DB->delete_records('local_orange_audience', ['noticeid' => $data->id]);
+        }
+        if (!$DB->record_exists('local_orange_revision', ['noticeid' => $data->id, 'revision' => $data->revision])) {
+            $DB->insert_record('local_orange_revision', (object)['noticeid' => $data->id, 'revision' => $data->revision,
+                'title' => $data->title, 'content' => $data->content, 'authorid' => $USER->id, 'timecreated' => time()]);
         }
         foreach ($targets as $type => $ids) {
             foreach (array_unique($ids) as $id) {

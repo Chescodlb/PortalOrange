@@ -18,6 +18,33 @@ function orange_intro(string $eyebrow, string $title, string $description): stri
     return html_writer::div(html_writer::span(s($eyebrow), 'orange-eyebrow') .
         html_writer::tag('h2', s($title)) . html_writer::tag('p', s($description)), 'orange-intro');
 }
+function orange_admin_navigation(string $active, string $kind = 'incidents'): string {
+    $links = [];
+    if (has_capability('local/orangeportal:manage', context_system::instance())) {
+        $links = [
+            'incidents' => ['Incidencias', orange_link('manage.php', ['kind' => 'incidents'])],
+            'notifications' => ['Notificaciones', orange_link('manage.php', ['kind' => 'notifications'])],
+        ];
+    }
+    $cangestion = has_capability('local/orangeportal:manage', context_system::instance());
+    foreach (['librarycategory', 'coursescategory'] as $setting) {
+        $rootid = (int)get_config('local_orangeportal', $setting);
+        if ($rootid && has_capability('moodle/category:manage', context_coursecat::instance($rootid))) {
+            $cangestion = true;
+        }
+    }
+    if ($cangestion) { $links['categories'] = ['Gestionar categorías', orange_link('categories.php', ['kind' => $kind])]; }
+    if (has_capability('local/orangeportal:viewreports', context_system::instance())) {
+        $links['reports'] = ['Confirmaciones y resultados', orange_link('reports.php')];
+    }
+    $html = '';
+    foreach ($links as $key => [$label, $url]) {
+        $attrs = ['class' => 'orange-admin-link' . ($key === $active ? ' active' : '')];
+        if ($key === $active) { $attrs['aria-current'] = 'page'; }
+        $html .= html_writer::link($url, $label, $attrs);
+    }
+    return html_writer::tag('nav', $html, ['class' => 'orange-admin-links', 'aria-label' => 'Gestión del portal']);
+}
 function orange_category_options(string $kind): array {
     global $DB;
     $cats = $DB->get_records('local_orange_category', ['kind' => $kind], 'name');
@@ -49,35 +76,30 @@ function orange_native_courses(int $rootid): array {
     }
     return $allowed;
 }
-function orange_library_tree(int $rootid, int $selected, array $courses): string {
+function orange_library_tree(int $rootid, int $selected, array $courses, string $section = 'library'): string {
     global $DB;
     if (!$root = $DB->get_record('course_categories', ['id' => $rootid])) { return ''; }
     $cats = $DB->get_records_sql('SELECT * FROM {course_categories} WHERE id = :id OR path LIKE :path ORDER BY sortorder',
         ['id' => $rootid, 'path' => $root->path . '/%']);
-    $manager = has_capability('moodle/category:manage', context_coursecat::instance($rootid));
-    $ancestry = [];
-    foreach ($courses as $course) {
-        foreach (explode('/', $cats[$course->category]->path) as $id) { $ancestry[(int)$id] = true; }
-    }
+    // Category structure is shared; access is enforced when listing/opening content.
     $selectedpath = isset($cats[$selected]) ? explode('/', $cats[$selected]->path) : [];
-    $walk = function(int $parent) use (&$walk, $cats, $manager, $ancestry, $selectedpath, $rootid): string {
+    $walk = function(int $parent) use (&$walk, $cats, $selectedpath, $rootid, $section): string {
         $html = '';
         foreach ($cats as $c) {
-            if ($c->parent != $parent || (!$manager && !isset($ancestry[$c->id])) ||
-                    !core_course_category::get($c->id)->is_uservisible()) { continue; }
+            if ($c->parent != $parent) { continue; }
             $children = $walk((int)$c->id);
-            $link = html_writer::link(orange_link('index.php', ['section' => 'library', 'category' => $c->id]),
+            $link = html_writer::link(orange_link('index.php', ['section' => $section, 'category' => $c->id]),
                 s($c->name), ['class' => 'orange-tree-link']);
             if ($children) {
                 $attrs = ['class' => 'orange-tree-node'];
-                if ($c->id == $rootid || in_array($c->id, $selectedpath)) { $attrs['open'] = 'open'; }
+                if ($c->parent == $rootid || in_array($c->id, $selectedpath)) { $attrs['open'] = 'open'; }
                 $html .= html_writer::tag('details', html_writer::tag('summary', $link) .
                     html_writer::div($children, 'orange-tree-children'), $attrs);
             } else { $html .= html_writer::div($link, 'orange-tree-leaf'); }
         }
         return $html;
     };
-    return $walk((int)$root->parent);
+    return $walk($rootid);
 }
 function orange_notice_tree(string $section, array $notices, int $selected): string {
     global $DB;
