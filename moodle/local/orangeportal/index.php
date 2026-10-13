@@ -26,6 +26,28 @@ if (in_array($section, ['library', 'courses']) ?
     echo html_writer::div(html_writer::link($manageurl, 'Gestionar ' . strtolower($titles[$section]),
         ['class' => 'btn btn-outline-secondary']), 'orange-toolbar');
 }
+if (in_array($section, ['library', 'courses'])) {
+    $rootid = (int)get_config('local_orangeportal', $section === 'library' ? 'librarycategory' : 'coursescategory');
+    $root = core_course_category::get($rootid, MUST_EXIST, true);
+    $actions = '';
+    if ($section === 'library' && array_filter(orange_native_courses($rootid), fn($c) =>
+            has_capability('mod/resource:addinstance', context_course::instance($c->id)) &&
+            has_capability('moodle/course:manageactivities', context_course::instance($c->id)))) {
+        $actions .= html_writer::link(orange_link('add_document.php'), 'Nuevo documento', ['class' => 'btn btn-primary']);
+    }
+    if (has_capability('moodle/course:create', context_coursecat::instance($rootid))) {
+        $destination = $category && $DB->record_exists_select('course_categories',
+            'id = ? AND (id = ? OR path LIKE ?)', [$category, $rootid, $root->path . '/%']) ? $category : $rootid;
+        if (has_capability('moodle/course:create', context_coursecat::instance($destination))) {
+            $actions .= html_writer::link(new moodle_url('/course/edit.php', ['category' => $destination,
+                'returnto' => 'url', 'returnurl' => orange_link('index.php', ['section' => $section])->out(false),
+                'sesskey' => sesskey()]),
+                $section === 'library' ? 'Nueva colección documental' : 'Nuevo curso',
+                ['class' => 'btn btn-primary orange-create-course']);
+        }
+    }
+    if ($actions) { echo html_writer::div($actions, 'orange-toolbar orange-content-actions'); }
+}
 $search = html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'section', 'value' => $section]) .
     html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'category', 'value' => $category]) .
     html_writer::tag('label', 'Buscar en ' . strtolower($titles[$section]), ['for' => 'orange-search', 'class' => 'sr-only']) .
@@ -52,11 +74,20 @@ if (in_array($section, ['library', 'courses'])) {
         if ($query && stripos($course->fullname . ' ' . strip_tags($course->summary), $query) === false) { continue; }
         $count++;
         $badge = $section == 'library' ? 'DOCUMENTACIÓN' : 'FORMACIÓN';
+        $editbutton = has_capability('moodle/course:manageactivities', context_course::instance($course->id)) ?
+            html_writer::div(orange_post_button(new moodle_url('/course/view.php', ['id' => $course->id]),
+                $section == 'library' ? 'Editar documentos' : 'Editar curso', ['edit' => 1]), 'orange-card-edit') : '';
+        if ($section === 'courses' && has_capability('mod/quiz:addinstance', context_course::instance($course->id)) &&
+                has_capability('moodle/course:manageactivities', context_course::instance($course->id))) {
+            $editbutton .= html_writer::link(new moodle_url('/course/modedit.php', ['add' => 'quiz',
+                'course' => $course->id, 'section' => 0, 'return' => 0]), 'Nueva evaluación',
+                ['class' => 'btn btn-outline-secondary orange-create-quiz']);
+        }
         $cards .= html_writer::tag('article', html_writer::span($badge, 'orange-eyebrow') .
             html_writer::tag('h3', html_writer::link(new moodle_url('/course/view.php', ['id' => $course->id]), s($course->fullname))) .
             format_text($course->summary, $course->summaryformat, ['context' => context_course::instance($course->id)]) .
             html_writer::link(new moodle_url('/course/view.php', ['id' => $course->id]),
-                $section == 'library' ? 'Consultar documentación →' : 'Abrir curso →', ['class' => 'orange-card-link']),
+                $section == 'library' ? 'Consultar documentación →' : 'Abrir curso →', ['class' => 'orange-card-link']) . $editbutton,
             ['class' => 'orange-card']);
     }
     if ($section == 'courses' && has_capability('local/orangeportal:viewreports', context_system::instance())) {

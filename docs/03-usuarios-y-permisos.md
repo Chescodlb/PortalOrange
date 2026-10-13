@@ -13,7 +13,7 @@ Abrir **Usuarios > Permisos > Definir roles** para crear o modificar un perfil. 
 | Perfil | Asignación inicial | Permisos |
 | --- | --- | --- |
 | Agente | Estudiante en sus cursos y bibliotecas | Consulta, evaluación y confirmación de sus avisos; cambio de estado de incidencias asignadas |
-| Formador | Profesor con permiso de edición en sus cursos | Recursos, preguntas, evaluaciones y resultados de esos cursos |
+| Formador | Profesor con edición en sus colecciones/cursos y Creación de contenidos Orange en Biblioteca y Cursos | Nuevos documentos, colecciones y cursos; recursos, preguntas y evaluaciones de sus cursos |
 | Coordinación | Profesor sin edición en sus cursos y rol global Coordinación Orange | Resultados de cursos autorizados y trazabilidad de publicaciones |
 | Responsable documental | Profesor con edición en las colecciones documentales que gestiona | Publicación y mantenimiento de recursos; no requiere ser administrador global |
 | Responsable de comunicaciones | Rol global Responsable de comunicaciones Orange | Publicación, categorías y asignación de incidencias y notificaciones |
@@ -46,3 +46,7 @@ Referencia: [Grupos y cohortes en Moodle](https://docs.moodle.org/404/en/Groups_
 `editor.orange` tiene además el rol **Gestión de categorías Orange**, con `moodle/category:manage`, asignado en las dos categorías raíz **Biblioteca** y **Cursos**, no en el sistema. Permite crear, editar, mover y gestionar subcategorías dentro de esas raíces, sin conceder administración general ni gestión de categorías ajenas.
 
 Para asignarlo a otro usuario desde Moodle: abrir **Administración > Cursos > Administrar cursos y categorías**, seleccionar Biblioteca y entrar en **Permisos > Asignar roles**; asignar **Gestión de categorías Orange**. Repetir en Cursos si corresponde. Para retirar ese acceso, quitar la asignación en la raíz correspondiente. El permiso se hereda en sus subcategorías. No concede por sí solo matrícula, creación de cursos, edición de recursos ni acceso a informes.
+
+El usuario `formador.orange` tiene Profesor con permiso de edición en las dos colecciones de Biblioteca y en el curso de ejemplo. En las tarjetas correspondientes ve **Editar documentos** o **Editar curso**, que activan la edición nativa. Un agente no ve esos botones. Además, tiene el rol **Creación de contenidos Orange**, con `moodle/course:create`, asignado únicamente en las raíces Biblioteca y Cursos. Permite crear colecciones y cursos dentro de ellas, sin administración general ni creación en categorías ajenas.
+
+Para autorizar a otro responsable a crear contenidos, asignar **Creación de contenidos Orange** desde **Permisos > Asignar roles** en Biblioteca y/o Cursos. Moodle configura el rol del creador en un curso nuevo mediante **Usuarios > Permisos > Políticas de usuario > Rol de los creadores en nuevos cursos**; aquí es Profesor con permiso de edición. La edición de contenidos existentes sigue dependiendo del rol asignado en cada curso o colección. `editor.orange` no recibe este rol y conserva únicamente gestión de publicaciones de avisos y de categorías.

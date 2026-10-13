@@ -2,6 +2,21 @@
 namespace local_orangeportal;
 defined('MOODLE_INTERNAL') || die();
 class hooks {
+    public static function library_navigation(\core\hook\navigation\secondary_extend $hook): void {
+        global $PAGE, $DB;
+        if (!get_config('local_orangeportal', 'enabled') || !isloggedin() || isguestuser() ||
+                $PAGE->course->id == SITEID || $PAGE->context->contextlevel != CONTEXT_COURSE) { return; }
+        $rootid = (int)get_config('local_orangeportal', 'librarycategory');
+        $category = $DB->get_record('course_categories', ['id' => $PAGE->course->category]);
+        if (!$rootid || !$category || !in_array($rootid, array_map('intval', explode('/', $category->path)))) { return; }
+        $labels = ['coursehome' => 'Documentos', 'editsettings' => 'Configuración', 'participants' => 'Accesos'];
+        $nav = $hook->get_secondaryview();
+        foreach (iterator_to_array($nav->children) as $node) {
+            if (!isset($labels[$node->key])) { $node->remove(); continue; }
+            $node->text = $labels[$node->key];
+            $node->title = $labels[$node->key];
+        }
+    }
     public static function menus(\core\hook\output\before_footer_html_generation $hook): void {
         global $PAGE, $CFG;
         if (!isloggedin() || isguestuser() || !get_config('local_orangeportal', 'enabled')) { return; }

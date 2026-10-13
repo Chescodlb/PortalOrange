@@ -11,7 +11,7 @@ Abrir http://localhost:8080 para revisar la primera versión. La entrada por def
 | `agente.otro` | Equipo sin acceso a esas colecciones ni avisos |
 | `editor.orange` | Publicación y categorías de avisos; gestión de categorías dentro de Biblioteca y Cursos; no obtiene informes globales |
 | `coordinador.orange` | Resultados de sus cursos y confirmaciones de publicaciones |
-| `formador.orange` | Edición y evaluación del curso de ejemplo |
+| `formador.orange` | Documentos y colecciones de Biblioteca; creación, edición y evaluación de sus cursos |
 
 La contraseña del administrador está en `MOODLE_ADMIN_PASSWORD`. Los cinco perfiles ficticios usan `ORANGE_DEMO_PASSWORD`, también en `.env`. No copiar esas claves a documentación o Git.
 
@@ -75,3 +75,7 @@ Ejecutar `docker compose exec -T -u www-data web php local/orangeportal/cli/chec
 Ejecutar `docker compose exec -T -u www-data web php local/orangeportal/cli/check_notice_form.php`. Reproduce los datos enviados por el formulario Moodle con `editor.orange`, comprueba publicación individual, borrador con cohorte y edición con versión nueva, tanto para notificaciones como para incidencias. Incluye la validación de publicaciones sin destinatarios y revierte todos los datos de prueba. Los campos bloqueados de notificaciones tienen valores por defecto válidos para evitar el error de parámetro no válido.
 
 La prueba del formulario incluye el título «Pruebas nueva Notificación» en todas las categorías de Notificaciones y simula campos internos vacíos de formularios abiertos antes de la corrección. Estado e impacto de notificaciones son constantes del formulario y prevalecen sobre esos valores enviados; en incidencias siguen siendo editables.
+
+### Publicar contenidos con el formador
+
+`formador.orange` ve **Nuevo documento** y **Nueva colección documental** en Biblioteca, **Nuevo curso** en Cursos y **Nueva evaluación** en cada curso editable. Nuevo documento pide una colección autorizada y abre el formulario nativo Archivo; no guarda contenidos hasta que se complete ese formulario. Colecciones y cursos usan el formulario nativo de creación de cursos y evaluaciones el de Cuestionario. Un editor de categorías o un agente no debe ver esos accesos.

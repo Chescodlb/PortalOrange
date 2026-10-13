@@ -179,6 +179,11 @@ $categoryrole = orange_demo_role('orange_gestorcategorias', 'Gestión de categor
 foreach (['librarycategory', 'coursescategory'] as $setting) {
     role_assign($categoryrole, $publisher->id, context_coursecat::instance((int)get_config('local_orangeportal', $setting))->id);
 }
+$contentrole = orange_demo_role('orange_creadorcontenidos', 'Creación de contenidos Orange',
+    ['moodle/course:create'], [CONTEXT_COURSECAT]);
+foreach (['librarycategory', 'coursescategory'] as $setting) {
+    role_assign($contentrole, $trainer->id, context_coursecat::instance((int)get_config('local_orangeportal', $setting))->id);
+}
 $cohort = $DB->get_record('cohort', ['idnumber' => 'ORANGE-EQUIPO-DEMO']);
 if (!$cohort) {
     $id = cohort_add_cohort((object)['contextid' => context_system::instance()->id, 'name' => 'Equipo Orange · demo',

@@ -1,6 +1,8 @@
 <?php
 defined('MOODLE_INTERNAL') || die();
 $callbacks = [
+    ['hook' => \core\hook\navigation\secondary_extend::class,
+        'callback' => [\local_orangeportal\hooks::class, 'library_navigation']],
     ['hook' => \core\hook\output\before_footer_html_generation::class,
         'callback' => [\local_orangeportal\hooks::class, 'menus']],
     ['hook' => \core\hook\navigation\primary_extend::class,

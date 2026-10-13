@@ -31,13 +31,15 @@ La gestión general de Moodle sigue disponible para un administrador en **Admini
 
 ## Crear una colección y cargar recursos
 
-1. Dentro de la categoría adecuada, crear un curso con un nombre documental, por ejemplo **Manual de portabilidad entrante**.
-2. Añadir los colectivos mediante sincronización de cohortes o matriculación manual.
-3. Activar edición y añadir **Archivo** para PDF o documentos, **Carpeta** para varios archivos, **Página** o **Libro** para contenido consultable, y **URL** para material externo.
-4. Para grabaciones, añadir un archivo multimedia o un enlace autorizado.
+Con `formador.orange`, Biblioteca muestra **Nuevo documento** y **Nueva colección documental**.
+
+1. Para un archivo nuevo, pulsar **Nuevo documento**, elegir una colección editable y pulsar **Añadir documento**. Se abre el formulario nativo Archivo: indicar el nombre, subir el PDF o documento y guardar.
+2. Para una nueva colección, pulsar **Nueva colección documental**. El formulario nativo de Moodle crea un curso documental en Biblioteca. Si se ha seleccionado una categoría del árbol, se propone esa categoría. Elegir **Guardar y mostrar** para entrar en la colección nueva y activar edición.
+3. Añadir recursos Archivo, Carpeta, Página, Libro o URL desde la colección. Las evaluaciones se reservan normalmente a Cursos.
+4. En Participantes, matricular los usuarios o colectivos destinatarios y asignar los responsables. Una colección nueva no hereda automáticamente los destinatarios de otra.
 5. Probar con un agente matriculado.
 
-Las dos colecciones iniciales son ejemplos de Alta con terminal e Incidencias Centrex. Su contenido no es un procedimiento operativo aprobado.
+El selector Nuevo documento solo contiene colecciones de Biblioteca donde se pueden gestionar actividades y añadir archivos. La subida, almacenamiento y permisos de archivos son los del módulo nativo de Moodle. La nueva colección queda bajo la responsabilidad de su creador con el rol nativo Profesor con permiso de edición, según el ajuste de Moodle para creadores de cursos.
 
 ## Restringir documentos y secciones
 
@@ -54,3 +56,7 @@ Para sustituir un PDF, editar su recurso Archivo, reemplazarlo y actualizar la v
 ## Lectura y descarga frente a edición
 
 Tener acceso a la colección permite consultar y descargar sus documentos. Crear o modificar documentos exige un rol de profesor con edición o permisos equivalentes. El agente no obtiene edición por pertenecer a un grupo.
+
+## Menú al abrir una colección documental
+
+Una colección se almacena como curso nativo de Moodle. Su menú contextual se adapta dentro de Biblioteca a **Documentos**, **Configuración** y **Accesos**, mostrando las opciones que Moodle permite al usuario. Documentos abre sus recursos; Configuración permite modificar la colección y Accesos abre Participantes para gestionar destinatarios, matrículas y grupos. Se retiran de esta barra las herramientas académicas como calificaciones e informes; los cursos de formación conservan su navegación normal. El plugin adapta los nodos mediante el hook `secondary_extend`, sin alterar roles, permisos ni archivos del core.

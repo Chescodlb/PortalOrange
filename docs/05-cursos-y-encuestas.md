@@ -4,7 +4,7 @@ Los cursos, evaluaciones, calificaciones y encuestas utilizan Moodle estándar. 
 
 ## Crear un curso
 
-1. Abrir **Administración > Cursos > Administrar cursos y categorías > Cursos**.
+1. Con `formador.orange`, entrar en **Cursos > Nuevo curso**. Se abre el formulario nativo de Moodle con la categoría actual de Cursos propuesta.
 2. Crear el curso e indicar nombre, descripción y formato.
 3. Activar el seguimiento de finalización en sus ajustes.
 4. En **Participantes > Métodos de matriculación**, añadir cohortes o matricular usuarios individualmente.
@@ -12,7 +12,7 @@ Los cursos, evaluaciones, calificaciones y encuestas utilizan Moodle estándar. 
 
 ## Contenidos y evaluación
 
-Con edición activada, añadir recursos y actividades. Para una evaluación, elegir **Cuestionario**, indicar intentos, nota máxima, nota para aprobar y opciones de revisión. Añadir preguntas desde **Banco de preguntas** o crearlas dentro del cuestionario.
+Con `formador.orange`, pulsar **Editar curso** en la tarjeta del curso de ejemplo. Ese botón activa la edición nativa de Moodle; solo aparece si se tiene permiso para gestionar actividades en ese curso. Con edición activada, añadir recursos y actividades. Para una evaluación, pulsar **Nueva evaluación** en la tarjeta del curso o, dentro del curso, elegir **Cuestionario**, indicar intentos, nota máxima, nota para aprobar y opciones de revisión. Añadir preguntas desde **Banco de preguntas** o crearlas dentro del cuestionario.
 
 El ejemplo usa una pregunta Verdadero/Falso, dos intentos, nota sobre 100 y aprobado con 70. El cálculo de notas y el registro de intentos son los del módulo Cuestionario de Moodle.
 
