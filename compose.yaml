@@ -1,0 +1,45 @@
+services:
+  db:
+    image: mysql:8.4.8
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  web:
+    build: ./docker/php
+    ports:
+      - "127.0.0.1:${MOODLE_PORT:-8080}:80"
+    volumes:
+      - ./moodle:/var/www/html
+      - ./moodledata:/var/moodledata
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      TZ: Europe/Madrid
+
+  cron:
+    build: ./docker/php
+    profiles: ["jobs"]
+    command: ["sh", "-c", "while true; do php /var/www/html/admin/cli/cron.php; sleep 60; done"]
+    volumes:
+      - ./moodle:/var/www/html
+      - ./moodledata:/var/moodledata
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      TZ: Europe/Madrid
+
+volumes:
+  dbdata:

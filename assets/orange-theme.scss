@@ -1,0 +1,17 @@
+// Aplicar en Moove > Avanzado > SCSS en bruto. No modifica archivos del tema.
+body { font-family: Arial, Helvetica, sans-serif; background-color: #f5f5f6; }
+.navbar { background: #111 !important; border-bottom: 3px solid #ff7900; }
+.navbar .nav-link, .navbar .usermenu .dropdown-toggle, .navbar .icon, .navbar .navbar-brand { color: #fff !important; }
+.navbar .primary-navigation .navigation .nav-link:hover,
+.navbar .primary-navigation .navigation .nav-link.active { color: #ffb36d !important; background: transparent; border-bottom-color: #ff7900; }
+.navbar .navbar-brand .logo { max-height: 48px; }
+.navbar .dropdown-menu .icon { color: #222 !important; }
+.navbar .dropdown-menu .dropdown-item { color: #222; }
+.btn-primary { background: #ff7900; color: #111; border-color: #ff7900; font-weight: 700; }
+.btn-primary:hover, .btn-primary:focus { background: #ff9b40; color: #111; border-color: #ff9b40; }
+a { color: #914100; }
+a:hover { color: #663000; }
+#page-header h1 { font-weight: 700; }
+.secondary-navigation .moremenu .nav-link.active { border-bottom-color: #ff7900; }
+body.pagelayout-login #page { background-image: none !important; background-color: #f5f5f6; }
+.login-container { border-top: 5px solid #ff7900; }

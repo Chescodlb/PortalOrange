@@ -1,0 +1,24 @@
+.orange-intro{padding:24px 0 28px;border-bottom:1px solid #dedde0;margin-bottom:24px;max-width:1100px}
+.orange-eyebrow{display:block;font-size:.72rem;font-weight:700;letter-spacing:.12em;color:#6b4a2b;margin-bottom:12px}
+.orange-intro h2{font-size:2.5rem;font-weight:700;color:#171717;margin:0 0 12px;letter-spacing:-.04em}
+.orange-intro p{font-size:1.05rem;color:#61616a;margin:0;max-width:680px}
+.orange-toolbar{display:flex;gap:12px;justify-content:flex-end;margin:16px 0}
+.orange-search{display:flex;gap:12px;align-items:center;margin:24px 0;flex-wrap:wrap}
+.orange-search .form-control{flex:1;min-width:180px}.orange-search .custom-select{width:auto;max-width:100%}
+.orange-layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:32px;align-items:start}
+.orange-sidebar{border:1px solid #dedde0;border-radius:12px;padding:20px;background:#fafafa;max-height:75vh;overflow:auto}
+.orange-sidebar h3{font-size:1rem;font-weight:700;margin-bottom:16px}.orange-tree-all{display:block;margin-bottom:16px}
+.orange-tree-node summary{cursor:pointer;padding:8px 0;font-size:.88rem}.orange-tree-node summary::marker{color:#9d4b00}
+.orange-tree-link{color:#29292d;line-height:1.5;overflow-wrap:anywhere}.orange-tree-link:hover,.orange-tree-link.selected{color:#914100}
+.orange-tree-children{margin-left:12px;padding-left:12px;border-left:1px solid #dedde0}.orange-tree-leaf{padding:7px 0;font-size:.85rem}
+.orange-count{display:inline-block;min-width:24px;padding:1px 6px;margin-left:8px;border-radius:12px;background:#ffe7d1;color:#663000;font-weight:700;font-size:.75rem;text-align:center}
+.orange-result-count{color:#61616a;font-size:.85rem;margin-bottom:20px}.orange-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:20px}
+.orange-card{background:#fff;border:1px solid #dedde0;border-top:4px solid #ff7900;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:12px}
+.orange-card h3{font-size:1.2rem;font-weight:700;line-height:1.4;margin:0}.orange-card h3 a{color:#1d1d20}.orange-card p{font-size:.95rem;color:#61616a;margin:0;line-height:1.6}
+.orange-card-meta{font-size:.75rem;color:#61616a}.orange-card-link{font-size:.9rem;color:#914100;font-weight:700;margin-top:auto;padding-top:12px}
+.orange-card-footer{display:flex;align-items:center;flex-wrap:wrap;gap:10px}.orange-status{font-size:.75rem;font-weight:700;padding:4px 8px;border-radius:4px}
+.orange-status-open{background:#fff0df;color:#873e00}.orange-status-progress{background:#e8effc;color:#244782}.orange-status-closed{background:#e0f3e8;color:#1b6339}
+.orange-reading{font-size:.75rem;color:#61616a}.orange-empty{padding:32px;border:1px dashed #aaa;border-radius:12px;background:#fafafa}
+.orange-notice-content{background:white;padding:28px;border:1px solid #dedde0;border-radius:12px;margin-bottom:24px;line-height:1.7}
+.orange-receipt{font-size:.8rem;color:#61616a;margin-bottom:16px}.orange-admin-links{display:flex;gap:16px;flex-wrap:wrap;margin:20px 0}
+@media(max-width:900px){.orange-layout{grid-template-columns:1fr}.orange-sidebar{max-height:350px}.orange-intro h2{font-size:2rem}}

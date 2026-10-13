@@ -1,0 +1,22 @@
+.env
+.env.*
+!.env.example
+# Moodle y Moove son dependencias. Solo versionamos nuestro plugin local.
+moodle/*
+!moodle/local/
+moodle/local/*
+!moodle/local/orangeportal/
+# La matriz del cliente es material de trabajo local, no código público.
+assets/library-matrix-rows.json
+moodle/local/orangeportal/data/library-matrix-rows.json
+moodledata/
+backups/
+.DS_Store
+*.tgz
+*.zip
+moove-commit.json
+moove-extract/
+node_modules/
+test-results/
+.venv/
+*.log
