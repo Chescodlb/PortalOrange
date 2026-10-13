@@ -33,13 +33,11 @@ class course_creation {
     public static function definition(\core_course\hook\after_form_definition $hook): void {
         $section = self::section();
         if ($section === 'library') {
-            foreach (['fullname' => 'Nombre completo de la colección', 'shortname' => 'Nombre corto de la colección',
-                    'category' => 'Categoría de Biblioteca', 'summary_editor' => 'Descripción de la colección',
-                    'visible' => 'Visibilidad de la colección', 'idnumber' => 'Identificador de la colección',
-                    'overviewfiles_filemanager' => 'Imagen de portada de la colección',
-                    'downloadcontent' => 'Permitir descargar la colección', 'showreports' => 'Mostrar informes de consulta',
-                    'tagshdr' => 'Etiquetas', 'tags' => 'Etiquetas'] as $name => $label) {
+            foreach (['fullname', 'shortname', 'category', 'summary_editor', 'visible', 'idnumber',
+                    'overviewfiles_filemanager', 'downloadcontent', 'showreports', 'tagshdr', 'tags'] as $name) {
                 if ($hook->mform->elementExists($name)) {
+                    $label = in_array($name, ['tagshdr', 'tags']) ? get_string('tags', 'tag') :
+                        get_string('collection_' . $name, 'local_orangeportal');
                     $hook->mform->getElement($name)->setLabel($label);
                     if (in_array($name, ['fullname', 'shortname', 'category', 'summary_editor', 'visible',
                             'idnumber', 'overviewfiles_filemanager', 'downloadcontent', 'showreports'])) {
@@ -88,20 +86,14 @@ class course_creation {
         $section = self::section();
         if (!$section) { return; }
         $library = $section === 'library';
-        $title = $library ? 'Crear una nueva colección documental' : get_string('addnewcourse');
+        $title = $library ? get_string('createcollection', 'local_orangeportal') : get_string('addnewcourse');
         $PAGE->set_secondary_navigation(false);
         $PAGE->set_primary_active_tab('orange_' . $section);
         $PAGE->navbar->ignore_active();
         $PAGE->navbar->children = [];
         // Moodle always prepends its navigation root, even when active nodes are ignored.
         // Replace that root for this page instead of adding a misleading home link.
-        $root = native_categories::root($section);
-        $navigation = $PAGE->navigation;
-        $navigation->initialise();
-        $navigation->text = $library ? 'Biblioteca' : 'Cursos';
-        $navigation->shorttext = $navigation->text;
-        $navigation->action = new \moodle_url('/local/orangeportal/index.php',
-            ['section' => $section, 'category' => $root->id]);
+        breadcrumb::root($section);
         $PAGE->navbar->add($title);
         if ($library) {
             $PAGE->set_title($title);
@@ -115,8 +107,8 @@ class course_creation {
         if (!$section) { return; }
         $data = $hook->get_data();
         if (!isset(self::options($section)[(int)($data['category'] ?? 0)])) {
-            $hook->add_errors(['category' => 'Selecciona una categoría de ' .
-                ($section === 'library' ? 'Biblioteca' : 'Cursos') . ' en la que puedas crear contenido.']);
+            $hook->add_errors(['category' => get_string('invalidcreationcategory', 'local_orangeportal',
+                get_string($section, 'local_orangeportal'))]);
         }
     }
 }

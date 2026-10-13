@@ -62,38 +62,89 @@ try {
   };
   const nav = () => evaluate(`Array.from(document.querySelectorAll('.primary-navigation .nav-link')).filter(x=>x.textContent.trim()!=='').map(x=>x.textContent.trim()).filter(x=>!['Más','More'].includes(x))`);
   await send('Page.enable'); await send('Runtime.enable');
-  if (process.argv.includes('--creation-only')) {
+  if (process.argv.includes('--breadcrumb-only') || process.argv.includes('--breadcrumb-management-only')) {
+    if (!process.argv.includes('--breadcrumb-management-only')) {
     await login('formador.orange', env.ORANGE_DEMO_PASSWORD);
-    for (const section of ['library', 'courses']) {
-      await navigate('/local/orangeportal/index.php?section=' + section);
-      const target = await evaluate(`document.querySelector('.orange-create-course').href`);
-      await navigate(target);
-      await wait(`!!document.querySelector('#id_fullname')`);
-      if (section === 'library') {
-        await wait(`Array.from(document.querySelectorAll('h1,h2,h3')).some(h=>h.textContent.trim()==='Crear una nueva colección documental')`);
-        check(await evaluate(`document.querySelector('label[for="id_fullname"]').textContent.includes('colección')`), 'Biblioteca: nombres de colección en formulario');
-        check(await evaluate(`document.title.includes('colección')`), 'Biblioteca: título de colección');
-        check(await evaluate(`!(/\\bcurso(s)?\\b/i.test(document.querySelector('form.mform').innerText))`), 'Biblioteca: formulario sin términos de curso');
-        check(await evaluate(`!document.querySelector('select[name="showgrades"]') && !document.querySelector('select[name="enablecompletion"]') && !document.querySelector('[data-formatchooser-field="selector"]')`), 'Biblioteca: sin controles académicos');
-        check(await evaluate(`document.querySelector('input[name="format"]').value==='topics' && document.querySelector('input[name="enablecompletion"]').value==='0'`), 'Biblioteca: valores documentales nativos');
-      } else {
-        check(await evaluate(`Array.from(document.querySelectorAll('h1,h2,h3')).some(h=>h.textContent.includes('Crear un nuevo curso'))`), 'Cursos conserva el título de curso');
+    for (const language of ['es', 'en']) {
+      for (const section of ['library', 'courses']) {
+        await navigate('/local/orangeportal/index.php?section=' + section + '&lang=' + language);
+        const courseurl = await evaluate(`document.querySelector('.orange-card-link[href*="/course/view.php"]').href`);
+        const courseid = new URL(courseurl).searchParams.get('id');
+        await navigate(courseurl + '&lang=' + language);
+        const activityurl = await evaluate(`Array.from(document.querySelectorAll('a[href*="/mod/"]')).find(a=>a.href.includes(${JSON.stringify(section === 'courses' ? '/mod/quiz/view.php' : '/mod/page/view.php')}))?.href`);
+        check(!!activityurl, section + ': actividad nativa disponible para prueba');
+        const paths = [courseurl, '/course/edit.php?id=' + courseid, '/user/index.php?id=' + courseid, activityurl];
+        for (const path of paths) {
+          await navigate(path + '&lang=' + language);
+          const items = await evaluate(`Array.from(document.querySelectorAll('.breadcrumb li')).map(li=>({text:li.textContent.trim(),href:li.querySelector('a')?.href || ''}))`);
+          const label = language === 'es' ? (section === 'library' ? 'Biblioteca' : 'Cursos') : (section === 'library' ? 'Library' : 'Courses');
+          check((items.length === 0 && path !== activityurl) || (items.length > 0 && items[0].text === label && items[0].href.includes('section=' + section) &&
+            !items.some(item=>['Página Principal','Home'].includes(item.text))), language + ' / ' + section + ': raíz correcta en ' + new URL(path, base).pathname);
+          if (path === activityurl) {
+            check(items.some(item=>item.href.includes('/course/view.php?id=' + courseid)), language + ' / ' + section + ': conserva enlace al curso en actividad');
+            check(items.length >= 3, language + ' / ' + section + ': conserva ruta nativa de actividad');
+            await screenshot('breadcrumb-' + section + '-' + language);
+          }
+        }
+        await navigate('/local/orangeportal/add_document.php?lang=' + language);
+        const documentcrumb = await evaluate(`Array.from(document.querySelectorAll('.breadcrumb li')).map(li=>li.textContent.trim())`);
+        check(documentcrumb[0] === (language === 'es' ? 'Biblioteca' : 'Library'), language + ': nuevo documento empieza en Biblioteca');
       }
-      check(await evaluate(`!document.querySelector('.secondary-navigation .nav-link')`), section + ': sin barra Categoría/Más');
-      check(await evaluate(`!document.querySelector('.breadcrumb')?.textContent.includes('Administrar cursos y categorías')`), section + ': ruta sin administración de categorías');
-      const breadcrumb = await evaluate(`Array.from(document.querySelectorAll('.breadcrumb li')).map(li=>({text:li.textContent.trim(), href:li.querySelector('a')?.href || ''}))`);
-      const sectionLabel = section === 'library' ? 'Biblioteca' : 'Cursos';
-      check(breadcrumb.length === 2 && breadcrumb[0].text === sectionLabel &&
-        breadcrumb[0].href.includes('section=' + section) && !breadcrumb.some(item=>item.text.includes('Página Principal')),
-        section + ': breadcrumb empieza en la sección correcta');
-      await navigate(breadcrumb[0].href);
-      check(await evaluate(`location.pathname==='/local/orangeportal/index.php' && new URLSearchParams(location.search).get('section')===${JSON.stringify(section)}`), section + ': enlace del breadcrumb vuelve a su sección');
-      await navigate(target);
-      await wait(`!!document.querySelector('#id_fullname')`);
-      check(await evaluate(`!!document.querySelector('.primary-navigation .nav-link.active[href*="section=${section}"]')`), section + ': menú principal activo');
-      const options = await evaluate(`Array.from(document.querySelectorAll('select[name="category"] option')).filter(o=>o.value && o.value!=='0').map(o=>o.textContent)`);
-      check(options.length > 0 && options.every(t=>t.includes(section === 'library' ? 'Biblioteca' : 'Cursos')), section + ': categorías de su sección');
-      await screenshot('crear-' + section);
+    }
+    await logout();
+    }
+    await login(env.MOODLE_ADMIN_USER || 'admin', env.MOODLE_ADMIN_PASSWORD);
+    for (const section of ['library', 'courses', 'incidents', 'notifications']) {
+      await navigate('/local/orangeportal/categories.php?kind=' + section + '&lang=es');
+      const rootlink = await evaluate(`document.querySelector('.breadcrumb a')?.href || ''`);
+      check(rootlink.includes('section=' + section), section + ': gestión de categorías vuelve a su sección');
+    }
+    for (const section of ['incidents', 'notifications']) {
+      await navigate('/local/orangeportal/manage.php?kind=' + section + '&lang=es');
+      const rootlink = await evaluate(`document.querySelector('.breadcrumb a')?.href || ''`);
+      check(rootlink.includes('section=' + section), section + ': gestión de publicaciones vuelve a su sección');
+    }
+    await navigate('/local/orangeportal/reports.php?lang=es');
+    const reportcrumb = await evaluate(`document.querySelector('.breadcrumb li')?.textContent.trim()`);
+    check(reportcrumb === 'Administración', 'Resultados empieza en Administración');
+    console.log('Verificaciones de breadcrumbs: ' + results.length);
+  } else if (process.argv.includes('--creation-only') || process.argv.includes('--creation-languages')) {
+    await login('formador.orange', env.ORANGE_DEMO_PASSWORD);
+    for (const language of (process.argv.includes('--creation-languages') ? ['es', 'en'] : ['es'])) {
+      const collectionTitle = language === 'es' ? 'Crear una nueva colección documental' : 'Create a new document collection';
+      const collectionWord = language === 'es' ? 'colección' : 'Collection';
+      const courseTitle = language === 'es' ? 'Crear un nuevo curso' : 'Add a new course';
+      for (const section of ['library', 'courses']) {
+        await navigate('/local/orangeportal/index.php?section=' + section + '&lang=' + language);
+        const target = await evaluate(`document.querySelector('.orange-create-course').href`) + '&lang=' + language;
+        await navigate(target);
+        await wait(`!!document.querySelector('#id_fullname')`);
+        if (section === 'library') {
+          await wait(`Array.from(document.querySelectorAll('h1,h2,h3')).some(h=>h.textContent.trim()===${JSON.stringify(collectionTitle)})`);
+          check(await evaluate(`document.querySelector('label[for="id_fullname"]').textContent.includes(${JSON.stringify(collectionWord)})`), 'Biblioteca: nombres de colección en formulario');
+          check(await evaluate(`document.title.includes(${JSON.stringify(collectionTitle)})`), 'Biblioteca: título de colección');
+          check(await evaluate(`!(/\\bcurso(s)?\\b/i.test(document.querySelector('form.mform').innerText))`), 'Biblioteca: formulario sin términos de curso');
+          check(await evaluate(`!document.querySelector('select[name="showgrades"]') && !document.querySelector('select[name="enablecompletion"]') && !document.querySelector('[data-formatchooser-field="selector"]')`), 'Biblioteca: sin controles académicos');
+          check(await evaluate(`document.querySelector('input[name="format"]').value==='topics' && document.querySelector('input[name="enablecompletion"]').value==='0'`), 'Biblioteca: valores documentales nativos');
+        } else {
+          check(await evaluate(`Array.from(document.querySelectorAll('h1,h2,h3')).some(h=>h.textContent.includes(${JSON.stringify(courseTitle)}))`), 'Cursos conserva el título de curso');
+        }
+        check(await evaluate(`!document.querySelector('.secondary-navigation .nav-link')`), section + ': sin barra Categoría/Más');
+        check(await evaluate(`!document.querySelector('.breadcrumb')?.textContent.includes('Administrar cursos y categorías')`), section + ': ruta sin administración de categorías');
+        const breadcrumb = await evaluate(`Array.from(document.querySelectorAll('.breadcrumb li')).map(li=>({text:li.textContent.trim(), href:li.querySelector('a')?.href || ''}))`);
+        const sectionLabel = language === 'es' ? (section === 'library' ? 'Biblioteca' : 'Cursos') : (section === 'library' ? 'Library' : 'Courses');
+        check(breadcrumb.length === 2 && breadcrumb[0].text === sectionLabel &&
+          breadcrumb[0].href.includes('section=' + section) && !breadcrumb.some(item=>item.text.includes('Página Principal')),
+          section + ': breadcrumb empieza en la sección correcta');
+        await navigate(breadcrumb[0].href);
+        check(await evaluate(`location.pathname==='/local/orangeportal/index.php' && new URLSearchParams(location.search).get('section')===${JSON.stringify(section)}`), section + ': enlace del breadcrumb vuelve a su sección');
+        await navigate(target);
+        await wait(`!!document.querySelector('#id_fullname')`);
+        check(await evaluate(`!!document.querySelector('.primary-navigation .nav-link.active[href*="section=${section}"]')`), section + ': menú principal activo');
+        const options = await evaluate(`Array.from(document.querySelectorAll('select[name="category"] option')).filter(o=>o.value && o.value!=='0').map(o=>o.textContent)`);
+        check(options.length > 0 && options.every(t=>t.includes(section === 'library' ? 'Biblioteca' : 'Cursos')), section + ': categorías de su sección');
+        await screenshot('crear-' + section + '-' + language);
+      }
     }
     console.log('Verificaciones de creación: ' + results.length);
   } else if (process.argv.includes('--navigation-only')) {

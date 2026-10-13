@@ -7,7 +7,8 @@ $category = optional_param('category', 0, PARAM_INT);
 $query = optional_param('q', '', PARAM_TEXT);
 $status = optional_param('state', '', PARAM_ALPHA);
 $pending = optional_param('pending', 0, PARAM_BOOL);
-$titles = ['library' => 'Biblioteca', 'courses' => 'Cursos', 'incidents' => 'Incidencias', 'notifications' => 'Notificaciones'];
+$titles = array_combine(['library', 'courses', 'incidents', 'notifications'], array_map(
+    fn($key) => get_string($key, 'local_orangeportal'), ['library', 'courses', 'incidents', 'notifications']));
 if (!isset($titles[$section])) { throw new invalid_parameter_exception('Sección desconocida'); }
 $url = orange_link('index.php', ['section' => $section, 'category' => $category, 'q' => $query,
     'state' => $status, 'pending' => $pending]);
@@ -42,7 +43,7 @@ if (in_array($section, ['library', 'courses'])) {
             $actions .= html_writer::link(new moodle_url('/course/edit.php', ['category' => $destination,
                 'returnto' => 'url', 'returnurl' => orange_link('index.php', ['section' => $section])->out(false),
                 'sesskey' => sesskey()]),
-                $section === 'library' ? 'Nueva colección documental' : 'Nuevo curso',
+                get_string($section === 'library' ? 'newcollection' : 'newcourse', 'local_orangeportal'),
                 ['class' => 'btn btn-primary orange-create-course']);
         }
     }

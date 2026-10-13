@@ -48,3 +48,9 @@ La opción activa tiene fondo naranja suave, texto en negrita y subrayado naranj
 **Gestionar categorías** contiene cuatro opciones: **Biblioteca, Cursos, Incidencias y Notificaciones**, según permisos. Todas abren un formulario dentro del portal con Nombre, Categoría superior y Guardar categoría. Cada opción muestra únicamente su listado y sus posibles categorías superiores. La opción activa se remarca en naranja. No se añade la barra secundaria de gestión general de Moodle.
 
 Biblioteca y Cursos conservan sus categorías nativas: el formulario usa las APIs de Moodle para crear, renombrar y mover, y exige `moodle/category:manage` en la raíz correspondiente. Este formulario adaptado es necesario porque la gestión nativa completa muestra varias raíces y herramientas de cursos juntas; ese diseño no permite la experiencia separada solicitada. No se duplica la estructura en tablas del plugin.
+
+## Rutas de navegación del portal
+
+Los breadcrumbs de cursos, secciones, actividades y ajustes de formación empiezan en **Cursos**; los de colecciones y recursos documentales empiezan en **Biblioteca**. En inglés usan **Courses** y **Library**. Se conserva el recorrido nativo posterior, incluido el curso, la sección y la actividad cuando Moodle y el tema los muestran.
+
+El plugin determina la sección por la categoría raíz y adapta el nodo raíz de navegación de la página. El primer enlace abre la sección correspondiente, en lugar de «Página Principal» y su redirección a Biblioteca. Las páginas propias de documentos, publicaciones y gestión de categorías usan la misma regla. Las páginas generales de administración ajenas a esas secciones conservan la navegación de Moodle. No se modifica el core ni el tema.

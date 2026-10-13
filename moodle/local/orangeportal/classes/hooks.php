@@ -23,6 +23,7 @@ class hooks {
         require_once($CFG->dirroot . '/local/orangeportal/locallib.php');
         foreach (['library' => 'Biblioteca', 'courses' => 'Cursos', 'incidents' => 'Incidencias',
                 'notifications' => 'Notificaciones'] as $section => $label) {
+            $label = get_string($section, 'local_orangeportal');
             if (in_array($section, ['library', 'courses'])) {
                 $rootid = (int)get_config('local_orangeportal', $section == 'library' ? 'librarycategory' : 'coursescategory');
                 $tree = orange_library_tree($rootid, 0, orange_native_courses($rootid), $section);
@@ -50,6 +51,7 @@ class hooks {
         }
         foreach (['library' => 'Biblioteca', 'courses' => 'Cursos', 'incidents' => 'Incidencias',
                 'notifications' => 'Notificaciones'] as $key => $label) {
+            $label = get_string($key, 'local_orangeportal');
             $nav->add($label, new \moodle_url('/local/orangeportal/index.php', ['section' => $key]),
                 \navigation_node::TYPE_CUSTOM, null, 'orange_' . $key);
         }
@@ -65,7 +67,7 @@ class hooks {
             $adminpath = has_capability('moodle/site:config', \context_system::instance()) ? '/admin/search.php' :
                 (has_capability('local/orangeportal:manage', \context_system::instance()) ?
                     '/local/orangeportal/manage.php' : '/local/orangeportal/reports.php');
-            $nav->add('Administración', new \moodle_url($adminpath),
+            $nav->add(get_string('administration'), new \moodle_url($adminpath),
                 \navigation_node::TYPE_SITE_ADMIN, null, 'siteadminnode');
         }
     }
@@ -83,6 +85,7 @@ class hooks {
         }
         $PAGE->requires->css('/local/orangeportal/styles.css');
         course_creation::presentation();
+        breadcrumb::apply();
         // Error pages may default PAGE->url to the site root; use the actual request.
         $path = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
         if (in_array($path, ['/', '/index.php', '/my/index.php', '/my/'])) {
