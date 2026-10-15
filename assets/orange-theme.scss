@@ -1,6 +1,6 @@
 // Aplicar en Moove > Avanzado > SCSS en bruto. No modifica archivos del tema.
-body { font-family: Arial, Helvetica, sans-serif; background-color: #f5f5f6; }
-.navbar { background: #111 !important; border-bottom: 3px solid #ff7900; }
+body { font-family: Arial, Helvetica, sans-serif; background-color: #f5f5f5; }
+.navbar { background: #000 !important; border-bottom: 3px solid #ff7900; }
 .navbar .nav-link, .navbar .usermenu .dropdown-toggle, .navbar .icon, .navbar .navbar-brand { color: #fff !important; }
 .navbar .primary-navigation .navigation .nav-link:hover,
 .navbar .primary-navigation .navigation .nav-link:focus,
@@ -8,7 +8,7 @@ body { font-family: Arial, Helvetica, sans-serif; background-color: #f5f5f6; }
 .navbar .primary-navigation .navigation .nav-link.orange-nav-open,
 .navbar .primary-navigation .navigation .nav-link[aria-expanded="true"] {
   color: #ff7900 !important;
-  background-color: #111 !important;
+  background-color: #000 !important;
   border-bottom-color: #ff7900 !important;
   box-shadow: inset 0 -3px 0 #ff7900 !important;
 }
@@ -27,13 +27,116 @@ body.path-local-orangeportal .orange-layout { display: block; }
   .navbar .navbar-brand { display: flex !important; margin-left: 8px; }
   .navbar .navbar-brand .logo { max-height: 40px; }
 }
-.navbar .dropdown-menu .icon { color: #222 !important; }
-.navbar .dropdown-menu .dropdown-item { color: #222; }
-.btn-primary { background: #ff7900; color: #111; border-color: #ff7900; font-weight: 700; }
-.btn-primary:hover, .btn-primary:focus { background: #ff9b40; color: #111; border-color: #ff9b40; }
-a { color: #914100; }
-a:hover { color: #663000; }
+.navbar .dropdown-menu .icon { color: #000 !important; }
+.navbar .dropdown-menu .dropdown-item { color: #000; }
+.btn-primary { background: #ff7900; color: #000; border-color: #ff7900; font-weight: 700; }
+.btn-primary:hover, .btn-primary:focus { background: #000; color: #fff; border-color: #000; }
+a { color: #000; }
+a:hover { color: #000; }
 #page-header h1 { font-weight: 700; }
 .secondary-navigation .moremenu .nav-link.active { border-bottom-color: #ff7900; }
-body.pagelayout-login #page { background-image: none !important; background-color: #f5f5f6; }
-.login-container { border-top: 5px solid #ff7900; }
+body.pagelayout-login #page { background-image: none !important; background-color: #f5f5f5; }
+
+
+// Paleta web común. Azul y verde se reservan para estados funcionales.
+:root {
+  --orange-brand: #ff7900;
+  --orange-ink: #000000;
+  --orange-text: #242424;
+  --orange-muted: #595959;
+  --orange-border: #dedde0;
+  --orange-surface: #ffffff;
+  --orange-surface-muted: #f5f5f5;
+  --orange-progress-bg: #e8effc;
+  --orange-progress-ink: #244782;
+  --orange-closed-bg: #e0f3e8;
+  --orange-closed-ink: #1b6339;
+}
+body[class] { background-color: var(--orange-surface-muted) !important; color: var(--orange-text); }
+body a { color: var(--orange-ink); }
+body a:hover, body a:focus-visible {
+  color: var(--orange-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--orange-brand);
+  text-underline-offset: 3px;
+}
+.navbar .nav-link, .navbar .dropdown-item { text-decoration: none; }
+.btn-primary:not(:disabled):not(.disabled):active,
+.btn-primary.active, .show > .btn-primary.dropdown-toggle {
+  background-color: var(--orange-ink); border-color: var(--orange-ink); color: var(--orange-surface);
+}
+.btn-primary:focus-visible { outline: 2px solid var(--orange-ink); outline-offset: 2px; box-shadow: none; }
+.btn-outline-secondary { color: var(--orange-text); border-color: var(--orange-muted); }
+.btn-outline-secondary:hover { background-color: var(--orange-ink); border-color: var(--orange-ink); color: var(--orange-surface); }
+
+// 1. Acceso: logo proporcionado, sin franja en el contenedor de ancho completo.
+#page-login-index .login-container { border-top: 0; }
+#page-login-index .login-container .loginform {
+  width: 100%; max-width: 440px; padding: 32px;
+  border: 1px solid var(--orange-border); border-top: 4px solid var(--orange-brand);
+  border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.08);
+}
+#page-login-index .login-container .loginform.hastwocolumns { max-width: 880px; }
+#page-login-index #loginlogo { display: flex; justify-content: center; margin-bottom: 24px; }
+#page-login-index #loginlogo #logoimage { width: 112px; height: auto; max-width: 100%; }
+@media (max-width: 575px) {
+  #page-login-index .login-container .loginform { padding: 24px; }
+  #page-login-index #loginlogo #logoimage { width: 96px; }
+}
+
+// 2. Pie: ocultar bloques sin enlaces y el crédito visual; conservar soporte y sesión.
+#page-footer { background-color: var(--orange-ink); color: var(--orange-surface); }
+#page-footer .contact:not(:has(a)), #page-footer .socialnetworks:not(:has(a)),
+#page-footer .column-left:not(:has(a)), #page-footer .column-right:not(:has(a)),
+#page-footer .copyright { display: none; }
+#page-footer .footer-columns { padding-top: 24px; padding-bottom: 24px; }
+#page-footer .footer-columns > .row { justify-content: center; }
+#page-footer .column-center { flex: 1 1 360px; max-width: 100%; text-align: center; }
+
+// 3. Las cuatro secciones comparten ancho; los cursos nativos conservan su diseño.
+html { scrollbar-gutter: stable; }
+body#page-local-orangeportal-index #page.drawers .main-inner {
+  width: 100%; max-width: none; box-sizing: border-box;
+}
+body#page-local-orangeportal-index .orange-intro,
+body#page-local-orangeportal-index .orange-intro p { width: 100%; max-width: none; }
+
+// 4. Componentes del portal: superficies neutras y acentos de marca.
+body .orange-intro h2, body .orange-eyebrow,
+body .orange-card h3 a, body .orange-card-link,
+body .orange-incident-title, body .orange-notification-title { color: var(--orange-ink); }
+body .orange-intro p, body .orange-card p, body .orange-card-meta,
+body .orange-result-count, body .orange-reading, body .orange-receipt,
+body .orange-incident-summary, body .orange-menu-empty { color: var(--orange-muted); }
+body .orange-count { background: var(--orange-brand); color: var(--orange-ink); }
+body .orange-tree-link, body .orange-tree-link.selected,
+body .orange-nav-panel .orange-tree-link, body .orange-nav-panel .orange-tree-all {
+  color: var(--orange-ink);
+}
+body .orange-tree-node summary::marker { color: var(--orange-brand); }
+body .orange-nav-panel a:focus-visible, body .orange-nav-panel summary:focus-visible,
+body .orange-admin-link:focus-visible, body .orange-incident-title:focus-visible,
+body .orange-notification-title:focus-visible, body .orange-table-scroll:focus-visible {
+  outline-color: var(--orange-ink);
+}
+body .orange-admin-link { color: var(--orange-muted); }
+body .orange-admin-link:hover, body .orange-admin-link.active {
+  background: var(--orange-surface-muted); color: var(--orange-ink);
+}
+body .orange-notices-table th { background: var(--orange-surface-muted); color: var(--orange-ink); }
+body .orange-notices-table tbody tr:hover, body .orange-notices-table tbody tr:focus-within {
+  background: var(--orange-surface-muted);
+}
+body .orange-status { background: var(--orange-surface-muted); color: var(--orange-ink); }
+body .orange-status-open { background: var(--orange-brand); color: var(--orange-ink); }
+body .orange-status-progress { background: var(--orange-progress-bg); color: var(--orange-progress-ink); }
+body .orange-status-closed { background: var(--orange-closed-bg); color: var(--orange-closed-ink); }
+body .orange-incident-draft { color: var(--orange-muted); }
+
+// Moove fuerza este bloque a display:block!important en su CSS generado.
+body #page-footer .copyright { display: none !important; }
+body .btn-link { color: var(--orange-ink); }
+body .btn-link:hover, body .btn-link:focus { color: var(--orange-ink); text-decoration: underline; text-decoration-color: var(--orange-brand); }
+#page-footer .footer-columns .btn-link { color: var(--orange-surface); }
+#page-login-index .loginform .d-flex.mt-2 { flex-wrap: wrap; align-items: center; gap: 8px; }
+#page-login-index .loginform .d-flex.mt-2 > .btn-link { padding: 0; white-space: nowrap; }

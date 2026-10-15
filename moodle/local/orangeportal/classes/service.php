@@ -45,12 +45,12 @@ class service {
     public static function receipt(\stdClass $notice, string $stage): ?\stdClass {
         global $DB, $USER;
         self::require_view($notice);
-        // A manager's preview must never count as delivery to a recipient.
-        if (!self::can_view($notice, (int)$USER->id, false)) {
-            return null;
-        }
         if (!in_array($stage, ['received', 'readtime', 'confirmed'])) {
             throw new \coding_exception('Invalid receipt stage');
+        }
+        // Managers can record their own view, but delivery and confirmation require assignment.
+        if ($stage !== 'readtime' && !self::can_view($notice, (int)$USER->id, false)) {
+            return null;
         }
         $factory = \core\lock\lock_config::get_lock_factory('local_orangeportal');
         $lock = $factory->get_lock('notice_' . $notice->id, 10);
@@ -63,17 +63,29 @@ class service {
             if ($current->revision != $notice->revision) {
                 throw new \invalid_parameter_exception('El contenido ha cambiado. Vuelve a abrir el aviso antes de confirmar.');
             }
+            $isrecipient = self::can_view($current, (int)$USER->id, false);
+            if ($stage !== 'readtime' && !$isrecipient) {
+                return null;
+            }
             $r = self::get_receipt($notice, (int)$USER->id);
             if (!$r) {
                 $r = (object)['noticeid' => $notice->id, 'userid' => $USER->id, 'revision' => $notice->revision,
-                    'received' => time(), 'readtime' => 0, 'confirmed' => 0];
+                    'received' => $isrecipient ? time() : 0, 'readtime' => 0, 'confirmed' => 0];
                 $r->id = $DB->insert_record('local_orange_receipt', $r);
+            }
+            $changed = false;
+            if ($isrecipient && !$r->received) {
+                $r->received = time();
+                $changed = true;
             }
             if (!$r->$stage) {
                 $r->$stage = time();
+                $changed = true;
                 if ($stage == 'confirmed' && !$r->readtime) {
                     $r->readtime = time();
                 }
+            }
+            if ($changed) {
                 $DB->update_record('local_orange_receipt', $r);
             }
             return $r;

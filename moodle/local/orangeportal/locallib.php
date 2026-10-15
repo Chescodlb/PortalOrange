@@ -63,6 +63,32 @@ function orange_category_options(string $kind): array {
     };
     return $walk(0);
 }
+/** Category name and a compact ancestor path for administrative tables. */
+function orange_category_label(int $id, array $categories): string {
+    if (!isset($categories[$id])) { return ''; }
+    $category = $categories[$id];
+    $ancestors = [];
+    $visited = [$id => true];
+    $parent = (int)$category->parentid;
+    while ($parent && isset($categories[$parent]) && !isset($visited[$parent])) {
+        $visited[$parent] = true;
+        array_unshift($ancestors, $categories[$parent]->name);
+        $parent = (int)$categories[$parent]->parentid;
+    }
+    $label = html_writer::tag('strong', s($category->name), ['class' => 'orange-category-name']);
+    if (!$ancestors) { return $label; }
+    $fullpath = implode(' › ', $ancestors);
+    $truncated = count($ancestors) > 2;
+    $shortpath = ($truncated ? '… › ' : '') . implode(' › ', array_slice($ancestors, -2));
+    $attrs = ['class' => 'orange-category-path'];
+    $path = s($shortpath);
+    if ($truncated) {
+        $attrs += ['tabindex' => '0', 'aria-label' => $fullpath];
+        $path = html_writer::span($path, '', ['aria-hidden' => 'true']) .
+            html_writer::span(s($fullpath), 'orange-category-fullpath', ['aria-hidden' => 'true']);
+    }
+    return $label . html_writer::tag('span', $path, $attrs);
+}
 function orange_native_courses(int $rootid): array {
     global $DB, $USER;
     if (!$rootid || !$root = $DB->get_record('course_categories', ['id' => $rootid])) { return []; }

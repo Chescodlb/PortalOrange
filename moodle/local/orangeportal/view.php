@@ -28,7 +28,7 @@ echo html_writer::link(orange_link('index.php', ['section' => $notice->kind]), g
 echo orange_intro($category->name, $notice->title, get_string('noticeversiondate', 'local_orangeportal', (object)['version' => $notice->revision,
     'date' => userdate($notice->timecreated, '%d/%m/%Y')]));
 echo html_writer::div(format_text($notice->content, FORMAT_HTML, ['context' => context_system::instance()]), 'orange-notice-content');
-if ($receipt) {
+if ($receipt && service::can_view($notice, (int)$USER->id, false)) {
     echo html_writer::div(get_string('receiptdates', 'local_orangeportal', (object)['received' => userdate($receipt->received), 'read' => userdate($receipt->readtime)]), 'orange-receipt');
     echo $receipt->confirmed ? $OUTPUT->notification(get_string('confirmedon', 'local_orangeportal', userdate($receipt->confirmed)), 'success') :
         orange_post_button($url, get_string('confirmreading', 'local_orangeportal'), ['action' => 'confirm', 'revision' => $notice->revision]);

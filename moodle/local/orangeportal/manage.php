@@ -45,9 +45,9 @@ if ($form) { $form->display(); } else {
     echo html_writer::link(orange_link('manage.php', ['kind' => $kind, 'new' => 1]), get_string('createpublication', 'local_orangeportal'), ['class' => 'btn btn-primary']);
     $table = new html_table();
     $table->head = [get_string('noticetitle', 'local_orangeportal'), get_string('category'), get_string('publication', 'local_orangeportal'), get_string('incidentcolumnstate', 'local_orangeportal'), get_string('actions')];
-    $categories = orange_category_options($kind);
+    $categories = $DB->get_records('local_orange_category', ['kind' => $kind]);
     foreach ($DB->get_records('local_orange_notice', ['kind' => $kind], 'timecreated DESC') as $n) {
-        $table->data[] = [s($n->title), s($categories[$n->categoryid] ?? ''), $n->published ? get_string('published', 'local_orangeportal') : get_string('draft', 'local_orangeportal'),
+        $table->data[] = [s($n->title), orange_category_label((int)$n->categoryid, $categories), $n->published ? get_string('published', 'local_orangeportal') : get_string('draft', 'local_orangeportal'),
             s(service::states()[$n->state]), html_writer::link(orange_link('manage.php', ['kind' => $kind, 'id' => $n->id]), get_string('edit')) .
             ' · ' . html_writer::link(orange_link('view.php', ['id' => $n->id]), get_string('viewnotice', 'local_orangeportal'))];
     }

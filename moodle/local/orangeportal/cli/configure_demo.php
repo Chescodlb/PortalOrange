@@ -249,7 +249,7 @@ if (!$fs->get_file($context->id, 'theme_moove', 'logo', 0, '/', 'orange-logo.png
     set_config('logo', '/orange-logo.png', 'theme_moove');
 }
 set_config('brandcolor', '#FF7900', 'theme_moove');
-set_config('secondarymenucolor', '#111111', 'theme_moove');
+set_config('secondarymenucolor', '#000000', 'theme_moove');
 set_config('scss', file_get_contents($assetdir . '/orange-theme.scss'), 'theme_moove');
 set_config('fontsite', 'Moodle', 'theme_moove');
 set_config('displaymarketingbox', 0, 'theme_moove');

@@ -50,6 +50,9 @@
 .orange-incident-draft{display:block;color:#873e00;font-size:.75rem;font-weight:700;margin-top:4px}
 
 .orange-notifications-table{min-width:600px}
+.orange-notification-heading,.orange-incident-heading{display:flex;align-items:flex-start;justify-content:flex-start;gap:12px;text-align:left}
+.orange-notification-heading>div,.orange-incident-heading>div{min-width:0;flex:1}
+.orange-notification-envelope,.orange-incident-icon{display:block;width:28px;height:28px;flex:0 0 28px;margin:0}
 
 .orange-filter-field{display:flex;flex-direction:column;gap:4px;max-width:100%;min-width:0}
 .orange-filter-field label{font-size:.8rem;font-weight:700;margin:0}
@@ -71,3 +74,11 @@
 body.orange-wide-listing #page.drawers .main-inner{width:100%;max-width:none;box-sizing:border-box}
 body.orange-wide-listing .orange-intro,
 body.orange-wide-listing .orange-intro p{width:100%;max-width:none;box-sizing:border-box}
+
+/* Shared compact ancestor paths in incident and notification tables. */
+.orange-category-name{display:block;overflow-wrap:anywhere}
+.orange-category-path{display:block;position:relative;width:fit-content;max-width:100%;margin-top:4px;font-size:.8rem;color:#595959;overflow-wrap:anywhere}
+.orange-category-path[tabindex]{cursor:help}
+.orange-category-path:focus-visible{outline:2px solid #000;outline-offset:3px}
+.orange-category-fullpath{display:none;position:absolute;top:100%;left:0;z-index:10;width:max-content;max-width:min(28rem,70vw);padding:8px 12px;background:#000;color:#fff;border-radius:4px;box-shadow:0 2px 6px #0003}
+.orange-category-path:hover .orange-category-fullpath,.orange-category-path:focus .orange-category-fullpath{display:block}

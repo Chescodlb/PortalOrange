@@ -23,3 +23,5 @@ El panel Orange reúne enlaces y un resumen por curso; no sustituye el libro de 
 La tabla de avisos muestra cada destinatario actual y sus fechas de recibido, leído y confirmado. Quienes todavía no han abierto el portal aparecen como Pendiente. Pulsar el título limita la consulta a esa publicación y muestra su histórico por versión.
 
 Las lecturas históricas siguen disponibles aunque el usuario deje de pertenecer al colectivo. La tabla principal usa destinatarios actuales; el histórico usa las lecturas efectivamente registradas. Los datos de confirmación y cambio de estado se gestionan también mediante las herramientas de privacidad de Moodle.
+
+Las vistas personales de responsables sin asignación se guardan en `local_orange_receipt` con `readtime`, dejando `received` y `confirmed` a cero. Pueden aparecer en el histórico de la versión, pero no añaden destinatarios a la tabla principal. No se crean tablas ni campos nuevos. Si posteriormente se asigna la publicación al responsable, se reutiliza su registro individual de esa versión y la recepción y confirmación siguen sus pasos habituales.

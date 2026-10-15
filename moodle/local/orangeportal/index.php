@@ -172,9 +172,23 @@ if (in_array($section, ['library', 'courses'])) {
         if (!$notice->published) {
             $title .= html_writer::span(get_string('incidentdraft', 'local_orangeportal'), 'orange-incident-draft');
         }
-        $cells = html_writer::tag('td', $title . html_writer::div(
-            s(shorten_text(strip_tags($notice->content), 120)), 'orange-incident-summary'));
-        $cells .= html_writer::tag('td', s($cats[$notice->categoryid]->name));
+        $titlecontent = $title . html_writer::div(
+            s(shorten_text(strip_tags($notice->content), 120)), 'orange-incident-summary');
+        if (in_array($section, ['incidents', 'notifications'])) {
+            $isread = $receipt && ($receipt->readtime || $receipt->confirmed);
+            $iconname = $section === 'incidents' ? 'incident' : 'envelope';
+            $readingicon = $section === 'incidents' && $isread ?
+                html_writer::span('', 'orange-incident-icon', ['aria-hidden' => 'true']) :
+                html_writer::empty_tag('img', [
+                'src' => $OUTPUT->image_url($iconname . ($isread ? '-read' : '-unread'), 'local_orangeportal'),
+                'alt' => '', 'aria-hidden' => 'true', 'width' => 28, 'height' => 28,
+                'class' => $section === 'incidents' ? 'orange-incident-icon' : 'orange-notification-envelope',
+            ]);
+            $titlecontent = html_writer::div($readingicon . html_writer::div($titlecontent),
+                $section === 'incidents' ? 'orange-incident-heading' : 'orange-notification-heading');
+        }
+        $cells = html_writer::tag('td', $titlecontent);
+        $cells .= html_writer::tag('td', orange_category_label((int)$notice->categoryid, $cats));
         $cells .= html_writer::tag('td', s(userdate($notice->timecreated, '%d/%m/%Y')));
         if ($section === 'incidents') {
             $cells .= html_writer::tag('td', s(service::impacts()[$notice->impact]));
@@ -183,7 +197,11 @@ if (in_array($section, ['library', 'courses'])) {
         }
         $readingkey = $receipt && $receipt->confirmed ? 'incidentconfirmed' :
             ($receipt && $receipt->readtime ? 'incidentreadpending' : 'incidentunread');
-        $cells .= html_writer::tag('td', get_string($readingkey, 'local_orangeportal'));
+        if ($receipt && $receipt->readtime && !service::can_view($notice, (int)$USER->id, false)) {
+            $readingkey = 'managementread';
+        }
+        $readingtext = get_string($readingkey, 'local_orangeportal');
+        $cells .= html_writer::tag('td', $readingtext);
         $rows .= html_writer::tag('tr', $cells);
     }
 }

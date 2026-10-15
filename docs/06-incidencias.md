@@ -29,6 +29,8 @@ La asignación es la unión de los destinatarios: basta pertenecer a uno de los 
 
 La sección **Incidencias** muestra una tabla con título y resumen, categoría, fecha de creación, impacto, estado compartido y situación individual de lectura. Pulsar el título abre el detalle para consultar el aviso, confirmar su lectura o cambiar su estado si se tienen permisos. Los borradores se identifican en el título y solo aparecen para los responsables autorizados.
 
+A la izquierda del título aparece un signo de exclamación naranja solo si el destinatario no ha leído la versión actual. Al abrir la incidencia desaparece el signo, conservando el espacio para mantener los títulos alineados. El icono es informativo y utiliza el registro individual de lectura existente; no representa el impacto ni el estado compartido de la incidencia. La confirmación explícita sigue siendo independiente y el texto de lectura permanece accesible en su columna. No requiere configuración ni nuevos campos en la base de datos: el SVG y su presentación pertenecen al plugin, sin cambios en el core o en Moove.
+
 Se mantienen los filtros de categoría (incluidas subcategorías), búsqueda, estado y pendientes de confirmar, además de los contadores del menú. El filtro **Impacto** permite elegir Normal, Alto o Crítico y combinarlo con los demás filtros; **Todos los impactos** elimina esa restricción. Elegir el impacto y pulsar **Buscar** aplica la selección. **Desde** y **Hasta** filtran por la fecha de creación que se muestra en la tabla: se puede indicar una sola fecha o ambas, incluyendo los días completos según la zona horaria del usuario. Se combinan con categoría, búsqueda, estado, impacto y confirmaciones. Un rango invertido o una fecha inválida muestra un mensaje para corregirlo; los enlaces del árbol lateral conservan los filtros. En pantallas pequeñas la tabla se desplaza horizontalmente dentro del listado; también se puede enfocar con el teclado. Notificaciones utiliza el mismo formato de tabla, con sus columnas de título, categoría, fecha y lectura.
 
 Esta presentación se implementa en `local/orangeportal/index.php` y `styles.css`, con encabezados traducidos en los archivos de idioma del plugin. No existe un ajuste nativo de Moodle para cambiar el listado de este plugin de tarjetas a tabla; no se modifica el core ni el tema Moove.
@@ -43,7 +45,7 @@ Los estados iniciales son Abierta, En seguimiento y Cerrada. Un destinatario con
 
 Si un responsable cambia el título o el contenido, aumenta la versión y se exige una nueva confirmación. Se conservan el texto y las confirmaciones anteriores, consultables desde los informes. Cambiar únicamente el estado no invalida la confirmación de lectura.
 
-Un responsable que abre una vista de gestión sin ser destinatario no se cuenta como receptor ni lector. Un borrador tampoco registra lecturas de destinatarios.
+Un responsable (editor, coordinador o administrador con permiso de gestión) que abre una publicación registra que la ha visto para su propio usuario y versión, aunque no sea destinatario. En su listado aparece **Visto** y desaparece la exclamación. No se añade a los destinatarios ni registra recepción o confirmación por esa vista de gestión. El botón de confirmación se mantiene solo para destinatarios de publicaciones publicadas. Esto también permite registrar la revisión personal de un borrador sin contabilizarlo como entregado.
 
 ## Modificar o retirar
 
@@ -69,3 +71,9 @@ Debe quedar al menos una opción activa por listado. El valor inicial de un avis
 Se conservan los valores iniciales Abierta, En seguimiento, Cerrada y Normal, Alto, Crítico hasta que se modifiquen. Se guardan mediante `get_config`/`set_config` de Moodle, sin editar core ni añadir tablas. No hay un ajuste estándar que defina las opciones de estos avisos personalizados: el CRUD pertenece al plugin. Las confirmaciones de lectura mantienen su funcionamiento actual.
 
 Permisos: `local/orangeportal:manageoptions` en contexto de sistema. La actualización del plugin concede esta capacidad a los roles Orange de publicación y coordinación existentes. No concede permiso para publicar avisos al coordinador. En otras instalaciones, el administrador puede conceder o retirar esta capacidad mediante **Usuarios > Permisos > Definir roles**. Al desplegar esta versión, ejecutar la actualización habitual de plugins de Moodle (`admin/cli/upgrade.php --non-interactive`).
+
+## Categorías en las tablas del portal y administración
+
+En las tablas de Incidencias y Notificaciones del portal, y en los listados de publicaciones y de gestión de categorías, se muestra el nombre sin guiones y, debajo, la ruta de sus categorías superiores en texto pequeño. Se muestran como máximo las dos superiores más cercanas: `Centrex` con `Sistemas › Telefonía` debajo. Si existen más niveles, la ruta comienza por `… ›`; al pasar el cursor o enfocar la ruta con el teclado aparece la ruta superior completa. Las categorías raíz no muestran una segunda línea. Se mantiene el orden jerárquico y los selectores de los formularios conservan su indentación. Es una presentación del plugin, sin cambios en los nombres guardados ni en Moodle o Moove.
+
+La función compartida `orange_category_label()` de `local/orangeportal/locallib.php` genera esta presentación para `index.php`, `manage.php` y `categories.php`, con los mismos estilos de `styles.css`. Las categorías se consultan una vez por listado; no se añade una consulta por fila.

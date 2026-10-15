@@ -18,9 +18,13 @@ Crear una publicación, escribir su título y contenido, elegir la categoría y 
 
 La recepción en el listado, la apertura y la confirmación explícita se registran separadamente. La opción **Pendientes de confirmar** permite localizar lo que queda por confirmar. Cambiar el texto genera una nueva versión y conserva el histórico de la anterior.
 
+La apertura desde un perfil con permiso de gestión también guarda la vista individual de la versión actual. Si el editor no es destinatario, el listado muestra **Visto** y el sobre abierto; no se registra recepción ni confirmación, ni se añade al usuario a los destinatarios. La confirmación explícita solo está disponible cuando el usuario es destinatario de la publicación publicada.
+
 ## Consultar el listado
 
 La sección **Notificaciones** presenta una tabla con título y resumen, categoría, fecha de creación y situación individual de lectura. Pulsar el título abre el detalle donde el destinatario puede confirmar la lectura. Los borradores se identifican para los responsables autorizados.
+
+A la izquierda del título de cada notificación aparece un sobre cerrado naranja si la notificación está pendiente de lectura, o un sobre abierto blanco con borde naranja si el usuario ya la abrió. Se utiliza el registro de lectura del destinatario para la versión actual de la publicación; no hace falta configurar nada ni se añaden campos a la base de datos. Consultar el listado registra recepción, pero no marca la publicación como leída. El texto de estado sigue visible y accesible: una publicación abierta puede seguir pendiente de confirmación explícita. Los iconos son informativos, no botones. Esta presentación se implementa en el plugin (`index.php`, `styles.css` y los SVG de `pix/`), sin cambios en el core ni en Moove; no existe un ajuste nativo para estos iconos del listado personalizado.
 
 El formulario permite combinar búsqueda, categoría (incluidas subcategorías), fecha y pendientes de confirmar. Seleccionar una categoría en el desplegable; **Todas las categorías** elimina esa restricción. **Desde** y **Hasta** filtran por la fecha de creación mostrada en la tabla: se puede usar solo uno o ambos, e incluyen los días completos según la zona horaria del usuario. Pulsar **Buscar** aplica los filtros. Si el rango está invertido o una fecha es inválida, se muestra un mensaje para corregirla. Los enlaces del árbol lateral conservan la búsqueda, las fechas y el filtro de confirmaciones. Solo se muestran los avisos a los que el usuario tiene acceso. En móvil la tabla se desplaza horizontalmente dentro del listado y también se puede enfocar con el teclado.
 
@@ -45,3 +49,9 @@ En local no se envía correo y no hay conexión con Teams. **Recibido** signific
 Los estilos del plugin se cargan con una versión basada en la fecha de modificación del archivo para que el navegador reciba los cambios visuales sin reutilizar una copia antigua.
 
 En los listados de Incidencias y Notificaciones, la clase `orange-wide-listing` amplía el contenedor principal de Moove al ancho disponible de la página, conservando sus márgenes y relleno. Encabezado, descripción, separador, filtros y tabla comparten ese ancho. El ajuste se limita a estos dos listados, sin modificar archivos del tema.
+
+## Categorías en las tablas del portal y administración
+
+En las tablas de Incidencias y Notificaciones del portal, y en los listados de publicaciones y de gestión de categorías, se muestra el nombre sin guiones y, debajo, la ruta de sus categorías superiores en texto pequeño. Se muestran como máximo las dos superiores más cercanas: `Centrex` con `Sistemas › Telefonía` debajo. Si existen más niveles, la ruta comienza por `… ›`; al pasar el cursor o enfocar la ruta con el teclado aparece la ruta superior completa. Las categorías raíz no muestran una segunda línea. Se mantiene el orden jerárquico y los selectores de los formularios conservan su indentación. Es una presentación del plugin, sin cambios en los nombres guardados ni en Moodle o Moove.
+
+La función compartida `orange_category_label()` de `local/orangeportal/locallib.php` genera esta presentación para `index.php`, `manage.php` y `categories.php`, con los mismos estilos de `styles.css`. Las categorías se consultan una vez por listado; no se añade una consulta por fila.

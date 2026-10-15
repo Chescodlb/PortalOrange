@@ -87,10 +87,11 @@ echo html_writer::tag('nav', $categorylinks, ['class' => 'orange-admin-links ora
 $form->display();
 $table = new html_table(); $table->head = [get_string('category'), get_string('actions')];
 foreach (($native ? array_filter(\local_orangeportal\native_categories::options($kind), fn($id) => $id !== 0, ARRAY_FILTER_USE_KEY) : orange_category_options($kind)) as $catid => $name) {
+    if (!$native) { $name = $cats[$catid]->name; }
     $actions = html_writer::link(orange_link('categories.php', ['kind' => $kind, 'id' => $catid]), get_string('editmove', 'local_orangeportal'));
     $actions .= ' · ' . html_writer::link(orange_link('categories.php', ['kind' => $kind, 'delete' => $catid]),
         get_string('delete'), ['aria-label' => get_string('deletecategorynamed', 'local_orangeportal', $name)]);
-    $table->data[] = [s($name), $actions];
+    $table->data[] = [$native ? s($name) : orange_category_label((int)$catid, $cats), $actions];
 }
 echo html_writer::table($table);
 echo $OUTPUT->footer();
