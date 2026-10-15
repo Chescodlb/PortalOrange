@@ -10,25 +10,28 @@ class notice extends \moodleform {
         $m->addElement('hidden', 'id', 0); $m->setType('id', PARAM_INT);
         $m->addElement('hidden', 'revision', 1); $m->setType('revision', PARAM_INT);
         $m->addElement('hidden', 'kind', $kind); $m->setType('kind', PARAM_ALPHA);
-        $m->addElement('text', 'title', 'Título', ['size' => 70, 'maxlength' => 255]);
-        $m->setType('title', PARAM_TEXT); $m->addRule('title', 'Escribe un título', 'required', null, 'client');
-        $m->addElement('select', 'categoryid', 'Categoría', \orange_category_options($kind));
-        $m->addRule('categoryid', 'Crea una categoría antes de publicar', 'required');
-        $m->addElement('editor', 'body', 'Descripción / contenido', null,
+        $m->addElement('text', 'title', get_string('noticetitle', 'local_orangeportal'), ['size' => 70, 'maxlength' => 255]);
+        $m->setType('title', PARAM_TEXT); $m->addRule('title', get_string('entertitle', 'local_orangeportal'), 'required', null, 'client');
+        $m->addElement('select', 'categoryid', get_string('category'), \orange_category_options($kind));
+        $m->addRule('categoryid', get_string('categoryrequired', 'local_orangeportal'), 'required');
+        $m->addElement('editor', 'body', get_string('noticecontent', 'local_orangeportal'), null,
             ['maxfiles' => 0, 'context' => \context_system::instance(), 'subdirs' => 0]);
         $m->setType('body', PARAM_RAW);
-        $m->addElement('select', 'impact', 'Impacto', \local_orangeportal\service::impacts());
-        $m->addElement('select', 'state', 'Estado compartido', \local_orangeportal\service::states());
+        $current = $this->_customdata['current'] ?? null;
+        $impact = $current->impact ?? \local_orangeportal\notice_options::default_code('impacts');
+        $state = $current->state ?? \local_orangeportal\notice_options::default_code('states');
+        $m->addElement('select', 'impact', 'Impacto', \local_orangeportal\service::impacts(true, $impact));
+        $m->addElement('select', 'state', get_string('sharedstate', 'local_orangeportal'), \local_orangeportal\service::states(true, $state));
         // Frozen selects export their configured value, not the first option.
-        $m->setDefault('impact', 'normal');
-        $m->setDefault('state', 'open');
+        $m->setDefault('impact', $impact);
+        $m->setDefault('state', $state);
         if ($kind === 'notifications') {
             // Read-only values must override stale or altered hidden POST fields.
-            $m->setConstant('state', 'open');
-            $m->setConstant('impact', 'normal');
+            $m->setConstant('state', $state);
+            $m->setConstant('impact', $impact);
             $m->freeze('state'); $m->freeze('impact');
         }
-        $m->addElement('header', 'audience', 'Destinatarios');
+        $m->addElement('header', 'audience', get_string('recipients', 'local_orangeportal'));
         $users = [];
         foreach ($DB->get_records_select('user', 'deleted = 0 AND suspended = 0 AND id > 1', [], 'lastname, firstname') as $u) {
             if (!isguestuser($u)) { $users[$u->id] = fullname($u) . ' (' . $u->username . ')'; }
@@ -39,21 +42,21 @@ class notice extends \moodleform {
         foreach ($DB->get_records_sql('SELECT g.*, c.fullname AS coursename FROM {groups} g JOIN {course} c ON c.id = g.courseid ORDER BY c.fullname, g.name') as $g) {
             $groups[$g->id] = $g->coursename . ' / ' . $g->name;
         }
-        foreach (['users' => ['Usuarios individuales', $users], 'cohorts' => ['Colectivos globales (cohortes Moodle)', $cohorts],
-                'groups' => ['Grupos de cursos Moodle', $groups]] as $name => [$label, $choices]) {
+        foreach (['users' => [get_string('individualusers', 'local_orangeportal'), $users], 'cohorts' => [get_string('globalcohorts', 'local_orangeportal'), $cohorts],
+                'groups' => [get_string('coursegroups', 'local_orangeportal'), $groups]] as $name => [$label, $choices]) {
             $m->addElement('autocomplete', $name, $label, $choices, ['multiple' => true]);
             $m->setType($name, PARAM_INT);
         }
-        $m->addElement('static', 'audiencenote', '', 'Se aplica la unión de destinatarios: basta pertenecer a uno de los colectivos seleccionados. La pertenencia se comprueba en cada acceso.');
-        $m->addElement('advcheckbox', 'published', 'Publicado', 'Visible para sus destinatarios');
-        $m->addElement('static', 'revisionnote', '', 'Si cambias el título o contenido, los destinatarios deberán volver a leer y confirmar la nueva versión.');
-        $this->add_action_buttons(true, 'Guardar publicación');
+        $m->addElement('static', 'audiencenote', '', get_string('audiencenote', 'local_orangeportal'));
+        $m->addElement('advcheckbox', 'published', get_string('publishlabel', 'local_orangeportal'), get_string('visibleforrecipients', 'local_orangeportal'));
+        $m->addElement('static', 'revisionnote', '', get_string('revisionnote', 'local_orangeportal'));
+        $this->add_action_buttons(true, get_string('savepublication', 'local_orangeportal'));
     }
     public function validation($data, $files): array {
         $errors = parent::validation($data, $files);
-        if (empty(trim(strip_tags($data['body']['text'] ?? '')))) { $errors['body'] = 'Escribe el contenido'; }
+        if (empty(trim(strip_tags($data['body']['text'] ?? '')))) { $errors['body'] = get_string('entercontent', 'local_orangeportal'); }
         if (!empty($data['published']) && empty($data['users']) && empty($data['cohorts']) && empty($data['groups'])) {
-            $errors['users'] = 'Selecciona al menos un destinatario individual, cohorte o grupo';
+            $errors['users'] = get_string('recipientsrequired', 'local_orangeportal');
         }
         return $errors;
     }

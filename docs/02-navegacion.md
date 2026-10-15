@@ -54,3 +54,15 @@ Biblioteca y Cursos conservan sus categorías nativas: el formulario usa las API
 Los breadcrumbs de cursos, secciones, actividades y ajustes de formación empiezan en **Cursos**; los de colecciones y recursos documentales empiezan en **Biblioteca**. En inglés usan **Courses** y **Library**. Se conserva el recorrido nativo posterior, incluido el curso, la sección y la actividad cuando Moodle y el tema los muestran.
 
 El plugin determina la sección por la categoría raíz y adapta el nodo raíz de navegación de la página. El primer enlace abre la sección correspondiente, en lugar de «Página Principal» y su redirección a Biblioteca. Las páginas propias de documentos, publicaciones y gestión de categorías usan la misma regla. Las páginas generales de administración ajenas a esas secciones conservan la navegación de Moodle. No se modifica el core ni el tema.
+
+### Páginas personales del usuario
+
+Preferencias, la vista personal de Calificaciones, Calendario personal y Archivos privados usan **Mi cuenta** como raíz del breadcrumb, enlazada al perfil del usuario. Por ejemplo: **Mi cuenta > Preferencias**. En inglés: **My account > Preferences**. Se eliminan las raíces «Página Principal» y los duplicados que llevaban a Biblioteca. Los nodos de mes o día del calendario se conservan cuando Moodle los añade. En la propia página del perfil, la raíz es Mi cuenta; Moove puede ocultar una ruta con un único elemento.
+
+Si la página corresponde a un curso o una colección de las raíces del portal, conserva la ruta de Cursos o Biblioteca. Cuando un responsable consulta las preferencias o calificaciones de otra persona en contexto de usuario, la raíz muestra el nombre de esa persona y apunta a su perfil; no altera permisos ni datos. El ajuste se implementa en `classes/breadcrumb.php`, mediante los nodos nativos de navegación, sin modificar Moodle ni Moove.
+
+## Idioma de la administración del portal
+
+Las pestañas de gestión, formularios de publicaciones y categorías, tablas, informes, ayudas, validaciones y mensajes utilizan `lang/es` y `lang/en` del plugin y cadenas estándar de Moodle. Los ajustes generales existentes del plugin también tienen traducciones. Cambiar el idioma desde el menú de usuario o las preferencias aplica la traducción de la interfaz; el idioma predeterminado del sitio se configura con los ajustes nativos de Moodle. No hay un segundo ajuste de idioma propio del portal.
+
+Los títulos y cuerpos de publicaciones, nombres de categorías, cursos, colectivos y opciones configurables de Estados e Impactos son contenido guardado y mantienen el texto introducido por el responsable. No se renombran ni se traducen automáticamente al cambiar el idioma. El detalle de un aviso y el formulario Nuevo documento traducen sus instrucciones y controles.

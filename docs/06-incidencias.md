@@ -54,3 +54,18 @@ La presentación y este flujo utilizan el plugin local. La actividad Base de dat
 Los filtros del listado tienen etiquetas visibles y controles de altura uniforme. El separador bajo la descripción ocupa todo el ancho del contenido; los estilos incluyen una versión para invalidar la caché del navegador al modificarlos.
 
 En los listados de Incidencias y Notificaciones, la clase `orange-wide-listing` amplía el contenedor principal de Moove al ancho disponible de la página, conservando sus márgenes y relleno. Encabezado, descripción, separador, filtros y tabla comparten ese ancho. El ajuste se limita a estos dos listados, sin modificar archivos del tema.
+
+## Administrar Estados e Impactos
+
+Con `editor.orange` o `coordinador.orange`, abrir **Administración** del portal y la pestaña **Estados e impactos**. Elegir Estados o Impactos. Es una pantalla del portal y no se añade a los ajustes generales de Moodle.
+
+- Crear: escribir un nombre, marcar Activa y guardar. Aparece en los selectores de nuevas incidencias y, en estados, en el cambio de estado del destinatario.
+- Editar: pulsar Editar, cambiar el nombre y guardar. El identificador interno no cambia; el nuevo nombre se aplica también a las publicaciones e históricos existentes.
+- Desactivar: desmarcar Activa al editar. Desaparece de nuevas asignaciones, pero sigue visible en avisos e informes que ya la usan, y en los filtros para consultar el histórico. Al editar un aviso se puede conservar su opción desactivada actual, pero no asignársela a otro aviso.
+- Eliminar: pulsar Eliminar y confirmar. Solo es posible si no hay publicaciones, borradores ni cambios de estado históricos que la referencien. Se exige POST con la protección nativa de sesión.
+
+Debe quedar al menos una opción activa por listado. El valor inicial de un aviso nuevo es la primera opción activa del listado; las notificaciones y alertas automáticas usan también esos valores internos, sin añadir estados ni impactos a su interfaz. Los cambios de catálogo y de publicación se coordinan mediante un bloqueo del plugin para evitar eliminar una opción mientras se está asignando.
+
+Se conservan los valores iniciales Abierta, En seguimiento, Cerrada y Normal, Alto, Crítico hasta que se modifiquen. Se guardan mediante `get_config`/`set_config` de Moodle, sin editar core ni añadir tablas. No hay un ajuste estándar que defina las opciones de estos avisos personalizados: el CRUD pertenece al plugin. Las confirmaciones de lectura mantienen su funcionamiento actual.
+
+Permisos: `local/orangeportal:manageoptions` en contexto de sistema. La actualización del plugin concede esta capacidad a los roles Orange de publicación y coordinación existentes. No concede permiso para publicar avisos al coordinador. En otras instalaciones, el administrador puede conceder o retirar esta capacidad mediante **Usuarios > Permisos > Definir roles**. Al desplegar esta versión, ejecutar la actualización habitual de plugins de Moodle (`admin/cli/upgrade.php --non-interactive`).

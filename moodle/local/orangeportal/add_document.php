@@ -13,23 +13,23 @@ if (!$options) { throw new required_capability_exception(context_system::instanc
 class orange_document_destination_form extends moodleform {
     public function definition(): void {
         $m = $this->_form;
-        $m->addElement('select', 'collection', 'Colección documental', $this->_customdata['options']);
+        $m->addElement('select', 'collection', get_string('collectiondestination', 'local_orangeportal'), $this->_customdata['options']);
         $m->setType('collection', PARAM_INT);
-        $m->addElement('static', 'instructions', '', 'El siguiente paso permite escribir el título y subir el documento con el formulario de archivos de Moodle.');
-        $this->add_action_buttons(true, 'Añadir documento');
+        $m->addElement('static', 'instructions', '', get_string('documentinstructions', 'local_orangeportal'));
+        $this->add_action_buttons(true, get_string('adddocument', 'local_orangeportal'));
     }
 }
 $url = orange_link('add_document.php');
-orange_page('Nuevo documento', 'library', $url);
+orange_page(get_string('newdocument', 'local_orangeportal'), 'library', $url);
 $PAGE->set_secondary_navigation(false);
 $form = new orange_document_destination_form($url, ['options' => $options]);
 if ($form->is_cancelled()) { redirect(orange_link('index.php', ['section' => 'library'])); }
 if ($data = $form->get_data()) {
-    if (!isset($options[$data->collection])) { throw new invalid_parameter_exception('Colección no permitida'); }
+    if (!isset($options[$data->collection])) { throw new invalid_parameter_exception(get_string('collectionnotallowed', 'local_orangeportal')); }
     require_capability('mod/resource:addinstance', context_course::instance($data->collection));
     redirect(new moodle_url('/course/modedit.php', ['add' => 'resource', 'course' => $data->collection, 'section' => 0, 'return' => 0]));
 }
 echo $OUTPUT->header();
-echo orange_intro('BIBLIOTECA', 'Nuevo documento', 'Elige la colección en la que quieres publicar el archivo.');
+echo orange_intro(get_string('library', 'local_orangeportal'), get_string('newdocument', 'local_orangeportal'), get_string('documentdestinationintro', 'local_orangeportal'));
 $form->display();
 echo $OUTPUT->footer();

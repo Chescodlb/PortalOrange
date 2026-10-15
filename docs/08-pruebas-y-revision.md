@@ -79,3 +79,17 @@ La prueba del formulario incluye el título «Pruebas nueva Notificación» en t
 ### Publicar contenidos con el formador
 
 `formador.orange` ve **Nuevo documento** y **Nueva colección documental** en Biblioteca, **Nuevo curso** en Cursos y **Nueva evaluación** en cada curso editable. Nuevo documento pide una colección autorizada y abre el formulario nativo Archivo; no guarda contenidos hasta que se complete ese formulario. Colecciones y cursos usan el formulario nativo de creación de cursos y evaluaciones el de Cuestionario. Un editor de categorías o un agente no debe ver esos accesos.
+
+### CRUD de Estados e Impactos
+
+Ejecutar `docker compose exec -T -u www-data web php local/orangeportal/cli/check_notice_options.php`. Comprueba los permisos de editor y coordinación, creación, renombrado, desactivación, eliminación de opciones sin referencias, protección de publicaciones e histórico y conservación de al menos una opción activa. Comprueba además que una opción inactiva se puede conservar en su aviso actual, pero no reasignarse ni usarse en un aviso nuevo. La prueba revierte publicaciones y ajustes del catálogo; está limitada al entorno local de demostración con los valores iniciales.
+
+Revisión manual: con editor o coordinador, entrar en **Administración > Estados e impactos**. Crear una opción, editar su nombre, desactivarla y reactivarla; comprobar que aparece entre las opciones de nuevas incidencias solo cuando está activa. Intentar eliminar Abierta, Normal u otra opción usada: se muestra el bloqueo y se puede desactivar mediante Editar. Crear una opción sin usarla y eliminarla tras confirmar. Un agente no puede acceder a `options.php`; coordinación no recibe permiso de publicación por gestionar estos catálogos. La pantalla tiene textos en español e inglés.
+
+### Breadcrumbs de páginas personales
+
+Ejecutar `node scripts/test-orange-browser.mjs --breadcrumb-user-only`. Con agente y coordinador verifica Preferencias, Calificaciones personales, Calendario y Archivos privados en español e inglés. La raíz debe ser Mi cuenta / My account, enlazar al perfil y no contener «Página Principal» ni enlaces a la portada que redirige a Biblioteca. Las capturas quedan en `backups/previews/`. `--breadcrumb-only` sigue verificando las rutas de cursos, biblioteca y gestión.
+
+### Administración en español e inglés
+
+Ejecutar `node scripts/test-orange-browser.mjs --admin-languages-only`. Verifica con editor las pestañas de incidencias/notificaciones, sus tablas, formularios de creación/edición, las cuatro gestiones de categorías y los catálogos. Con coordinador comprueba resultados, encabezados, instrucciones e histórico. Incluye Nuevo documento con formador y los ajustes existentes del plugin y la vista de gestión de un aviso con administrador. No cambia contenido y genera capturas en `backups/previews/`. Los nombres guardados por los usuarios permanecen en su idioma original.

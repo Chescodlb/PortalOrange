@@ -14,15 +14,16 @@ Abrir **Usuarios > Permisos > Definir roles** para crear o modificar un perfil. 
 | --- | --- | --- |
 | Agente | Estudiante en sus cursos y bibliotecas | Consulta, evaluación y confirmación de sus avisos; cambio de estado de incidencias asignadas |
 | Formador | Profesor con edición en sus colecciones/cursos y Creación de contenidos Orange en Biblioteca y Cursos | Nuevos documentos, colecciones y cursos; recursos, preguntas y evaluaciones de sus cursos |
-| Coordinación | Profesor sin edición en sus cursos y rol global Coordinación Orange | Resultados de cursos autorizados y trazabilidad de publicaciones |
+| Coordinación | Profesor sin edición en sus cursos y rol global Coordinación Orange | Resultados de cursos autorizados, trazabilidad de publicaciones y gestión de Estados e Impactos |
 | Responsable documental | Profesor con edición en las colecciones documentales que gestiona | Publicación y mantenimiento de recursos; no requiere ser administrador global |
-| Responsable de comunicaciones | Rol global Responsable de comunicaciones Orange | Publicación, categorías y asignación de incidencias y notificaciones |
+| Responsable de comunicaciones | Rol global Responsable de comunicaciones Orange | Publicación, categorías y asignación de incidencias y notificaciones; gestión de Estados e Impactos |
 | Administrador | Administrador del sitio | Configuración general y todas las funciones |
 
 Las capacidades del plugin se pueden buscar al definir un rol:
 
 - `local/orangeportal:manage`: publicar, editar, asignar y gestionar categorías de avisos.
 - `local/orangeportal:viewreports`: acceder al panel de resultados y confirmaciones.
+- `local/orangeportal:manageoptions`: gestionar Estados e Impactos desde el portal; asignado a coordinación y comunicaciones. No concede administración general ni publicación de avisos.
 - `local/orangeportal:changestate`: cambiar el estado compartido de una incidencia visible.
 
 Para ver notas de un curso también hace falta `moodle/grade:viewall` en ese curso. El permiso del portal por sí solo no concede acceso a notas de cursos ajenos.

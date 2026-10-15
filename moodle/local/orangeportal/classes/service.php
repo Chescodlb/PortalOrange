@@ -87,19 +87,23 @@ class service {
             'revision' => $notice->revision]) ?: null;
     }
     public static function change_state(\stdClass $notice, string $state): void {
+        notice_options::with_lock(fn() => self::change_state_serialized($notice, $state));
+    }
+    private static function change_state_serialized(\stdClass $notice, string $state): void {
         global $DB, $USER;
         self::require_view($notice);
         require_capability('local/orangeportal:changestate', \context_system::instance());
-        if ($notice->kind !== 'incidents' || !array_key_exists($state, self::states())) {
+        if ($notice->kind !== 'incidents') {
             throw new \invalid_parameter_exception('Invalid incident state');
         }
         $factory = \core\lock\lock_config::get_lock_factory('local_orangeportal');
         $lock = $factory->get_lock('notice_' . $notice->id, 10);
         if (!$lock) { throw new \moodle_exception('locktimeout'); }
         try {
-            $transaction = $DB->start_delegated_transaction();
             $current = $DB->get_record('local_orange_notice', ['id' => $notice->id], '*', MUST_EXIST);
             self::require_view($current);
+            notice_options::validate_selection('states', $state, $current->state);
+            $transaction = $DB->start_delegated_transaction();
             if ($current->state != $state) {
                 $DB->insert_record('local_orange_state_log', (object)['noticeid' => $notice->id,
                     'userid' => $USER->id, 'oldstate' => $current->state, 'newstate' => $state,
@@ -111,11 +115,11 @@ class service {
             $transaction->allow_commit();
         } finally { $lock->release(); }
     }
-    public static function states(): array {
-        return ['open' => 'Abierta', 'progress' => 'En seguimiento', 'closed' => 'Cerrada'];
+    public static function states(bool $activeonly = false, ?string $current = null): array {
+        return notice_options::choices('states', $activeonly, $current);
     }
-    public static function impacts(): array {
-        return ['normal' => 'Normal', 'high' => 'Alto', 'critical' => 'Crítico'];
+    public static function impacts(bool $activeonly = false, ?string $current = null): array {
+        return notice_options::choices('impacts', $activeonly, $current);
     }
     public static function category_descendants(int $id, array $categories): array {
         $ids = [$id];
@@ -155,6 +159,9 @@ class service {
         $DB->delete_records('local_orange_category', ['id' => $categoryid, 'kind' => $kind]);
     }
     public static function save_notice(\stdClass $data, array $targets): int {
+        return notice_options::with_lock(fn() => self::save_notice_serialized($data, $targets));
+    }
+    private static function save_notice_serialized(\stdClass $data, array $targets): int {
         $factory = \core\lock\lock_config::get_lock_factory('local_orangeportal');
         $lock = $factory->get_lock('notice_' . (int)($data->id ?? 0), 10);
         if (!$lock) { throw new \moodle_exception('locktimeout'); }
@@ -180,9 +187,10 @@ class service {
         if ($data->published && !array_filter($targets)) {
             throw new \invalid_parameter_exception('Choose at least one recipient');
         }
-        if (!isset(self::states()[$data->state]) || !isset(self::impacts()[$data->impact])) {
-            throw new \invalid_parameter_exception('Invalid state or impact');
-        }
+        $existing = !empty($data->id) ? $DB->get_record('local_orange_notice',
+            ['id' => $data->id, 'kind' => $data->kind], '*', MUST_EXIST) : null;
+        notice_options::validate_selection('states', $data->state, $existing->state ?? null);
+        notice_options::validate_selection('impacts', $data->impact, $existing->impact ?? null);
         $tx = $DB->start_delegated_transaction();
         $data->timemodified = time();
         if (empty($data->id)) {

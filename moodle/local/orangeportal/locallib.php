@@ -22,8 +22,8 @@ function orange_admin_navigation(string $active, string $kind = 'incidents'): st
     $links = [];
     if (has_capability('local/orangeportal:manage', context_system::instance())) {
         $links = [
-            'incidents' => ['Incidencias', orange_link('manage.php', ['kind' => 'incidents'])],
-            'notifications' => ['Notificaciones', orange_link('manage.php', ['kind' => 'notifications'])],
+            'incidents' => [get_string('incidents', 'local_orangeportal'), orange_link('manage.php', ['kind' => 'incidents'])],
+            'notifications' => [get_string('notifications', 'local_orangeportal'), orange_link('manage.php', ['kind' => 'notifications'])],
         ];
     }
     $cangestion = has_capability('local/orangeportal:manage', context_system::instance());
@@ -33,9 +33,12 @@ function orange_admin_navigation(string $active, string $kind = 'incidents'): st
             $cangestion = true;
         }
     }
-    if ($cangestion) { $links['categories'] = ['Gestionar categorías', orange_link('categories.php', ['kind' => $kind])]; }
+    if ($cangestion) { $links['categories'] = [get_string('managecategories', 'local_orangeportal'), orange_link('categories.php', ['kind' => $kind])]; }
     if (has_capability('local/orangeportal:viewreports', context_system::instance())) {
-        $links['reports'] = ['Confirmaciones y resultados', orange_link('reports.php')];
+        $links['reports'] = [get_string('confirmationsresults', 'local_orangeportal'), orange_link('reports.php')];
+    }
+    if (has_capability('local/orangeportal:manageoptions', context_system::instance())) {
+        $links['options'] = [get_string('manageoptions', 'local_orangeportal'), orange_link('options.php')];
     }
     $html = '';
     foreach ($links as $key => [$label, $url]) {
@@ -43,7 +46,7 @@ function orange_admin_navigation(string $active, string $kind = 'incidents'): st
         if ($key === $active) { $attrs['aria-current'] = 'page'; }
         $html .= html_writer::link($url, $label, $attrs);
     }
-    return html_writer::tag('nav', $html, ['class' => 'orange-admin-links', 'aria-label' => 'Gestión del portal']);
+    return html_writer::tag('nav', $html, ['class' => 'orange-admin-links', 'aria-label' => get_string('portalmanagement', 'local_orangeportal')]);
 }
 function orange_category_options(string $kind): array {
     global $DB;

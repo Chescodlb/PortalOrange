@@ -62,11 +62,13 @@ class hooks {
             $PAGE->set_primary_active_tab('orange_' . $key);
         }
         if (is_siteadmin() || has_capability('local/orangeportal:manage', \context_system::instance()) ||
-                has_capability('local/orangeportal:viewreports', \context_system::instance())) {
+                has_capability('local/orangeportal:viewreports', \context_system::instance()) ||
+                has_capability('local/orangeportal:manageoptions', \context_system::instance())) {
             // Delegated roles have portal capabilities, not site configuration access.
             $adminpath = has_capability('moodle/site:config', \context_system::instance()) ? '/admin/search.php' :
                 (has_capability('local/orangeportal:manage', \context_system::instance()) ?
-                    '/local/orangeportal/manage.php' : '/local/orangeportal/reports.php');
+                    '/local/orangeportal/manage.php' : (has_capability('local/orangeportal:viewreports', \context_system::instance()) ?
+                        '/local/orangeportal/reports.php' : '/local/orangeportal/options.php'));
             $nav->add(get_string('administration'), new \moodle_url($adminpath),
                 \navigation_node::TYPE_SITE_ADMIN, null, 'siteadminnode');
         }

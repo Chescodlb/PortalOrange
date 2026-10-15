@@ -172,6 +172,9 @@ function orange_demo_role(string $shortname, string $name, array $caps, array $c
 }
 $publishrole = orange_demo_role('orange_publicador', 'Responsable de comunicaciones Orange', ['local/orangeportal:manage']);
 $reportrole = orange_demo_role('orange_seguimiento', 'Coordinación Orange', ['local/orangeportal:viewreports']);
+foreach ([$publishrole, $reportrole] as $roleid) {
+    assign_capability('local/orangeportal:manageoptions', CAP_ALLOW, $roleid, context_system::instance()->id);
+}
 role_assign($publishrole, $publisher->id, context_system::instance()->id);
 role_assign($reportrole, $coordinator->id, context_system::instance()->id);
 $categoryrole = orange_demo_role('orange_gestorcategorias', 'Gestión de categorías Orange',

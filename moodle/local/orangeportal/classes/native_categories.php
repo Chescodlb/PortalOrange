@@ -4,9 +4,9 @@ defined('MOODLE_INTERNAL') || die();
 /** Portal form backed by Moodle course categories, scoped to one configured root. */
 class native_categories {
     public static function root(string $kind): \core_course_category {
-        if (!in_array($kind, ['library', 'courses'])) { throw new \invalid_parameter_exception('Sección desconocida'); }
+        if (!in_array($kind, ['library', 'courses'])) { throw new \invalid_parameter_exception(get_string('unknownsection', 'local_orangeportal')); }
         $id = (int)get_config('local_orangeportal', $kind === 'library' ? 'librarycategory' : 'coursescategory');
-        if (!$id) { throw new \invalid_parameter_exception('Falta la categoría raíz'); }
+        if (!$id) { throw new \invalid_parameter_exception(get_string('missingrootcategory', 'local_orangeportal')); }
         return \core_course_category::get($id, MUST_EXIST, true);
     }
     public static function records(string $kind): array {
@@ -17,7 +17,7 @@ class native_categories {
     }
     public static function editable(string $kind, int $id): \core_course_category {
         $records = self::records($kind);
-        if (!isset($records[$id])) { throw new \invalid_parameter_exception('La categoría no pertenece a esta sección'); }
+        if (!isset($records[$id])) { throw new \invalid_parameter_exception(get_string('categoryoutsidesection', 'local_orangeportal')); }
         require_capability('moodle/category:manage', \context_coursecat::instance($id));
         return \core_course_category::get($id, MUST_EXIST, true);
     }
@@ -37,19 +37,19 @@ class native_categories {
             }
             return $options;
         };
-        return [0 => $root->name . ' · raíz de la sección'] + $walk((int)$root->id);
+        return [0 => get_string('sectionroot', 'local_orangeportal', $root->name)] + $walk((int)$root->id);
     }
     public static function save(string $kind, int $id, string $name, int $parentid): int {
         $root = self::root($kind);
         require_capability('moodle/category:manage', \context_coursecat::instance($root->id));
         $category = $id ? self::editable($kind, $id) : null;
         if (!array_key_exists($parentid, self::options($kind, $id))) {
-            throw new \invalid_parameter_exception('Categoría superior fuera de la sección o ciclo no permitido');
+            throw new \invalid_parameter_exception(get_string('invalidcategoryparent', 'local_orangeportal'));
         }
         $parentid = $parentid ?: (int)$root->id;
         require_capability('moodle/category:manage', \context_coursecat::instance($parentid));
         $name = trim($name);
-        if ($name === '' || \core_text::strlen($name) > 255) { throw new \invalid_parameter_exception('Nombre no válido'); }
+        if ($name === '' || \core_text::strlen($name) > 255) { throw new \invalid_parameter_exception(get_string('invalidcategoryname', 'local_orangeportal')); }
         $data = (object)['name' => $name, 'parent' => $parentid];
         if ($category) {
             $category->update($data);

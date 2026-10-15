@@ -16,7 +16,7 @@
 .orange-card{background:#fff;border:1px solid #dedde0;border-top:4px solid #ff7900;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:12px}
 .orange-card h3{font-size:1.2rem;font-weight:700;line-height:1.4;margin:0}.orange-card h3 a{color:#1d1d20}.orange-card p{font-size:.95rem;color:#61616a;margin:0;line-height:1.6}
 .orange-card-meta{font-size:.75rem;color:#61616a}.orange-card-link{font-size:.9rem;color:#914100;font-weight:700;margin-top:auto;padding-top:12px}
-.orange-card-footer{display:flex;align-items:center;flex-wrap:wrap;gap:10px}.orange-status{font-size:.75rem;font-weight:700;padding:4px 8px;border-radius:4px}
+.orange-card-footer{display:flex;align-items:center;flex-wrap:wrap;gap:10px}.orange-status{background:#fff0df;color:#873e00;font-size:.75rem;font-weight:700;padding:4px 8px;border-radius:4px}
 .orange-status-open{background:#fff0df;color:#873e00}.orange-status-progress{background:#e8effc;color:#244782}.orange-status-closed{background:#e0f3e8;color:#1b6339}
 .orange-reading{font-size:.75rem;color:#61616a}.orange-empty{padding:32px;border:1px dashed #aaa;border-radius:12px;background:#fafafa}
 .orange-notice-content{background:white;padding:28px;border:1px solid #dedde0;border-radius:12px;margin-bottom:24px;line-height:1.7}

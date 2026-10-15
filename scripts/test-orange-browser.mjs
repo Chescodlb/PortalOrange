@@ -41,7 +41,8 @@ try {
   };
   const navigate = async path => {
     await send('Page.navigate', {url: path.startsWith('http') ? path : base + path});
-    await delay(500); await wait(`document.readyState !== 'loading'`);
+    await delay(500); await wait(`document.readyState !== 'loading' ||
+      (location.pathname==='/login/index.php' && !!document.querySelector('#loginbtn'))`);
   };
   const screenshot = async name => {
     await delay(500); const r = await send('Page.captureScreenshot', {format: 'png', captureBeyondViewport: false});
@@ -62,7 +63,86 @@ try {
   };
   const nav = () => evaluate(`Array.from(document.querySelectorAll('.primary-navigation .nav-link')).filter(x=>x.textContent.trim()!=='').map(x=>x.textContent.trim()).filter(x=>!['Más','More'].includes(x))`);
   await send('Page.enable'); await send('Runtime.enable');
-  if (process.argv.includes('--breadcrumb-only') || process.argv.includes('--breadcrumb-management-only')) {
+  if (process.argv.includes('--admin-languages-only')) {
+    await login('editor.orange', env.ORANGE_DEMO_PASSWORD);
+    for (const language of ['es', 'en']) {
+      const en = language === 'en';
+      for (const kind of ['incidents', 'notifications']) {
+        await navigate('/local/orangeportal/manage.php?kind=' + kind + '&lang=' + language);
+        check(await evaluate(`document.querySelector('.orange-intro h2').textContent===${JSON.stringify(en ? 'Orange publications' : 'Publicaciones Orange')} && document.querySelector('.orange-admin-links .active').textContent===${JSON.stringify(en ? (kind==='incidents'?'Incidents':'Notifications') : (kind==='incidents'?'Incidencias':'Notificaciones'))}`), language+' / '+kind+': cabecera y pestaña traducidas');
+        check(await evaluate(`Array.from(document.querySelectorAll('table th')).map(n=>n.textContent).join('|')===${JSON.stringify(en?'Title|Category|Publication|Status|Actions':'Título|Categoría|Publicación|Estado|Acciones')}`),language+' / '+kind+': tabla traducida');
+        check(await evaluate(`document.querySelector('h1').textContent.trim()===${JSON.stringify(en?'Publish and manage notices':'Publicar y gestionar avisos')} && document.title.includes(${JSON.stringify(en?'Publish and manage notices':'Publicar y gestionar avisos')})`),language+' / '+kind+': título y encabezado de página traducidos');
+        const editurl=await evaluate(`document.querySelector('table a[href*="manage.php"][href*="id="]')?.href`);
+        if(editurl){await navigate(editurl);check(await evaluate(`document.querySelector('input[name="title"]').value!=='' && document.querySelector('label[for="id_title"]').textContent.includes(${JSON.stringify(en?'Title':'Título')})`),language+' / '+kind+': edición conserva el contenido y traduce etiquetas');}
+        await navigate('/local/orangeportal/manage.php?kind='+kind+'&new=1&lang='+language);
+        check(await evaluate(`document.querySelector('label[for="id_title"]').textContent.includes(${JSON.stringify(en?'Title':'Título')}) && document.querySelector('#id_submitbutton').value===${JSON.stringify(en?'Save publication':'Guardar publicación')} && document.body.innerText.includes(${JSON.stringify(en?'Individual users':'Usuarios individuales')}) && document.body.innerText.includes(${JSON.stringify(en?'Changing the title or content':'Si cambias el título o contenido')})`),language+' / '+kind+': formulario, destinatarios y ayuda traducidos');
+        if(en && kind==='incidents')await screenshot('administracion-formulario-ingles');
+      }
+      for(const kind of ['library','courses','incidents','notifications']){
+        await navigate('/local/orangeportal/categories.php?kind='+kind+'&lang='+language);
+        const label=en?({library:'Library',courses:'Courses',incidents:'Incidents',notifications:'Notifications'})[kind]:({library:'Biblioteca',courses:'Cursos',incidents:'Incidencias',notifications:'Notificaciones'})[kind];
+        check(await evaluate(`document.querySelector('.orange-intro h2').textContent===${JSON.stringify(en?'Categories: '+label:'Categorías de '+label)} && document.querySelector('.orange-category-tabs .active').textContent===${JSON.stringify(label)}`),language+' / '+kind+': cabecera y sección de categorías traducidas');
+        check(await evaluate(`document.querySelector('#id_submitbutton').value===${JSON.stringify(en?'Save category':'Guardar categoría')} && document.querySelector('label[for="id_parentid"]').textContent.includes(${JSON.stringify(en?'Parent category':'Categoría superior')})`),language+' / '+kind+': formulario de categorías traducido');
+        if(en && kind==='library')await screenshot('administracion-categorias-ingles');
+      }
+      for(const type of ['states','impacts']){
+        await navigate('/local/orangeportal/options.php?type='+type+'&lang='+language);
+        check(await evaluate(`document.querySelector('.orange-intro h2').textContent===${JSON.stringify(en?'Statuses and impacts':'Estados e impactos')}`),language+' / '+type+': catálogo traducido');
+      }
+    }
+    await logout();await login('coordinador.orange',env.ORANGE_DEMO_PASSWORD);
+    for(const language of ['es','en']){
+      const en=language==='en';
+      await navigate('/local/orangeportal/reports.php?lang='+language);
+      check(await evaluate(`document.querySelector('.orange-intro h2').textContent===${JSON.stringify(en?'Results and confirmations':'Resultados y confirmaciones')} && document.querySelector('.orange-admin-links .active').textContent===${JSON.stringify(en?'Confirmations and results':'Confirmaciones y resultados')}`),language+': resultados y navegación traducidos');
+      check(await evaluate(`document.body.innerText.includes(${JSON.stringify(en?'Active participants':'Participantes activos')}) && document.body.innerText.includes(${JSON.stringify(en?'Receipt, reading and confirmation':'Recepción, lectura y confirmación')}) && document.body.innerText.includes(${JSON.stringify(en?'Current recipient':'Destinatario actual')})`),language+': tablas e instrucciones de informes traducidas');
+      check(await evaluate(`document.querySelector('h1').textContent.trim()===${JSON.stringify(en?'Results and confirmations':'Resultados y confirmaciones')} && document.title.includes(${JSON.stringify(en?'Results and confirmations':'Resultados y confirmaciones')})`),language+': título y encabezado de informes traducidos');
+      const noticeurl=await evaluate(`document.querySelector('table a[href*="noticeid="]')?.href`);
+      check(!!noticeurl,language+': aviso disponible para comprobar histórico');
+      await navigate(noticeurl);
+      check(await evaluate(`document.body.innerText.includes(${JSON.stringify(en?'Confirmation history by version':'Histórico de confirmaciones por versión')})`),language+': histórico de confirmaciones traducido');
+      if(en)await screenshot('administracion-resultados-ingles');
+    }
+    await logout();await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
+    await navigate('/local/orangeportal/add_document.php?lang=en');
+    check(await evaluate(`document.querySelector('.orange-intro h2').textContent==='New document' && document.querySelector('#id_submitbutton').value==='Add document'`),'Formador: nuevo documento en inglés');
+    await logout();await login(env.MOODLE_ADMIN_USER||'admin',env.MOODLE_ADMIN_PASSWORD);
+    await navigate('/admin/settings.php?section=local_orangeportal&lang=en');
+    check(await evaluate(`document.body.innerText.includes('Orange settings') && document.body.innerText.includes('Automatic training alerts') && document.body.innerText.includes('Library root category')`),'Administrador general: ajustes existentes del plugin en inglés');
+    await navigate('/local/orangeportal/manage.php?kind=incidents&lang=en');
+    const viewurl=await evaluate(`document.querySelector('table a[href*="view.php"]')?.href`);
+    await navigate(viewurl);
+    check(await evaluate(`document.body.innerText.includes('Management preview:') && document.body.innerText.includes('Edit publication') && document.body.innerText.includes('Back to list')`),'Detalle de publicación y vista de gestión traducidos');
+    check(await evaluate(`!document.body.innerText.includes('[[') && !document.querySelector('.debuggingmessage')`),'Sin cadenas de idioma faltantes');
+    console.log('Verificaciones de administración bilingüe: '+results.length);
+  } else if (process.argv.includes('--breadcrumb-user-only')) {
+    for (const username of ['agente.orange', 'coordinador.orange']) {
+      await login(username, env.ORANGE_DEMO_PASSWORD);
+      for (const language of ['es', 'en']) {
+        const pages = [
+          ['/user/preferences.php', language === 'es' ? 'Preferencias' : 'Preferences'],
+          ['/grade/report/overview/index.php', language === 'es' ? 'Calificaciones' : 'Grades'],
+          ['/calendar/view.php', language === 'es' ? 'Calendario' : 'Calendar'],
+          ['/user/files.php', language === 'es' ? 'Archivos privados' : 'Private files']
+        ];
+        for (const [path, label] of pages) {
+          await navigate(path + '?lang=' + language);
+          const items = await evaluate(`Array.from(document.querySelectorAll('.breadcrumb li')).map(li=>({text:li.textContent.trim(),href:li.querySelector('a')?.href || ''}))`);
+          const root = language === 'es' ? 'Mi cuenta' : 'My account';
+          check(items.length >= 2 && items[0].text === root && items.some(i=>i.text === label), username + ' / ' + language + ': Mi cuenta y sección en ' + path);
+          check(items[0].href.includes('/user/profile.php?id=') && !items.some(i=>['Página Principal','Página principal','Home'].includes(i.text) || (i.href && new URL(i.href).pathname === '/')),
+            username + ' / ' + language + ': sin inicio repetido ni enlaces a Biblioteca en ' + path);
+          if (language === 'es' && username === 'agente.orange') {
+            await screenshot('breadcrumb-cuenta-' + path.split('/').filter(Boolean).join('-'));
+            await navigate(items[0].href);
+            check(await evaluate(`location.pathname==='/user/profile.php' && !document.querySelector('.alert-danger')`), 'Mi cuenta abre el perfil desde ' + path);
+          }
+        }
+      }
+      await logout();
+    }
+    console.log('Verificaciones de breadcrumbs personales: ' + results.length);
+  } else if (process.argv.includes('--breadcrumb-only') || process.argv.includes('--breadcrumb-management-only')) {
     if (!process.argv.includes('--breadcrumb-management-only')) {
     await login('formador.orange', env.ORANGE_DEMO_PASSWORD);
     for (const language of ['es', 'en']) {
