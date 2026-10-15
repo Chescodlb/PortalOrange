@@ -6,13 +6,34 @@ $section = optional_param('section', 'library', PARAM_ALPHA);
 $category = optional_param('category', 0, PARAM_INT);
 $query = optional_param('q', '', PARAM_TEXT);
 $status = optional_param('state', '', PARAM_ALPHA);
+$impact = optional_param('impact', '', PARAM_ALPHA);
 $pending = optional_param('pending', 0, PARAM_BOOL);
+$datefrom = in_array($section, ['incidents', 'notifications']) ? optional_param('datefrom', '', PARAM_RAW_TRIMMED) : '';
+$dateto = in_array($section, ['incidents', 'notifications']) ? optional_param('dateto', '', PARAM_RAW_TRIMMED) : '';
 $titles = array_combine(['library', 'courses', 'incidents', 'notifications'], array_map(
     fn($key) => get_string($key, 'local_orangeportal'), ['library', 'courses', 'incidents', 'notifications']));
 if (!isset($titles[$section])) { throw new invalid_parameter_exception('Sección desconocida'); }
 $url = orange_link('index.php', ['section' => $section, 'category' => $category, 'q' => $query,
-    'state' => $status, 'pending' => $pending]);
+    'state' => $status, 'impact' => $impact, 'pending' => $pending, 'datefrom' => $datefrom, 'dateto' => $dateto]);
 orange_page($titles[$section], $section, $url);
+if (in_array($section, ['incidents', 'notifications'])) {
+    $PAGE->add_body_class('orange-wide-listing');
+}
+$dateerror = '';
+$datebounds = [];
+foreach (['datefrom' => $datefrom, 'dateto' => $dateto] as $field => $value) {
+    if ($value === '') { continue; }
+    $date = preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/D', $value) ?
+        DateTimeImmutable::createFromFormat('!Y-m-d', $value, core_date::get_user_timezone_object()) : false;
+    if (!$date || $date->format('Y-m-d') !== $value) {
+        $dateerror = get_string('invalidnotificationdate', 'local_orangeportal');
+        continue;
+    }
+    $datebounds[$field] = ($field === 'dateto' ? $date->modify('+1 day') : $date)->getTimestamp();
+}
+if (!$dateerror && $datefrom !== '' && $dateto !== '' && $datefrom > $dateto) {
+    $dateerror = get_string('invalidnotificationrange', 'local_orangeportal');
+}
 echo $OUTPUT->header();
 $descriptions = ['library' => 'Procedimientos, manuales y guías para tu operativa diaria.',
     'courses' => 'Aprende, evalúa tus conocimientos y comparte tu valoración.',
@@ -49,22 +70,54 @@ if (in_array($section, ['library', 'courses'])) {
     }
     if ($actions) { echo html_writer::div($actions, 'orange-toolbar orange-content-actions'); }
 }
+$filterfield = function(string $id, string $label, string $control, string $extra = ''): string {
+    return html_writer::div(html_writer::tag('label', s($label), ['for' => $id]) . $control,
+        'orange-filter-field' . ($extra ? ' ' . $extra : ''));
+};
 $search = html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'section', 'value' => $section]) .
-    html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'category', 'value' => $category]) .
-    html_writer::tag('label', 'Buscar en ' . strtolower($titles[$section]), ['for' => 'orange-search', 'class' => 'sr-only']) .
-    html_writer::empty_tag('input', ['id' => 'orange-search', 'name' => 'q', 'type' => 'search',
-        'value' => $query, 'placeholder' => 'Buscar en ' . strtolower($titles[$section]) . '…', 'class' => 'form-control']);
+    $filterfield('orange-search', get_string('search'), html_writer::empty_tag('input', ['id' => 'orange-search', 'name' => 'q', 'type' => 'search',
+        'value' => $query, 'placeholder' => 'Buscar en ' . strtolower($titles[$section]) . '…', 'class' => 'form-control']), 'orange-filter-search');
+if ($section === 'notifications') {
+    $categories = $DB->get_records('local_orange_category', ['kind' => 'notifications'], 'name');
+    $options = [0 => get_string('allnotificationcategories', 'local_orangeportal')];
+    $categoryoptions = function(int $parent, string $prefix = '') use (&$categoryoptions, &$options, $categories): void {
+        foreach ($categories as $cat) {
+            if ((int)$cat->parentid !== $parent) { continue; }
+            $path = $prefix . $cat->name;
+            $options[$cat->id] = $path;
+            $categoryoptions((int)$cat->id, $path . ' / ');
+        }
+    };
+    $categoryoptions(0);
+    $search .= html_writer::div(html_writer::tag('label', get_string('incidentcolumncategory', 'local_orangeportal'),
+        ['for' => 'orange-category']) . html_writer::select($options, 'category', $category, false,
+            ['id' => 'orange-category', 'class' => 'custom-select']), 'orange-filter-field');
+} else {
+    $search .= html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'category', 'value' => $category]);
+}
 if ($section == 'incidents') {
-    $search .= html_writer::select(['' => 'Todos los estados'] + service::states(), 'state', $status, false,
-        ['aria-label' => 'Estado', 'class' => 'custom-select']);
+    $search .= $filterfield('orange-state', get_string('incidentcolumnstate', 'local_orangeportal'),
+        html_writer::select(['' => get_string('allstates', 'local_orangeportal')] + service::states(),
+            'state', $status, false, ['id' => 'orange-state', 'class' => 'custom-select']));
+    $search .= $filterfield('orange-impact', get_string('incidentcolumnimpact', 'local_orangeportal'),
+        html_writer::select(['' => get_string('allimpacts', 'local_orangeportal')] + service::impacts(),
+            'impact', $impact, false, ['id' => 'orange-impact', 'class' => 'custom-select']));
 }
 if (in_array($section, ['incidents', 'notifications'])) {
-    $search .= html_writer::select([0 => 'Todas las confirmaciones', 1 => 'Pendientes de confirmar'], 'pending', $pending,
-        false, ['aria-label' => 'Confirmaciones', 'class' => 'custom-select']);
+    foreach (['datefrom' => $datefrom, 'dateto' => $dateto] as $field => $value) {
+        $search .= $filterfield('orange-' . $field, get_string($field, 'local_orangeportal'),
+            html_writer::empty_tag('input', ['type' => 'date', 'name' => $field, 'id' => 'orange-' . $field,
+                'value' => $value, 'class' => 'form-control']));
+    }
+    $search .= $filterfield('orange-confirmations', get_string('filterconfirmations', 'local_orangeportal'),
+        html_writer::select([0 => get_string('allconfirmations', 'local_orangeportal'),
+            1 => get_string('pendingconfirmations', 'local_orangeportal')], 'pending', $pending, false,
+            ['id' => 'orange-confirmations', 'class' => 'custom-select']));
 }
 $search .= html_writer::tag('button', 'Buscar', ['type' => 'submit', 'class' => 'btn btn-primary']);
-echo html_writer::tag('form', $search, ['method' => 'get', 'action' => orange_link('index.php')->out(false), 'class' => 'orange-search']);
-$tree = ''; $cards = ''; $count = 0;
+echo html_writer::tag('form', $search, ['method' => 'get', 'action' => orange_link('index.php')->out(false), 'class' => 'orange-search orange-list-filters']);
+if ($dateerror) { echo $OUTPUT->notification($dateerror, 'error'); }
+$tree = ''; $cards = ''; $rows = ''; $count = 0;
 if (in_array($section, ['library', 'courses'])) {
     $rootid = (int)get_config('local_orangeportal', $section == 'library' ? 'librarycategory' : 'coursescategory');
     $courses = orange_native_courses($rootid);
@@ -96,32 +149,62 @@ if (in_array($section, ['library', 'courses'])) {
     }
 } else {
     $notices = service::visible($section);
-    $tree = orange_notice_tree($section, $notices, $category);
+    $tree = orange_notice_tree($section, $notices, $category,
+        ['q' => $query, 'datefrom' => $datefrom, 'dateto' => $dateto, 'pending' => $pending,
+            'state' => $status, 'impact' => $impact]);
     $cats = $DB->get_records('local_orange_category', ['kind' => $section]);
     $selectedids = $category && isset($cats[$category]) ? service::category_descendants($category, $cats) : [];
     foreach ($notices as $notice) {
+        if ($dateerror) { continue; }
+        if (isset($datebounds['datefrom']) && $notice->timecreated < $datebounds['datefrom']) { continue; }
+        if (isset($datebounds['dateto']) && $notice->timecreated >= $datebounds['dateto']) { continue; }
         if ($category && !in_array($notice->categoryid, $selectedids)) { continue; }
         if ($query && stripos($notice->title . ' ' . strip_tags($notice->content), $query) === false) { continue; }
         if ($status && $notice->state !== $status) { continue; }
+        if ($section === 'incidents' && $impact && $notice->impact !== $impact) { continue; }
         $receipt = service::get_receipt($notice, (int)$USER->id);
         if ($pending && $receipt && $receipt->confirmed) { continue; }
         service::receipt($notice, 'received');
         $count++;
-        $label = $receipt && $receipt->confirmed ? 'Confirmado' : ($receipt && $receipt->readtime ? 'Leído · pendiente de confirmar' : 'Pendiente de lectura');
-        $meta = s($cats[$notice->categoryid]->name) . ' · ' . userdate($notice->timecreated, '%d/%m/%Y');
-        if ($section == 'incidents') { $meta .= ' · ' . service::impacts()[$notice->impact]; }
-        $cards .= html_writer::tag('article', html_writer::span($notice->published ? s($meta) : 'BORRADOR · ' . s($meta), 'orange-card-meta') .
-            html_writer::tag('h3', html_writer::link(orange_link('view.php', ['id' => $notice->id]), s($notice->title))) .
-            html_writer::tag('p', s(shorten_text(strip_tags($notice->content), 180))) .
-            html_writer::div(($section == 'incidents' ? html_writer::span(service::states()[$notice->state],
-                'orange-status orange-status-' . $notice->state) : '') . html_writer::span(s($label), 'orange-reading'), 'orange-card-footer') .
-            html_writer::link(orange_link('view.php', ['id' => $notice->id]), 'Leer aviso →', ['class' => 'orange-card-link']),
-            ['class' => 'orange-card']);
+        $detailurl = orange_link('view.php', ['id' => $notice->id]);
+        $title = html_writer::link($detailurl, s($notice->title),
+            ['class' => $section === 'incidents' ? 'orange-incident-title' : 'orange-notification-title']);
+        if (!$notice->published) {
+            $title .= html_writer::span(get_string('incidentdraft', 'local_orangeportal'), 'orange-incident-draft');
+        }
+        $cells = html_writer::tag('td', $title . html_writer::div(
+            s(shorten_text(strip_tags($notice->content), 120)), 'orange-incident-summary'));
+        $cells .= html_writer::tag('td', s($cats[$notice->categoryid]->name));
+        $cells .= html_writer::tag('td', s(userdate($notice->timecreated, '%d/%m/%Y')));
+        if ($section === 'incidents') {
+            $cells .= html_writer::tag('td', s(service::impacts()[$notice->impact]));
+            $cells .= html_writer::tag('td', html_writer::span(s(service::states()[$notice->state]),
+                'orange-status orange-status-' . $notice->state));
+        }
+        $readingkey = $receipt && $receipt->confirmed ? 'incidentconfirmed' :
+            ($receipt && $receipt->readtime ? 'incidentreadpending' : 'incidentunread');
+        $cells .= html_writer::tag('td', get_string($readingkey, 'local_orangeportal'));
+        $rows .= html_writer::tag('tr', $cells);
     }
 }
-if (!$cards) { $cards = html_writer::div('No hay contenido disponible para esta selección.', 'orange-empty'); }
+if ($rows) {
+    $headers = '';
+    $columns = $section === 'incidents' ? ['title', 'category', 'date', 'impact', 'state', 'reading'] :
+        ['title', 'category', 'date', 'reading'];
+    foreach ($columns as $column) {
+        $key = $section === 'notifications' && $column === 'title' ? 'notificationcolumntitle' : 'incidentcolumn' . $column;
+        $headers .= html_writer::tag('th', get_string($key, 'local_orangeportal'), ['scope' => 'col']);
+    }
+    $table = html_writer::tag('caption', $titles[$section], ['class' => 'sr-only']) .
+        html_writer::tag('thead', html_writer::tag('tr', $headers)) . html_writer::tag('tbody', $rows);
+    $listing = html_writer::div(html_writer::tag('table', $table, ['class' => 'orange-notices-table orange-' . $section . '-table']),
+        'orange-table-scroll', ['tabindex' => '0', 'role' => 'region', 'aria-label' => $titles[$section]]);
+} else {
+    if (!$cards) { $cards = html_writer::div('No hay contenido disponible para esta selección.', 'orange-empty'); }
+    $listing = html_writer::div($cards, in_array($section, ['incidents', 'notifications']) ? 'orange-notices-empty' : 'orange-cards');
+}
 $content = html_writer::tag('p', $count . ' ' . ($section == 'library' ? 'colecciones disponibles' : 'resultados'), ['class' => 'orange-result-count']) .
-    html_writer::div($cards, 'orange-cards');
+    $listing;
 if ($tree) {
     $tree = html_writer::tag('h3', $section == 'library' ? 'Explorar biblioteca' : 'Categorías') .
         html_writer::link(orange_link('index.php', ['section' => $section]), 'Ver todo', ['class' => 'orange-tree-all']) . $tree;

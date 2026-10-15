@@ -9,7 +9,7 @@ function orange_page(string $title, string $section, moodle_url $url): void {
     $PAGE->set_title($title . ' · Orange');
     $PAGE->set_heading($title);
     $PAGE->set_primary_active_tab('orange_' . $section);
-    $PAGE->requires->css('/local/orangeportal/styles.css');
+    $PAGE->requires->css(new \moodle_url('/local/orangeportal/styles.css', ['v' => filemtime(__DIR__ . '/styles.css')]));
 }
 function orange_link(string $file, array $params = []): moodle_url {
     return new moodle_url('/local/orangeportal/' . $file, $params);
@@ -101,16 +101,16 @@ function orange_library_tree(int $rootid, int $selected, array $courses, string 
     };
     return $walk($rootid);
 }
-function orange_notice_tree(string $section, array $notices, int $selected): string {
+function orange_notice_tree(string $section, array $notices, int $selected, array $filters = []): string {
     global $DB;
     $cats = $DB->get_records('local_orange_category', ['kind' => $section], 'name');
-    $walk = function(int $parent) use (&$walk, $cats, $notices, $section, $selected): string {
+    $walk = function(int $parent) use (&$walk, $cats, $notices, $section, $selected, $filters): string {
         $out = '';
         foreach ($cats as $c) {
             if ($c->parentid != $parent) { continue; }
             $ids = \local_orangeportal\service::category_descendants((int)$c->id, $cats);
             $count = count(array_filter($notices, fn($n) => in_array($n->categoryid, $ids)));
-            $link = html_writer::link(orange_link('index.php', ['section' => $section, 'category' => $c->id]),
+            $link = html_writer::link(orange_link('index.php', ['section' => $section, 'category' => $c->id] + $filters),
                 s($c->name) . html_writer::span((string)$count, 'orange-count'),
                 ['class' => 'orange-tree-link' . ($selected == $c->id ? ' selected' : '')]);
             $children = $walk((int)$c->id);

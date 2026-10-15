@@ -74,3 +74,11 @@ Los títulos, campos, ayudas, botones de creación y errores de categoría usan 
 Las nuevas colecciones usan formato Temas con una sección documental, sin fechas de formación, anuncios, libro de calificaciones ni seguimiento de finalización. Estos valores se fijan en el servidor mediante el formulario nativo. Los documentos se añaden después como recursos Archivo, Carpeta, Página o Libro. Los cursos de formación conservan todos sus ajustes académicos. La edición de colecciones existentes mantiene por ahora el formulario nativo completo.
 
 Los marcos de competencias son una función académica nativa para organizar habilidades y relacionarlas con cursos y planes de aprendizaje. No son categorías documentales. La instalación local no contiene marcos ni competencias. Si se decide desactivar esta función en todo Moodle, se hace desde **Administración del sitio > Características avanzadas > Habilitar competencias**; no es necesario desactivarla globalmente para limpiar la creación de colecciones.
+
+## Eliminar categorías vacías
+
+En **Administración > Gestionar categorías > Biblioteca**, pulsar **Eliminar** junto a una categoría y confirmar su nombre. **Cancelar** vuelve al listado sin cambios. La operación requiere permiso nativo `moodle/category:manage` en la raíz, la categoría y su padre; está disponible para el editor autorizado.
+
+La categoría debe estar vacía: no puede contener subcategorías ni colecciones documentales, incluidos los ocultos. Moverlos primero mediante las herramientas nativas de Moodle. La raíz **Biblioteca** está protegida y no ofrece eliminación; tampoco se pueden eliminar categorías de otra sección manipulando la URL.
+
+El portal utiliza `core_course_category::delete_move()` hacia la categoría superior después de comprobar que no existen cursos ni subcategorías. Moodle gestiona contextos, cachés y eventos, y conserva otros contenidos del contexto mediante su traslado nativo. Se exige confirmación mediante POST con `sesskey` y se comprueba de nuevo que la categoría esté vacía. No se modifica el core ni se borran cursos o documentos.

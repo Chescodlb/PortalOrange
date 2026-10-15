@@ -5,6 +5,7 @@ require_once($CFG->libdir . '/adminlib.php');
 require_login();
 $kind = optional_param('kind', 'incidents', PARAM_ALPHA);
 $id = optional_param('id', 0, PARAM_INT);
+$deleteid = optional_param('delete', 0, PARAM_INT);
 if (!in_array($kind, ['library', 'courses', 'incidents', 'notifications'])) { throw new invalid_parameter_exception('Sección desconocida'); }
 $native = in_array($kind, ['library', 'courses']);
 $url = orange_link('categories.php', ['kind' => $kind]);
@@ -25,6 +26,26 @@ if ($native) {
 orange_page('Gestionar categorías', $kind, $url);
 $PAGE->set_primary_active_tab('siteadminnode');
 $PAGE->set_secondary_navigation(false);
+if ($deleteid) {
+    $categoryservice = $native ? \local_orangeportal\native_categories::class : \local_orangeportal\service::class;
+    $deletecategory = $native ? \local_orangeportal\native_categories::editable($kind, $deleteid)->get_db_record() :
+        $DB->get_record('local_orange_category', ['id' => $deleteid, 'kind' => $kind], '*', MUST_EXIST);
+    $blocker = $categoryservice::category_delete_blocker($kind, $deleteid);
+    if ($blocker) {
+        redirect($url, get_string($blocker, 'local_orangeportal'), null, \core\output\notification::NOTIFY_ERROR);
+    }
+    if (data_submitted() && optional_param('confirm', 0, PARAM_BOOL)) {
+        require_sesskey();
+        $categoryservice::delete_category($kind, $deleteid);
+        redirect($url, get_string('categorydeleted', 'local_orangeportal'), null, \core\output\notification::NOTIFY_SUCCESS);
+    }
+    echo $OUTPUT->header();
+    $confirmurl = orange_link('categories.php', ['kind' => $kind, 'delete' => $deleteid, 'confirm' => 1]);
+    echo $OUTPUT->confirm(get_string('deletecategoryconfirm', 'local_orangeportal', s($deletecategory->name)),
+        new single_button($confirmurl, get_string('delete'), 'post'), $url);
+    echo $OUTPUT->footer();
+    exit;
+}
 $form = new \local_orangeportal\form\category($url, ['kind' => $kind, 'excluded' => $excluded, 'options' => $options]);
 if ($form->is_cancelled()) { redirect($url); }
 if ($data = $form->get_data()) {
@@ -66,7 +87,10 @@ echo html_writer::tag('nav', $categorylinks, ['class' => 'orange-admin-links ora
 $form->display();
 $table = new html_table(); $table->head = ['Categoría', 'Acciones'];
 foreach (($native ? array_filter(\local_orangeportal\native_categories::options($kind), fn($id) => $id !== 0, ARRAY_FILTER_USE_KEY) : orange_category_options($kind)) as $catid => $name) {
-    $table->data[] = [s($name), html_writer::link(orange_link('categories.php', ['kind' => $kind, 'id' => $catid]), 'Editar / mover')];
+    $actions = html_writer::link(orange_link('categories.php', ['kind' => $kind, 'id' => $catid]), 'Editar / mover');
+    $actions .= ' · ' . html_writer::link(orange_link('categories.php', ['kind' => $kind, 'delete' => $catid]),
+        get_string('delete'), ['aria-label' => get_string('deletecategorynamed', 'local_orangeportal', $name)]);
+    $table->data[] = [s($name), $actions];
 }
 echo html_writer::table($table);
 echo $OUTPUT->footer();

@@ -132,6 +132,28 @@ class service {
             throw new \invalid_parameter_exception('Category does not belong to this section');
         }
     }
+    /** Empty categories only: never delete publications or subcategories implicitly. */
+    public static function category_delete_blocker(string $kind, int $categoryid): string {
+        global $DB;
+        require_capability('local/orangeportal:manage', \context_system::instance());
+        if (!in_array($kind, ['incidents', 'notifications'])) {
+            throw new \invalid_parameter_exception('Invalid section');
+        }
+        self::validate_category($kind, $categoryid);
+        if ($DB->record_exists('local_orange_category', ['parentid' => $categoryid])) {
+            return 'categoryhassubcategories';
+        }
+        if ($DB->record_exists('local_orange_notice', ['categoryid' => $categoryid])) {
+            return 'categoryhaspublications';
+        }
+        return '';
+    }
+    public static function delete_category(string $kind, int $categoryid): void {
+        global $DB;
+        $blocker = self::category_delete_blocker($kind, $categoryid);
+        if ($blocker) { throw new \moodle_exception($blocker, 'local_orangeportal'); }
+        $DB->delete_records('local_orange_category', ['id' => $categoryid, 'kind' => $kind]);
+    }
     public static function save_notice(\stdClass $data, array $targets): int {
         $factory = \core\lock\lock_config::get_lock_factory('local_orangeportal');
         $lock = $factory->get_lock('notice_' . (int)($data->id ?? 0), 10);

@@ -83,7 +83,7 @@ class hooks {
                 defined('CLI_SCRIPT') && CLI_SCRIPT) {
             return;
         }
-        $PAGE->requires->css('/local/orangeportal/styles.css');
+        $PAGE->requires->css(new \moodle_url('/local/orangeportal/styles.css', ['v' => filemtime(__DIR__ . '/../styles.css')]));
         course_creation::presentation();
         breadcrumb::apply();
         // Error pages may default PAGE->url to the site root; use the actual request.

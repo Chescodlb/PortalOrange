@@ -178,7 +178,7 @@ try {
     await screenshot('menu-biblioteca-agente');
     await navigate('/local/orangeportal/index.php?section=incidents');
     await openMenu('incidents');
-    check(await evaluate(`document.querySelectorAll('.orange-card').length===2 && JSON.stringify(Array.from(document.querySelectorAll('#orange-menu-incidents .orange-count')).map(n=>n.textContent))===JSON.stringify(Array.from(document.querySelectorAll('.orange-sidebar .orange-count')).map(n=>n.textContent))`), 'Contadores del menú coinciden con las incidencias accesibles');
+    check(await evaluate(`document.querySelectorAll('.orange-incidents-table tbody tr').length>=2 && JSON.stringify(Array.from(document.querySelectorAll('#orange-menu-incidents .orange-count')).map(n=>n.textContent))===JSON.stringify(Array.from(document.querySelectorAll('.orange-sidebar .orange-count')).map(n=>n.textContent))`), 'Contadores del menú coinciden con las incidencias accesibles');
     await send('Emulation.setDeviceMetricsOverride', {width:390,height:844,deviceScaleFactor:1,mobile:true});
     await navigate('/local/orangeportal/index.php?section=library');
     await evaluate(`document.querySelector('[data-target="theme_moove-drawers-primary"]').click()`);
@@ -218,8 +218,8 @@ try {
   check(await evaluate(`document.querySelectorAll('.orange-card').length===2`), 'Agente ve sus dos colecciones nativas');
   await screenshot('biblioteca-agente');
   await navigate('/local/orangeportal/index.php?section=incidents');
-  check(await evaluate(`document.querySelectorAll('.orange-card').length===2`), 'Asignaciones individuales y por cohorte');
-  const incidentUrl = await evaluate(`document.querySelector('.orange-card h3 a').href`);
+  check(await evaluate(`document.querySelectorAll('.orange-incidents-table tbody tr').length>=2`), 'Asignaciones individuales y por cohorte');
+  const incidentUrl = await evaluate(`document.querySelector('.orange-incident-title').href`);
   await navigate(incidentUrl);
   await wait(`!!document.querySelector('.orange-notice-content')`);
   check(await evaluate(`document.body.innerText.includes('Leído:')`), 'Apertura registra lectura');
@@ -234,8 +234,8 @@ try {
   check(await evaluate(`document.body.innerText.includes('Agente Orange')`), 'Estado compartido con autor en histórico');
   await screenshot('incidencia-agente');
   await navigate('/local/orangeportal/index.php?section=notifications');
-  check(await evaluate(`document.querySelectorAll('.orange-card').length>=2`), 'Noticias por grupo y comunicados por cohorte');
-  const notificationUrl = await evaluate(`document.querySelector('.orange-card h3 a').href`);
+  check(await evaluate(`document.querySelectorAll('.orange-notifications-table tbody tr').length>=2`), 'Noticias por grupo y comunicados por cohorte');
+  const notificationUrl = await evaluate(`document.querySelector('.orange-notification-title').href`);
   await navigate(notificationUrl);
   if (await evaluate(`!!document.querySelector('input[name="action"][value="confirm"]')`)) {
     await evaluate(`document.querySelector('input[name="action"][value="confirm"]').form.querySelector('button').click()`);
@@ -250,7 +250,7 @@ try {
   await logout(); await login('agente.otro', env.ORANGE_DEMO_PASSWORD);
   check(await evaluate(`document.querySelectorAll('.orange-card').length===0`), 'Otro equipo no ve documentos restringidos');
   await navigate('/local/orangeportal/index.php?section=incidents');
-  check(await evaluate(`document.querySelectorAll('.orange-card').length===0`), 'Otro equipo no ve incidencias ni contadores ajenos');
+  check(await evaluate(`document.querySelectorAll('.orange-incidents-table tbody tr').length===0`), 'Otro equipo no ve incidencias ni contadores ajenos');
   await navigate(incidentUrl);
   check(!(await evaluate(`!!document.querySelector('.orange-notice-content')`)), 'Acceso directo a incidencia ajena denegado');
   await navigate('/local/orangeportal/reports.php');

@@ -41,3 +41,11 @@ Al pulsar «Nuevo curso» desde Cursos, el selector del formulario nativo muestr
 La ruta de navegación al crear un curso es **Cursos > Crear un nuevo curso**; el primer enlace vuelve a la raíz de Cursos. No muestra «Página Principal» ni lleva a Biblioteca.
 
 Moodle ofrece un selector conjunto de las categorías donde se tiene permiso; no dispone de un ajuste para separar estos dos accesos manteniendo ambos permisos. El plugin usa los hooks nativos del formulario y valida la categoría al guardar, sin modificar el core. La creación desde la administración general y la edición de cursos existentes conservan su comportamiento nativo.
+
+## Eliminar categorías vacías
+
+En **Administración > Gestionar categorías > Cursos**, pulsar **Eliminar** junto a una categoría y confirmar su nombre. **Cancelar** vuelve al listado sin cambios. La operación requiere permiso nativo `moodle/category:manage` en la raíz, la categoría y su padre; está disponible para el editor autorizado.
+
+La categoría debe estar vacía: no puede contener subcategorías ni cursos, incluidos los ocultos. Moverlos primero mediante las herramientas nativas de Moodle. La raíz **Cursos** está protegida y no ofrece eliminación; tampoco se pueden eliminar categorías de otra sección manipulando la URL.
+
+El portal utiliza `core_course_category::delete_move()` hacia la categoría superior después de comprobar que no existen cursos ni subcategorías. Moodle gestiona contextos, cachés y eventos, y conserva otros contenidos del contexto mediante su traslado nativo. Se exige confirmación mediante POST con `sesskey` y se comprueba de nuevo que la categoría esté vacía. No se modifica el core ni se borran cursos o documentos.

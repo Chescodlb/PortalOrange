@@ -57,4 +57,32 @@ class native_categories {
         }
         return (int)\core_course_category::create($data)->id;
     }
+    /** Include hidden courses and categories when checking whether the category is empty. */
+    public static function category_delete_blocker(string $kind, int $id): string {
+        global $DB;
+        $root = self::root($kind);
+        require_capability('moodle/category:manage', \context_coursecat::instance($root->id));
+        $category = self::editable($kind, $id);
+        if (!$category->can_delete()) {
+            throw new \required_capability_exception(\context_coursecat::instance($id),
+                'moodle/category:manage', 'nopermissions', '');
+        }
+        if ($DB->record_exists('course_categories', ['parent' => $id])) { return 'categoryhassubcategories'; }
+        if ($DB->record_exists('course', ['category' => $id])) {
+            return $kind === 'library' ? 'categoryhascollections' : 'categoryhascourses';
+        }
+        if (!$category->can_move_content_to((int)$category->parent)) {
+            return 'categorydeletefailed';
+        }
+        return '';
+    }
+    public static function delete_category(string $kind, int $id): void {
+        $blocker = self::category_delete_blocker($kind, $id);
+        if ($blocker) { throw new \moodle_exception($blocker, 'local_orangeportal'); }
+        $category = self::editable($kind, $id);
+        // Native deletion preserves category context content by moving it to its parent.
+        if (!$category->delete_move((int)$category->parent, false)) {
+            throw new \moodle_exception('categorydeletefailed', 'local_orangeportal');
+        }
+    }
 }
