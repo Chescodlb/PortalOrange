@@ -26,7 +26,13 @@ class notice_options {
         return $out;
     }
     public static function default_code(string $type): string {
-        return array_key_first(self::choices($type, true));
+        foreach (self::choices($type, true) as $code => $name) {
+            if ($type !== 'states' || !self::is_closed($code)) { return $code; }
+        }
+        throw new \moodle_exception('incidentneedopenstate', 'local_orangeportal');
+    }
+    public static function is_closed(string $state): bool {
+        return (bool)(self::records('states')[$state]['closed'] ?? ($state === 'closed'));
     }
     public static function with_lock(callable $action) {
         $lock = \core\lock\lock_config::get_lock_factory('local_orangeportal')->get_lock('notice_options', 10);
@@ -45,9 +51,9 @@ class notice_options {
             ($type === 'states' && $DB->record_exists_select('local_orange_state_log',
                 'oldstate = ? OR newstate = ?', [$code, $code]));
     }
-    public static function save(string $type, string $code, string $name, bool $active): string {
+    public static function save(string $type, string $code, string $name, bool $active, ?bool $closed = null): string {
         require_capability('local/orangeportal:manageoptions', \context_system::instance());
-        return self::with_lock(function() use ($type, $code, $name, $active) {
+        return self::with_lock(function() use ($type, $code, $name, $active, $closed) {
             $records = self::records($type);
             if ($code !== '' && !isset($records[$code])) { throw new \invalid_parameter_exception('Unknown option'); }
             $name = trim(clean_param($name, PARAM_TEXT));
@@ -61,7 +67,19 @@ class notice_options {
             }
             // Alphabetic immutable identifiers fit existing fields and PARAM_ALPHA inputs.
             if ($code === '') { $code = 'custom' . strtr(bin2hex(random_bytes(6)), '0123456789', 'ghijklmnop'); }
-            $records[$code] = ['name' => $name, 'active' => $active];
+            $record = ['name' => $name, 'active' => $active];
+            if ($type === 'states') {
+                $oldclosed = (bool)($records[$code]['closed'] ?? ($code === 'closed'));
+                $record['closed'] = $closed ?? $oldclosed;
+                if ($record['closed'] !== $oldclosed && self::used($type, $code)) {
+                    throw new \moodle_exception('incidentclassificationused', 'local_orangeportal');
+                }
+                $candidate = $records; $candidate[$code] = $record;
+                if (!array_filter($candidate, fn($r, $key) => $r['active'] && !($r['closed'] ?? ($key === 'closed')), ARRAY_FILTER_USE_BOTH)) {
+                    throw new \moodle_exception('incidentneedopenstate', 'local_orangeportal');
+                }
+            }
+            $records[$code] = $record;
             self::store($type, $records);
             return $code;
         });
@@ -79,6 +97,10 @@ class notice_options {
     private static function store(string $type, array $records): void {
         if (!array_filter($records, fn($r) => $r['active'])) {
             throw new \moodle_exception('lastactiveoption', 'local_orangeportal');
+        }
+        if ($type === 'states' && !array_filter($records,
+                fn($r, $key) => $r['active'] && !($r['closed'] ?? ($key === 'closed')), ARRAY_FILTER_USE_BOTH)) {
+            throw new \moodle_exception('incidentneedopenstate', 'local_orangeportal');
         }
         set_config('notice_' . $type, json_encode($records, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), 'local_orangeportal');
     }

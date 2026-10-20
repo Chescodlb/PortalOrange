@@ -6,7 +6,7 @@ defined('MOODLE_INTERNAL') || die();
 class course_creation {
     public static function section(): ?string {
         global $PAGE, $CFG;
-        if (!get_config('local_orangeportal', 'enabled') || $PAGE->url->get_param('id') ||
+        if (!experience::member() || $PAGE->url->get_param('id') ||
                 $PAGE->url->get_path() !== parse_url($CFG->wwwroot . '/course/edit.php', PHP_URL_PATH) ||
                 $PAGE->url->get_param('returnto') !== 'url') {
             return null;

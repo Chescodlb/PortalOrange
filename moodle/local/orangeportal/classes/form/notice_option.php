@@ -13,6 +13,10 @@ class notice_option extends \moodleform {
         $m->addRule('name', get_string('required'), 'required', null, 'client');
         $m->addElement('advcheckbox', 'active', get_string('optionactive', 'local_orangeportal'));
         $m->setDefault('active', 1);
+        if ($this->_customdata['type'] === 'states') {
+            $m->addElement('advcheckbox', 'closed', get_string('incidentclosingstate', 'local_orangeportal'));
+            $m->addElement('static', 'closedhelp', '', get_string('incidentclosingstatehelp', 'local_orangeportal'));
+        }
         $this->add_action_buttons(true, get_string('savechanges'));
     }
     public function validation($data, $files): array {

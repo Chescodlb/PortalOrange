@@ -1,6 +1,10 @@
 # Gestionar usuarios y permisos
 
-Moodle permite crear roles y asignar permisos por contexto. Una persona puede tener más de un rol y pertenecer a varias cohortes y grupos. RPV/CENTREX es una rama de Biblioteca y no representa un colectivo de usuarios.
+Moodle permite crear roles y asignar permisos por contexto. Una persona puede tener más de un rol y pertenecer a varias cohortes y grupos. RPV y CENTREX son categorías de Biblioteca y no representan colectivos de usuarios.
+
+## Habilitar la experiencia Orange
+
+Añadir el usuario a la cohorte de sistema **Usuarios Orange** y seguir [el procedimiento de navegación y tema](02-navegacion.md). La cohorte habilita el portal; los roles existentes determinan las acciones permitidas. Tener un rol Orange sin pertenecer a la cohorte no cambia la experiencia general de Moodle ni habilita el acceso directo al portal. No usar como criterio el nombre de usuario, el dominio del correo o ser administrador.
 
 ## Crear y modificar usuarios
 
@@ -12,11 +16,11 @@ Abrir **Usuarios > Permisos > Definir roles** para crear o modificar un perfil. 
 
 | Perfil | Asignación inicial | Permisos |
 | --- | --- | --- |
-| Agente | Estudiante en sus cursos y bibliotecas | Consulta, evaluación y confirmación de sus avisos; cambio de estado de incidencias asignadas |
-| Formador | Profesor con edición en sus colecciones/cursos y Creación de contenidos Orange en Biblioteca y Cursos | Nuevos documentos, colecciones y cursos; recursos, preguntas y evaluaciones de sus cursos |
-| Coordinación | Profesor sin edición en sus cursos y rol global Coordinación Orange | Resultados de cursos autorizados, trazabilidad de publicaciones y gestión de Estados e Impactos |
+| Agente | Estudiante en sus cursos y bibliotecas | Consulta y evaluación; incidencias abiertas asignadas sin cambiar estados; confirmación manual solo en Notificaciones |
+| Formador | Rol global Formador Orange; Profesor con edición y Creación de contenidos Orange en sus ámbitos formativos | Funciones del antiguo editor: publicar avisos, categorías y catálogos; CRUD de incidencias, todos los estados y seguimiento; además sus funciones de formación |
+| Coordinación | Profesor sin edición en sus cursos y rol global Coordinación Orange | Consulta todas las incidencias y su seguimiento, resultados autorizados y catálogos; no cambia estados ni publica |
 | Responsable documental | Profesor con edición en las colecciones documentales que gestiona | Publicación y mantenimiento de recursos; no requiere ser administrador global |
-| Responsable de comunicaciones | Rol global Responsable de comunicaciones Orange | Publicación, categorías y asignación de incidencias y notificaciones; gestión de Estados e Impactos |
+| Antiguo editor/comunicaciones | Integrado en Formador Orange | Se conserva el ID del rol para no perder asignaciones; `editor.orange` queda como cuenta histórica de pruebas de ese mismo perfil |
 | Administrador | Administrador del sitio | Configuración general y todas las funciones |
 
 Las capacidades del plugin se pueden buscar al definir un rol:
@@ -24,7 +28,8 @@ Las capacidades del plugin se pueden buscar al definir un rol:
 - `local/orangeportal:manage`: publicar, editar, asignar y gestionar categorías de avisos.
 - `local/orangeportal:viewreports`: acceder al panel de resultados y confirmaciones.
 - `local/orangeportal:manageoptions`: gestionar Estados e Impactos desde el portal; asignado a coordinación y comunicaciones. No concede administración general ni publicación de avisos.
-- `local/orangeportal:changestate`: cambiar el estado compartido de una incidencia visible.
+- `local/orangeportal:changestate`: cambiar estados de incidencias; reservado al Formador, nunca al agente o coordinador.
+- `local/orangeportal:viewallincidents`: consultar abiertas/cerradas y el panel específico de seguimiento; no concede edición.
 
 Para ver notas de un curso también hace falta `moodle/grade:viewall` en ese curso. El permiso del portal por sí solo no concede acceso a notas de cursos ajenos.
 
@@ -42,9 +47,9 @@ Los avisos permiten asignar tanto cohortes como grupos de cursos e individuos. C
 
 Referencia: [Grupos y cohortes en Moodle](https://docs.moodle.org/404/en/Groups_and_cohorts).
 
-## Editor de categorías de Biblioteca y Cursos
+## Formador y categorías de Biblioteca y Cursos
 
-`editor.orange` tiene además el rol **Gestión de categorías Orange**, con `moodle/category:manage`, asignado en las dos categorías raíz **Biblioteca** y **Cursos**, no en el sistema. Permite crear, editar, mover y gestionar subcategorías dentro de esas raíces, sin conceder administración general ni gestión de categorías ajenas.
+Formador (incluida la cuenta histórica `editor.orange`) tiene además el rol **Gestión de categorías Orange**, con `moodle/category:manage`, asignado en las dos categorías raíz **Biblioteca** y **Cursos**, no en el sistema. Permite crear, editar, mover y gestionar subcategorías dentro de esas raíces, sin conceder administración general ni gestión de categorías ajenas.
 
 Para asignarlo a otro usuario desde Moodle: abrir **Administración > Cursos > Administrar cursos y categorías**, seleccionar Biblioteca y entrar en **Permisos > Asignar roles**; asignar **Gestión de categorías Orange**. Repetir en Cursos si corresponde. Para retirar ese acceso, quitar la asignación en la raíz correspondiente. El permiso se hereda en sus subcategorías. No concede por sí solo matrícula, creación de cursos, edición de recursos ni acceso a informes.
 

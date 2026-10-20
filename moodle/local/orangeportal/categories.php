@@ -3,6 +3,7 @@ require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/locallib.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_login();
+\local_orangeportal\experience::require_access();
 $kind = optional_param('kind', 'incidents', PARAM_ALPHA);
 $id = optional_param('id', 0, PARAM_INT);
 $deleteid = optional_param('delete', 0, PARAM_INT);

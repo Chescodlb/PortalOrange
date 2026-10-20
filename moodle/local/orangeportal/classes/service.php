@@ -26,8 +26,14 @@ class service {
     public static function can_view(\stdClass $notice, ?int $userid = null, bool $allowmanager = true): bool {
         global $USER;
         $userid = $userid ?? (int)$USER->id;
-        if ($allowmanager && $userid == $USER->id && self::manager()) {
+        if (!experience::member($userid)) { return false; }
+        if (!empty($notice->deleted)) { return false; }
+        if ($allowmanager && $userid == $USER->id && (self::manager() ||
+                ($notice->kind === 'incidents' && incident_workflow::all()))) {
             return true;
+        }
+        if ($notice->kind === 'incidents' && notice_options::is_closed($notice->state) && !incident_workflow::all($userid)) {
+            return false;
         }
         return $notice->published && self::assigned((int)$notice->id, $userid);
     }
@@ -45,6 +51,9 @@ class service {
     public static function receipt(\stdClass $notice, string $stage): ?\stdClass {
         global $DB, $USER;
         self::require_view($notice);
+        if ($notice->kind === 'incidents' && $stage === 'confirmed') {
+            throw new \moodle_exception('incidentnoconfirmation', 'local_orangeportal');
+        }
         if (!in_array($stage, ['received', 'readtime', 'confirmed'])) {
             throw new \coding_exception('Invalid receipt stage');
         }
@@ -117,11 +126,15 @@ class service {
             notice_options::validate_selection('states', $state, $current->state);
             $transaction = $DB->start_delegated_transaction();
             if ($current->state != $state) {
+                $closure = (object)['kind' => 'incidents', 'state' => $state];
+                incident_workflow::change_metadata($closure, $current);
                 $DB->insert_record('local_orange_state_log', (object)['noticeid' => $notice->id,
                     'userid' => $USER->id, 'oldstate' => $current->state, 'newstate' => $state,
                     'timecreated' => time()]);
                 $current->state = $state;
                 $current->timemodified = time();
+                $current->timeclosed = $closure->timeclosed;
+                $current->closedby = $closure->closedby;
                 $DB->update_record('local_orange_notice', $current);
             }
             $transaction->allow_commit();
@@ -201,6 +214,8 @@ class service {
         }
         $existing = !empty($data->id) ? $DB->get_record('local_orange_notice',
             ['id' => $data->id, 'kind' => $data->kind], '*', MUST_EXIST) : null;
+        if ($existing && !empty($existing->deleted)) { throw new \invalid_parameter_exception('Deleted publication'); }
+        incident_workflow::change_metadata($data, $existing);
         notice_options::validate_selection('states', $data->state, $existing->state ?? null);
         notice_options::validate_selection('impacts', $data->impact, $existing->impact ?? null);
         $tx = $DB->start_delegated_transaction();
@@ -221,7 +236,8 @@ class service {
                     'oldstate' => $old->state, 'newstate' => $data->state, 'timecreated' => time()]);
             }
             // Require a fresh reading/confirmation when published text changes.
-            if ($old->title !== $data->title || $old->content !== $data->content) {
+            if ($old->title !== $data->title || $old->content !== $data->content ||
+                    ($data->kind === 'incidents' && ($old->client !== $data->client || $old->product !== $data->product))) {
                 $data->revision++;
             }
             $DB->update_record('local_orange_notice', $data);

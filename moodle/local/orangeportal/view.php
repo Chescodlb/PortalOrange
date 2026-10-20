@@ -3,6 +3,7 @@ require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/locallib.php');
 use local_orangeportal\service;
 require_login();
+\local_orangeportal\experience::require_access();
 $id = required_param('id', PARAM_INT);
 $notice = $DB->get_record('local_orange_notice', ['id' => $id], '*', MUST_EXIST);
 service::require_view($notice);
@@ -30,10 +31,21 @@ echo orange_intro($category->name, $notice->title, get_string('noticeversiondate
 echo html_writer::div(format_text($notice->content, FORMAT_HTML, ['context' => context_system::instance()]), 'orange-notice-content');
 if ($receipt && service::can_view($notice, (int)$USER->id, false)) {
     echo html_writer::div(get_string('receiptdates', 'local_orangeportal', (object)['received' => userdate($receipt->received), 'read' => userdate($receipt->readtime)]), 'orange-receipt');
-    echo $receipt->confirmed ? $OUTPUT->notification(get_string('confirmedon', 'local_orangeportal', userdate($receipt->confirmed)), 'success') :
-        orange_post_button($url, get_string('confirmreading', 'local_orangeportal'), ['action' => 'confirm', 'revision' => $notice->revision]);
-} else { echo $OUTPUT->notification(get_string('managementpreview', 'local_orangeportal'), 'info'); }
+    if ($notice->kind === 'notifications') {
+        echo $receipt->confirmed ? $OUTPUT->notification(get_string('confirmedon', 'local_orangeportal', userdate($receipt->confirmed)), 'success') :
+            orange_post_button($url, get_string('confirmreading', 'local_orangeportal'), ['action' => 'confirm', 'revision' => $notice->revision]);
+    }
+} else { echo $OUTPUT->notification(get_string($notice->kind === 'incidents' ? 'incidentmanagementpreview' : 'managementpreview', 'local_orangeportal'), 'info'); }
 if ($notice->kind == 'incidents') {
+    echo html_writer::tag('p', s(get_string('incidentclient', 'local_orangeportal') . ': ' . ($notice->client ?: '—') .
+        ' · ' . get_string('incidentproduct', 'local_orangeportal') . ': ' . ($notice->product ?: '—')));
+    if ($notice->timeclosed) {
+        echo html_writer::tag('p', s(get_string('incidentcloseddate', 'local_orangeportal') . ': ' . userdate($notice->timeclosed)));
+    }
+    if (\local_orangeportal\incident_workflow::all()) {
+        echo html_writer::div(html_writer::link(orange_link('incident_tracking.php', ['id' => $id]),
+            get_string('incidenttracking', 'local_orangeportal'), ['class' => 'btn btn-outline-secondary']), 'orange-toolbar');
+    }
     echo html_writer::tag('h3', get_string('currentstatus', 'local_orangeportal', s(service::states()[$notice->state])));
     if (has_capability('local/orangeportal:changestate', context_system::instance())) {
         $form = html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]) .

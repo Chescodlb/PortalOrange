@@ -1,4 +1,5 @@
-// Aplicar en Moove > Avanzado > SCSS en bruto. No modifica archivos del tema.
+// Referencia anterior al aislamiento. Fuente activa: moodle/theme/orange/scss/brand.scss.
+// No aplicar este archivo al SCSS global de Moove en un campus compartido.
 body { font-family: Arial, Helvetica, sans-serif; background-color: #f5f5f5; }
 .navbar { background: #000 !important; border-bottom: 3px solid #ff7900; }
 .navbar .nav-link, .navbar .usermenu .dropdown-toggle, .navbar .icon, .navbar .navbar-brand { color: #fff !important; }

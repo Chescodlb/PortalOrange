@@ -18,7 +18,7 @@ class observer {
     }
     private static function alert(int $userid, int $courseid, string $title, string $text): void {
         global $DB;
-        if (!$userid || !get_config('local_orangeportal', 'automaticalerts') ||
+        if (!experience::member($userid) || !get_config('local_orangeportal', 'automaticalerts') ||
                 !get_config('local_orangeportal', 'version')) { return; }
         $course = $DB->get_record('course', ['id' => $courseid]);
         $rootid = (int)get_config('local_orangeportal', 'coursescategory');

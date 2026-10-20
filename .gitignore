@@ -20,3 +20,8 @@ node_modules/
 test-results/
 .venv/
 *.log
+
+# Tema hijo propio; los temas originales siguen como dependencias.
+!moodle/theme/
+moodle/theme/*
+!moodle/theme/orange/

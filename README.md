@@ -6,7 +6,7 @@ Repositorio: [Chescodlb/PortalOrange](https://github.com/Chescodlb/PortalOrange)
 
 ## Portal Orange local
 
-La navegación contiene Biblioteca, Cursos, Incidencias y Notificaciones, con Administración para los perfiles autorizados. La biblioteca usa categorías y recursos nativos de Moodle; las evaluaciones y encuestas usan sus actividades estándar. Los avisos y sus confirmaciones se gestionan desde **Administración > Portal Orange** mediante el plugin propio `local_orangeportal`, sin modificar el core ni Moove.
+La cohorte **Usuarios Orange** recibe Biblioteca, Cursos, Incidencias y Notificaciones, con Administración para los perfiles autorizados, y el tema hijo propio `theme_orange`. El resto conserva la experiencia nativa del sitio. El acceso es común. La configuración se explica en [la guía de aislamiento](docs/02-navegacion.md). La biblioteca usa categorías y recursos nativos de Moodle; las evaluaciones y encuestas usan sus actividades estándar. Los avisos y sus confirmaciones se gestionan desde **Administración > Portal Orange** mediante el plugin propio `local_orangeportal`, sin modificar el core ni Moove.
 
 Consulta las [guías de administración por caso](docs/README.md), la [implementación y sus límites](docs/implementacion.md) y el [recorrido de prueba](docs/08-pruebas-y-revision.md). Los perfiles ficticios usan la clave `ORANGE_DEMO_PASSWORD` de `.env`.
 
@@ -44,3 +44,11 @@ La restauración se hará en una base de datos local vacía, sustituyendo el có
 La instalación limpia tiene el envío de correo desactivado. Al restaurar una base de datos del portal, hay que volver a comprobar esa configuración antes de arrancar cron o probar integraciones.
 
 Referencias: [migración de Moodle 4.5](https://docs.moodle.org/405/en/Moodle_migration) · [Moove](https://moodle.org/plugins/theme_moove/versions) · [Moodle 4.5.1](https://packaging.moodle.org/stable405/)
+
+## Comprobar las dos experiencias
+
+- `agente.orange` y los demás perfiles Orange: portal y diseño Orange.
+- `usuario.externo`: navegación y diseño Moove estándar de la demo. Usa `ORANGE_DEMO_PASSWORD` de `.env`.
+- Administrador general: administración completa de Moodle, sin diseño Orange mientras no pertenezca a la cohorte.
+
+No ejecutar los inicializadores de demostración en el campus existente. El despliegue debe conservar su tema y configuración general y asignar Orange únicamente a su cohorte.

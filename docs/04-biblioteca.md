@@ -1,28 +1,43 @@
-# Gestionar la biblioteca RPV/CENTREX
+# Gestionar la biblioteca RPV y CENTREX
 
-La biblioteca usa categorías de Moodle para el árbol y cursos como colecciones documentales. Dentro de cada colección se añaden recursos nativos. El cliente puede crear, mover y renombrar categorías sin editar código.
+La biblioteca usa categorías nativas de Moodle y cursos como colecciones documentales. El usuario navega por columnas y selecciona directamente los recursos Archivo, Carpeta, Página, Libro o URL de las colecciones, sin entrar antes en el curso documental. El cliente puede crear, mover y renombrar categorías, colecciones y recursos desde Moodle.
+
+## Navegación por columnas · 20/10/2026
+
+**Biblioteca** en el menú superior abre una página; ya no despliega un árbol flotante. La primera columna permite elegir RPV o CENTREX. Cada elección abre a su derecha la lista de categorías hijas, con el nombre de la categoría seleccionada como título. No se utilizan los títulos fijos Proceso, Subproceso, Detalle o Sistemas. La columna final se llama **Documentos**. Los pasos seleccionados de la ruta y el documento elegido se resaltan con fondo naranja suave y texto/borde naranja, siguiendo la referencia visual.
+
+Ejemplo de recorrido: `RPV → ALTA → Alta con terminal → SIM Física → Documentos`. Las categorías pueden tener más o menos niveles; no se fija una profundidad. La lista final recoge los recursos accesibles de las colecciones de la rama seleccionada, incluidas sus subcategorías. Las colecciones se mantienen en Moodle para organizar y gestionar los documentos, pero no añaden un paso obligatorio al lector.
+
+Al seleccionar un documento se muestra su ruta, título, descripción y tipo, con **Abrir documento**. El botón abre el recurso nativo de Moodle y respeta su configuración de visualización. Los perfiles con permiso para gestionar actividades ven además **Gestionar colección**, para editar sus recursos y accesos con las herramientas nativas. Antes de seleccionar no hay botón de apertura. En móvil, las columnas se desplazan horizontalmente dentro de la biblioteca; los enlaces y la búsqueda funcionan sin JavaScript. Una mejora opcional de foco muestra la siguiente columna tras navegar.
 
 ## Estructura inicial
 
 ```text
 Biblioteca
-└── RPV/CENTREX
-    └── Proceso
-        └── Subproceso
-            └── Producto cuando corresponda
-                └── Colección documental
+├── RPV
+│   └── ALTA
+│       └── Alta con terminal
+│           └── SIM Física
+│               └── Colección documental → recursos
+└── CENTREX (vacía por ahora)
 ```
 
-Se han importado las 121 filas de contenido del Excel facilitado. RPV/CENTREX es una sola rama, conforme a la aclaración del usuario. Las celdas fusionadas de proceso y subproceso se propagan a sus productos. Hay procesos o subprocesos sin producto y se conservan como nodos finales válidos.
+El contenido importado de las 121 filas del Excel se mantiene inicialmente bajo RPV. RPV y CENTREX son ahora categorías separadas, reemplazando la decisión inicial de una rama única. En la demo, las ramas que estaban bajo CENTREX se han trasladado a RPV con las APIs nativas, conservando los IDs, cursos, recursos y sus permisos. El script explícito `cli/reorganize_library.php` solo admite localhost y no debe ejecutarse automáticamente contra el campus existente.
 
-Todos los usuarios ven el árbol completo, incluidas categorías vacías o sin contenido asignado, en los desplegables de la barra superior. Cada usuario solo ve las colecciones y los recursos para los que tiene permiso; un recurso restringido sigue protegido por Moodle aunque alguien conozca su URL.
+Todos los usuarios Orange pueden explorar la estructura completa, incluidas las categorías vacías. Los documentos se filtran por matrícula/acceso al curso, visibilidad de la categoría, visibilidad y disponibilidad de la actividad, restricciones nativas por grupos y capacidad de vista del recurso. Los recursos ocultos de la página del curso (incluidos los de tipo stealth) no se añaden al listado. Moodle vuelve a comprobar los permisos al abrir cada documento.
+
+## Búsqueda global
+
+**Buscar en toda la biblioteca** busca por nombre y descripción de los recursos accesibles, con independencia de la rama seleccionada, y muestra los resultados en la columna derecha **Documentos**. No busca en el cuerpo de los PDF, archivos adjuntos ni el contenido interno de páginas o libros. **Limpiar búsqueda** vuelve a la biblioteca sin filtro. Seleccionar otra categoría retoma la navegación por su rama. Elegir un resultado sitúa las columnas en su ruta y muestra su ficha, conservando la búsqueda global.
+
+Las descripciones proceden del campo nativo de descripción del recurso; no se duplica el contenido en tablas del portal. No se envían al navegador datos de documentos restringidos para filtrarlos después en JavaScript.
 
 ## Crear o reorganizar categorías
 
 1. Entrar con `editor.orange` o un perfil autorizado y abrir **Administración > Gestionar categorías > Biblioteca**. También sirve **Biblioteca > Gestionar biblioteca**.
 2. Escribir el nombre de la nueva categoría.
-3. En **Categoría superior**, elegir **Biblioteca · raíz de la sección** para una rama principal o una categoría existente para una subrama. Para mantener los procedimientos dentro de RPV/CENTREX, elegir esa rama o alguno de sus descendientes.
-4. Pulsar **Guardar categoría**. El árbol superior se actualiza con la estructura de Moodle.
+3. En **Categoría superior**, elegir **Biblioteca · raíz de la sección** para una rama principal o una categoría existente para una subrama. Para mantener los procedimientos dentro de RPV, elegir esa rama o alguno de sus descendientes.
+4. Pulsar **Guardar categoría**. Las columnas se actualizan con la estructura de Moodle.
 5. Usar **Editar / mover** en el listado para renombrar o cambiar la categoría superior. El selector excluye la categoría editada y sus descendientes.
 
 El formulario es el mismo estilo que Incidencias y Notificaciones, pero crea y actualiza categorías nativas mediante `core_course_category`. Biblioteca y Cursos tienen listados y selectores separados. No se puede seleccionar una categoría de Cursos como superior de una categoría de Biblioteca ni modificar la raíz desde este formulario.
@@ -82,3 +97,21 @@ En **Administración > Gestionar categorías > Biblioteca**, pulsar **Eliminar**
 La categoría debe estar vacía: no puede contener subcategorías ni colecciones documentales, incluidos los ocultos. Moverlos primero mediante las herramientas nativas de Moodle. La raíz **Biblioteca** está protegida y no ofrece eliminación; tampoco se pueden eliminar categorías de otra sección manipulando la URL.
 
 El portal utiliza `core_course_category::delete_move()` hacia la categoría superior después de comprobar que no existen cursos ni subcategorías. Moodle gestiona contextos, cachés y eventos, y conserva otros contenidos del contexto mediante su traslado nativo. Se exige confirmación mediante POST con `sesskey` y se comprueba de nuevo que la categoría esté vacía. No se modifica el core ni se borran cursos o documentos.
+
+## Implementación y comprobación
+
+La generación de columnas, la consulta de recursos permitidos y la búsqueda se reúnen en `classes/library_browser.php`, reutilizando `orange_native_courses()` y `get_fast_modinfo()`. Las categorías siguen gestionadas con las APIs nativas; no se crean tablas ni se modifica el core o Moove. La presentación por columnas requiere código porque no existe un ajuste nativo para ese recorrido dentro del portal. Los textos nuevos están en español e inglés y el diseño sigue limitado a la cohorte Orange.
+
+`node scripts/test-orange-browser.mjs --library-columns-only` comprueba el recorrido, selección, apertura, búsqueda, móvil, traducciones y que Formaciones abra directamente su página. `php local/orangeportal/cli/check_library_browser.php` dentro del contenedor comprueba búsquedas globales y permisos, incluidos recursos ocultos, restricciones por grupo y capacidades de módulo; revierte todas las actividades y roles temporales.
+
+## Orden y lectura individual · 20/10/2026
+
+El listado se abre por defecto con **Más recientes**, usando la fecha de última actualización del recurso nativo. El selector compacto está a la derecha de **Documentos** en la misma línea. Permite cambiar a **Nombre** y aplica el orden automáticamente, sin botón; esta mejora usa JavaScript. La elección se conserva al navegar por las categorías o buscar, mediante el parámetro de URL `order`. No modifica un orden compartido para otros usuarios.
+
+Cada documento se presenta en una fila: indicador naranja a la izquierda, centrado verticalmente, y a su lado nombre, descripción y breadcrumb en tres líneas. El check indica **Leído**; el punto y el título destacado indican **Sin leer**. Los indicadores tienen etiquetas accesibles y texto al pasar el cursor. Las líneas largas se abrevian visualmente con puntos suspensivos y conservan el texto completo al pasar el cursor. La fecha no aparece en la fila; se utiliza para ordenar. La marca es individual y se registra al abrir realmente el recurso nativo; seleccionar su ficha no lo marca. Se mantiene al volver a entrar. No se exige activar finalización académica ni se concede acceso adicional a contenidos.
+
+El plugin observa el evento nativo `course_module_viewed` para recursos de Biblioteca y miembros Orange. Guarda únicamente usuario, ID del módulo y primera fecha de apertura en `local_orange_doc_read`, con una clave única por usuario/recurso. También aprovecha registros existentes de la tabla nativa `course_modules_viewed` cuando los hay; no depende de registros de actividad que puedan purgarse y no reconstruye aperturas antiguas sin evidencia. La marca indica una apertura del recurso, no una confirmación explícita de lectura ni el versionado de sus archivos. Editar un documento cambia su fecha y posición entre los recientes, pero no reinicia esta marca de lectura.
+
+Los registros nuevos se incluyen en las herramientas de privacidad de Moodle para exportación y eliminación. Al eliminar un módulo, se limpian sus marcas. Actualizar el plugin desde Administración > Notificaciones o con `admin/cli/upgrade.php --non-interactive` crea la tabla sin modificar tablas nativas ni Moove. La apariencia de los usuarios externos no cambia.
+
+Prueba reversible: `docker compose exec -T web php local/orangeportal/cli/check_document_reads.php`. Comprueba fechas frente a lectura, orden alfabético, ficha sin apertura, lectura por usuario, reapertura sin duplicados, vistas nativas previas, exclusión de usuarios externos y limpieza de registros y privacidad.

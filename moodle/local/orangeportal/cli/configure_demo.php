@@ -20,7 +20,7 @@ $assetdir = rtrim($options['assets'], '/');
 $password = getenv('ORANGE_DEMO_PASSWORD');
 if (!$password || strlen($password) < 12) { cli_error('Define ORANGE_DEMO_PASSWORD con al menos 12 caracteres.'); }
 if (!is_readable($assetdir . '/library-matrix-rows.json')) { cli_error('Falta la extracción local de la matriz.'); }
-if (!is_readable($assetdir . '/orange-logo.png') || !is_readable($assetdir . '/orange-theme.scss')) { cli_error('Faltan los recursos de marca.'); }
+if (!is_readable($assetdir . '/orange-logo.png')) { cli_error('Faltan los recursos de marca.'); }
 \core\session\manager::set_user(get_admin());
 if (!get_string_manager()->translation_exists('es')) {
     cli_error('Instala el paquete español desde Administración > Idioma > Paquetes de idioma antes de cargar los ejemplos.');
@@ -37,7 +37,9 @@ function orange_demo_category(string $name, int $parent, string $key): \core_cou
     return \core_course_category::create((object)['name' => $name, 'parent' => $parent, 'idnumber' => $idnumber]);
 }
 $library = orange_demo_category('Biblioteca', 0, 'library');
-$branch = orange_demo_category('RPV/CENTREX', $library->id, 'library/RPV-CENTREX');
+$branch = orange_demo_category('RPV', $library->id, 'library/RPV-CENTREX');
+if ($branch->name === 'RPV/CENTREX') { $branch->update(['name' => 'RPV']); }
+$centrextop = orange_demo_category('CENTREX', $library->id, 'library/CENTREX');
 $training = orange_demo_category('Cursos', 0, 'training');
 $process = ''; $subprocess = ''; $processcat = null; $subcat = null; $leafcats = []; $paths = [];
 foreach ($rows as $row) {
@@ -170,17 +172,24 @@ function orange_demo_role(string $shortname, string $name, array $caps, array $c
     foreach ($caps as $cap) { assign_capability($cap, CAP_ALLOW, $id, context_system::instance()->id); }
     return $id;
 }
-$publishrole = orange_demo_role('orange_publicador', 'Responsable de comunicaciones Orange', ['local/orangeportal:manage']);
+$publishrole = orange_demo_role('orange_publicador', 'Formador Orange', ['local/orangeportal:manage', 'local/orangeportal:changestate', 'local/orangeportal:viewallincidents', 'local/orangeportal:viewreports']);
 $reportrole = orange_demo_role('orange_seguimiento', 'Coordinación Orange', ['local/orangeportal:viewreports']);
 foreach ([$publishrole, $reportrole] as $roleid) {
     assign_capability('local/orangeportal:manageoptions', CAP_ALLOW, $roleid, context_system::instance()->id);
 }
 role_assign($publishrole, $publisher->id, context_system::instance()->id);
+role_assign($publishrole, $trainer->id, context_system::instance()->id);
+foreach (['manage', 'changestate', 'viewallincidents', 'viewreports'] as $cap) {
+    assign_capability('local/orangeportal:' . $cap, CAP_ALLOW, $publishrole, context_system::instance()->id);
+}
+assign_capability('local/orangeportal:viewallincidents', CAP_ALLOW, $reportrole, context_system::instance()->id);
 role_assign($reportrole, $coordinator->id, context_system::instance()->id);
 $categoryrole = orange_demo_role('orange_gestorcategorias', 'Gestión de categorías Orange',
     ['moodle/category:manage'], [CONTEXT_COURSECAT]);
 foreach (['librarycategory', 'coursescategory'] as $setting) {
-    role_assign($categoryrole, $publisher->id, context_coursecat::instance((int)get_config('local_orangeportal', $setting))->id);
+    foreach ([$publisher, $trainer] as $u) {
+        role_assign($categoryrole, $u->id, context_coursecat::instance((int)get_config('local_orangeportal', $setting))->id);
+    }
 }
 $contentrole = orange_demo_role('orange_creadorcontenidos', 'Creación de contenidos Orange',
     ['moodle/course:create'], [CONTEXT_COURSECAT]);
@@ -240,40 +249,27 @@ foreach ($examples as [$kind, $categoryid, $title, $content, $impact, $targets])
             'content' => $content, 'impact' => $impact, 'state' => 'open', 'published' => 1], $targets);
     }
 }
-// Native theme configuration: files stored using the same areas as Moove's admin settings.
-$fs = get_file_storage();
-$context = context_system::instance();
-if (!$fs->get_file($context->id, 'theme_moove', 'logo', 0, '/', 'orange-logo.png')) {
-    $fs->create_file_from_pathname(['contextid' => $context->id, 'component' => 'theme_moove', 'filearea' => 'logo',
-        'itemid' => 0, 'filepath' => '/', 'filename' => 'orange-logo.png'], $assetdir . '/orange-logo.png');
-    set_config('logo', '/orange-logo.png', 'theme_moove');
+// Orange is an opt-in experience; never write brand settings to the site's Moove theme.
+set_config('brandcolor', '#FF7900', 'theme_orange');
+set_config('secondarymenucolor', '#000000', 'theme_orange');
+set_config('fontsite', 'Moodle', 'theme_orange');
+$orangecohort = $DB->get_record('cohort', ['idnumber' => 'orange_portal_users']);
+if (!$orangecohort) {
+    $orangecohort = (object)['contextid' => context_system::instance()->id,
+        'name' => 'Usuarios Orange', 'idnumber' => 'orange_portal_users', 'visible' => 1];
+    $orangecohort->id = cohort_add_cohort($orangecohort);
 }
-set_config('brandcolor', '#FF7900', 'theme_moove');
-set_config('secondarymenucolor', '#000000', 'theme_moove');
-set_config('scss', file_get_contents($assetdir . '/orange-theme.scss'), 'theme_moove');
-set_config('fontsite', 'Moodle', 'theme_moove');
-set_config('displaymarketingbox', 0, 'theme_moove');
-set_config('numbersfrontpage', 0, 'theme_moove');
-set_config('slidercount', 0, 'theme_moove');
-set_config('theme', 'moove');
-set_config('lang', 'es');
-set_config('timezone', 'Europe/Madrid');
-set_config('forcelogin', 1);
-set_config('guestloginbutton', 0);
-set_config('enabledashboard', 0);
-set_config('enablecompletion', 1);
-set_config('enableavailability', 1);
-set_config('enablemessaging', 1);
-set_config('defaulthomepage', '/local/orangeportal/index.php?section=library');
-set_config('noreplyaddress', 'noreply@localhost.invalid');
-set_config('noemailever', 1);
-set_config('custommenuitems', '');
+foreach (['agente.orange', 'agente.otro', 'editor.orange', 'coordinador.orange', 'formador.orange'] as $username) {
+    cohort_add_member($orangecohort->id, $DB->get_field('user', 'id', ['username' => $username], MUST_EXIST));
+}
+set_config('allowcohortthemes', 1);
+$orangecohort->theme = 'orange';
+cohort_update_cohort($orangecohort);
+set_config('audiencecohort', $orangecohort->id, 'local_orangeportal');
 set_config('automaticalerts', 1, 'local_orangeportal');
 set_config('enabled', 1, 'local_orangeportal');
-require_once($CFG->libdir . '/adminlib.php');
-admin_write_settings(['s__fullname' => 'Orange · Portal de agentes', 's__shortname' => 'Orange']);
 theme_reset_all_caches();
-echo "Portal local configurado. Biblioteca raíz: {$library->id}; rama RPV/CENTREX: {$branch->id}.\n";
+echo "Portal local configurado. Biblioteca raíz: {$library->id}; rama RPV: {$branch->id}.\n";
 echo 'Categorías de biblioteca: ' . $DB->count_records_select('course_categories', 'path LIKE ?', [$library->path . '/%']) . "\n";
 echo "Usuarios de prueba: agente.orange, agente.otro, coordinador.orange, editor.orange, formador.orange.\n";
 echo "Contraseña: ORANGE_DEMO_PASSWORD de .env (no se muestra).\n";

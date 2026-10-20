@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/orangeportal/db" VERSION="20261013" COMMENT="Orange portal">
+<XMLDB PATH="local/orangeportal/db" VERSION="20261020" COMMENT="Orange portal">
   <TABLES>
+    <TABLE NAME="local_orange_doc_read" COMMENT="Personal views of Orange library resources">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="readtime" TYPE="int" LENGTH="10" NOTNULL="true"/>
+      </FIELDS>
+      <KEYS><KEY NAME="primary" TYPE="primary" FIELDS="id"/><KEY NAME="user" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/><KEY NAME="module" TYPE="foreign" FIELDS="cmid" REFTABLE="course_modules" REFFIELDS="id"/></KEYS>
+      <INDEXES><INDEX NAME="usermodule" UNIQUE="true" FIELDS="userid,cmid"/></INDEXES>
+    </TABLE>
     <TABLE NAME="local_orange_category" COMMENT="Editable notice category tree">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
@@ -18,6 +28,12 @@
         <FIELD NAME="categoryid" TYPE="int" LENGTH="10" NOTNULL="true"/>
         <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="true"/>
         <FIELD NAME="content" TYPE="text" NOTNULL="true"/>
+        <FIELD NAME="client" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT=""/>
+        <FIELD NAME="product" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT=""/>
+        <FIELD NAME="timeclosed" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="closedby" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="deleted" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="deletedby" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
         <FIELD NAME="impact" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="normal"/>
         <FIELD NAME="state" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="open"/>
         <FIELD NAME="published" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0"/>

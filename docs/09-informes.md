@@ -25,3 +25,7 @@ La tabla de avisos muestra cada destinatario actual y sus fechas de recibido, le
 Las lecturas históricas siguen disponibles aunque el usuario deje de pertenecer al colectivo. La tabla principal usa destinatarios actuales; el histórico usa las lecturas efectivamente registradas. Los datos de confirmación y cambio de estado se gestionan también mediante las herramientas de privacidad de Moodle.
 
 Las vistas personales de responsables sin asignación se guardan en `local_orange_receipt` con `readtime`, dejando `received` y `confirmed` a cero. Pueden aparecer en el histórico de la versión, pero no añaden destinatarios a la tabla principal. No se crean tablas ni campos nuevos. Si posteriormente se asigna la publicación al responsable, se reutiliza su registro individual de esa versión y la recepción y confirmación siguen sus pasos habituales.
+
+## Seguimiento específico de Incidencias · 20/10/2026
+
+Usar **Incidencias > Seguimiento de incidencias** para revisar destinatarios, aperturas, fechas y responsable de cierre e histórico por versión/estado. Se requiere `local/orangeportal:viewallincidents` y pertenecer a Orange. Formador puede gestionar y cambiar estados; coordinación solo consulta. En los informes combinados, la columna Confirmado muestra **No aplica** para Incidencias; Notificaciones conserva su confirmación. Ver [flujo y permisos](06-incidencias.md).

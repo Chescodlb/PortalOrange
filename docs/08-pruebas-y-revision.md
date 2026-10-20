@@ -93,3 +93,23 @@ Ejecutar `node scripts/test-orange-browser.mjs --breadcrumb-user-only`. Con agen
 ### Administración en español e inglés
 
 Ejecutar `node scripts/test-orange-browser.mjs --admin-languages-only`. Verifica con editor las pestañas de incidencias/notificaciones, sus tablas, formularios de creación/edición, las cuatro gestiones de categorías y los catálogos. Con coordinador comprueba resultados, encabezados, instrucciones e histórico. Incluye Nuevo documento con formador y los ajustes existentes del plugin y la vista de gestión de un aviso con administrador. No cambia contenido y genera capturas en `backups/previews/`. Los nombres guardados por los usuarios permanecen en su idioma original.
+
+## Aislamiento por cohorte · 19/10/2026
+
+Ejecutar `node scripts/test-orange-browser.mjs --isolation-only`. Comprueba acceso común, tema hijo y logo Orange, cuatro secciones, breadcrumbs personales, perfil editor y ajustes del administrador general. Con `usuario.externo` comprueba menú/tema nativos y denegación de enlaces directos al portal. Produce capturas y `backups/previews/isolation-checks.json` (ignorados por Git). No crea publicaciones ni cambia sus estados.
+
+Ejecutar `docker compose exec -T web php local/orangeportal/cli/check_experience.php`. Verifica pertenencia y tema nativos, entrada/salida de cohorte, que el rol editorial sin cohorte no habilita el portal, que la cohorte no concede permisos y que el portal se cierra si no tiene cohorte o se desactiva. Los datos temporales se revierten y los ajustes se restauran. Limitado a la demo local. No ejecutar simultáneamente con las pruebas de navegador.
+
+Los recorridos anteriores que asumían que el administrador general también tenía el portal Orange deben ejecutarse con una cuenta administrativa incluida expresamente en la cohorte. El administrador general de la demo queda fuera por defecto para probar la convivencia. Volver a iniciar sesión tras cambiar miembros o temas de cohortes, según el mecanismo nativo de Moodle.
+
+## Biblioteca por columnas · 20/10/2026
+
+Ejecutar `node scripts/test-orange-browser.mjs --library-columns-only` y `docker compose exec -T web php local/orangeportal/cli/check_library_browser.php` por separado. El primer recorrido no cambia datos; el segundo crea actividades/roles/grupos temporales en una transacción y los revierte. Comprobar RPV y CENTREX separadas, el contenido actual bajo RPV, títulos de columna por categoría, recursos nativos con botón tras seleccionar, búsqueda por nombre/descripción en toda la biblioteca y las restricciones por usuario/grupo. Los recorridos antiguos que abrían un desplegable Biblioteca quedan sustituidos por esta prueba.
+
+## Orden y lectura de documentos · 20/10/2026
+
+Ejecutar `docker compose exec -T web php local/orangeportal/cli/check_document_reads.php` para las pruebas reversibles del modelo y `node scripts/test-orange-browser.mjs --library-reading-only` para la interfaz. El recorrido de navegador abre un documento del agente y registra esa vista real; comprueba que el formador conserve sus propios estados, el orden por fecha/nombre, el selector compacto automático, móvil y textos en inglés.
+
+## Flujo de Incidencias · 20/10/2026
+
+Ejecutar `docker compose exec -T web php local/orangeportal/cli/check_incident_workflow.php` para la prueba reversible del modelo y `node scripts/test-orange-browser.mjs --incidents-workflow-only` para la interfaz. Verifica formador con funciones del editor, exclusión de cerradas para agentes, ausencia de confirmación, seguimiento de coordinador sin cambios de estado, campos de cliente/producto, filtros laterales, indicador de lectura, móvil e inglés. Los recorridos anteriores que permitían al agente actualizar estados o confirmar incidencias quedan sustituidos por esta prueba.

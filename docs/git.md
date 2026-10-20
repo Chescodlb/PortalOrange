@@ -2,7 +2,7 @@
 
 Repositorio: https://github.com/Chescodlb/PortalOrange
 
-La rama principal es `main`. El repositorio remoto es público y aún no se ha hecho push. Se versionan Docker, scripts, documentación, estilos y el plugin propio `moodle/local/orangeportal/`. Moodle y Moove se mantienen como dependencias descargables; sus archivos originales no se modifican.
+La rama principal es `main`. El repositorio remoto es público y aún no se ha hecho push. Se versionan Docker, scripts, documentación, estilos y los componentes propios `moodle/local/orangeportal/` y `moodle/theme/orange/`. Moodle y Moove se mantienen como dependencias descargables; sus archivos originales no se modifican.
 
 ## Archivos que permanecen locales
 
@@ -32,7 +32,7 @@ El commit inicial `805cf77` guardó el entorno y un esqueleto del plugin todaví
 ## Recuperación en otra máquina
 
 1. Clonar el repositorio y copiar `.env.example` a `.env` con contraseñas locales propias.
-2. Descargar Moodle 4.5.1 y Moove 4.5.1 en sus rutas del README, conservando `moodle/local/orangeportal/` del repositorio.
+2. Descargar Moodle 4.5.1 y Moove 4.5.1 en sus rutas del README, conservando `moodle/local/orangeportal/` y `moodle/theme/orange/` del repositorio.
 3. Ejecutar `bash scripts/init-fresh.sh` para una instalación limpia.
 4. Los documentos y datos existentes requieren una restauración independiente; no están en Git.
 

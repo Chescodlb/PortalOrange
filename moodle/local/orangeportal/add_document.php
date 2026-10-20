@@ -3,6 +3,7 @@ require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/locallib.php');
 require_once($CFG->libdir . '/formslib.php');
 require_login();
+\local_orangeportal\experience::require_access();
 $rootid = (int)get_config('local_orangeportal', 'librarycategory');
 $courses = array_filter(orange_native_courses($rootid), fn($c) =>
     has_capability('moodle/course:manageactivities', context_course::instance($c->id)) &&

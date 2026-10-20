@@ -82,3 +82,91 @@ body.orange-wide-listing .orange-intro p{width:100%;max-width:none;box-sizing:bo
 .orange-category-path:focus-visible{outline:2px solid #000;outline-offset:3px}
 .orange-category-fullpath{display:none;position:absolute;top:100%;left:0;z-index:10;width:max-content;max-width:min(28rem,70vw);padding:8px 12px;background:#000;color:#fff;border-radius:4px;box-shadow:0 2px 6px #0003}
 .orange-category-path:hover .orange-category-fullpath,.orange-category-path:focus .orange-category-fullpath{display:block}
+
+/* Library: category-labelled columns and native documents, independent of theme files. */
+.orange-library-search{margin:20px 0 24px;max-width:780px}
+.orange-library-search label{display:block;font-size:.85rem;font-weight:700;margin-bottom:6px}
+.orange-library-search-controls{display:flex;align-items:center;gap:12px}
+.orange-library-search-controls .form-control{flex:1;min-width:0}
+.orange-library-clear{display:inline-block;margin-top:8px;font-size:.85rem}
+.orange-library-browser{display:flex;align-items:stretch;gap:8px;overflow-x:auto;max-width:100%;padding-bottom:12px;scrollbar-width:thin}
+.orange-library-browser:focus-visible{outline:2px solid #000;outline-offset:3px}
+.orange-library-column{flex:0 0 clamp(170px,15vw,220px);min-width:0;border:1px solid #dedde0;border-radius:8px;padding:16px 12px;background:#fff}
+.orange-library-column h3{font-size:1rem;font-weight:700;line-height:1.4;margin:0 0 12px;padding-bottom:12px;border-bottom:1px solid #dedde0;overflow-wrap:anywhere}
+.orange-library-branches,.orange-library-documents{list-style:none;padding:0;margin:0;max-height:440px;overflow-y:auto;overscroll-behavior:contain}
+.orange-library-branches li,.orange-library-documents li{margin:0 0 4px}
+.orange-library-category{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 8px;border-left:3px solid transparent;border-radius:4px;color:#242424;font-size:.85rem;line-height:1.4;overflow-wrap:anywhere}
+.orange-library-category span:last-child{color:#ff7900;font-size:1.15rem;flex-shrink:0}
+.orange-library-category:hover,.orange-library-document:hover{background:#f5f5f5}
+body .orange-library-category.is-selected,body .orange-library-document.is-selected{border-left-color:#ff7900;background:#fff0e5;color:#ff7900;font-weight:700}
+.orange-library-category:focus-visible,.orange-library-document:focus-visible{outline:2px solid #000;outline-offset:-2px}
+.orange-library-results{flex:1 0 300px;display:flex;flex-direction:column}
+.orange-library-result-count,.orange-library-empty{font-size:.85rem;color:#595959;line-height:1.5}
+.orange-library-documents{max-height:320px}
+.orange-library-document{display:flex;align-items:center;gap:12px;padding:10px 8px;border-left:3px solid transparent;border-radius:4px;color:#242424;font-size:.9rem;line-height:1.5;overflow-wrap:anywhere}
+.orange-library-document-path,.orange-library-collection{display:block;font-size:.75rem;font-weight:400;color:#595959;margin:4px 0 0;overflow-wrap:anywhere}
+.orange-library-detail{margin-top:20px;padding-top:16px;border-top:1px solid #dedde0;font-size:.9rem;line-height:1.5;overflow-wrap:anywhere}
+.orange-library-detail h4{font-size:1.15rem;font-weight:700;margin:8px 0}
+.orange-library-resource-type{font-size:.8rem;color:#595959;display:block;margin-bottom:12px}
+.orange-library-open{display:inline-block;max-width:100%;white-space:normal}
+.orange-library-manage{display:block;margin-top:12px;font-size:.85rem}
+@media(max-width:575px){.orange-library-column{flex-basis:180px}.orange-library-results{flex-basis:calc(100vw - 64px)}.orange-library-browser{scroll-snap-type:x proximity}.orange-library-column{scroll-snap-align:start}.orange-library-search-controls{gap:8px}}
+
+/* Personal reading state and explicit ordering, independent of course completion. */
+.orange-library-results-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid #dedde0}
+.orange-library-results-heading h3{flex:1;border:0;padding:0;margin:0}
+.orange-library-sort{display:block;flex:0 1 auto;min-width:0;max-width:58%;margin:0}
+.orange-library-sort .custom-select{min-width:0;width:auto;max-width:100%;font-size:.75rem;height:30px;min-height:30px}
+.orange-library-read-icon{display:flex;align-items:center;justify-content:center;flex:0 0 24px;width:24px;font-size:1.25rem;line-height:1;color:#ff7900}
+.orange-library-document.is-unread .orange-library-read-icon{font-size:.75rem}
+.orange-library-document-text{display:block;flex:1;min-width:0}
+.orange-library-document-text strong,.orange-library-document-text .orange-library-document-path,.orange-library-document-description{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.orange-library-document-description{font-size:.8rem;font-weight:400;color:#595959;margin-top:4px}
+.orange-library-document.is-read strong{font-weight:400}
+
+/* Incident workspace: filters on the left and a reading marker as the first table column. */
+.orange-incidents-layout{display:grid;grid-template-columns:250px minmax(0,1fr);gap:24px;align-items:start}
+.orange-incidents-filters{padding:22px 18px;background:#2e3338;color:#fff;border-radius:8px}
+.orange-incidents-filters h3{font-size:1.25rem;font-weight:700;margin:0 0 20px;padding-bottom:16px;border-bottom:1px solid #60666c;color:#fff}
+.orange-incident-filter{margin:0 0 14px}
+.orange-incident-filter label{display:block;font-size:.82rem;font-weight:700;margin:0 0 6px}
+.orange-incident-filter .form-control,.orange-incident-filter .custom-select{display:block;width:100%;min-width:0;max-width:100%;font-size:.82rem}
+.orange-incident-unread-filter{display:block;font-size:.85rem;margin:12px 0 18px}
+.orange-incident-unread-filter input{margin-right:6px}
+body .orange-incidents-filters .orange-incident-reset{display:block;color:#fff;font-size:.8rem;margin-top:12px}
+.orange-incidents-results{min-width:0}
+.orange-incident-list-heading{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 16px}
+.orange-incident-list-heading h2{font-size:1.4rem;font-weight:700;margin:0}
+.orange-incident-total{font-size:.85rem;font-weight:700;color:#595959}
+.orange-incident-list-actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.orange-incident-list-actions .btn{font-size:.8rem}
+body .orange-incidents-table{min-width:920px;font-size:.8rem}
+body .orange-incidents-table th,body .orange-incidents-table td{padding:12px 10px}
+body .orange-incidents-table td:first-child,body .orange-incidents-table th:first-child{width:24px;min-width:24px;padding:12px 4px;text-align:center}
+body .orange-incidents-table td:nth-child(2){width:34%;min-width:240px}
+.orange-incident-unread{display:inline-block;min-width:10px;color:#ff7900;font-weight:700;font-size:1.3rem;line-height:1.2}
+.orange-incident-title-row{display:flex;gap:8px;align-items:flex-start;line-height:1.4}
+.orange-incident-identifier{flex-shrink:0;display:inline-block;padding:4px 6px;border-radius:5px;background:#ff7900;color:#000;font-size:.7rem;font-weight:700;font-variant-numeric:tabular-nums}
+.orange-incident-category-label{font-size:.7rem;color:#595959;margin-top:6px}
+.orange-incident-category-label .orange-category-name{font-weight:400}
+.orange-incident-category-label .orange-category-path{font-size:.7rem;margin-top:2px}
+@media(max-width:900px){.orange-incidents-layout{grid-template-columns:1fr}.orange-incidents-filters form{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.orange-incident-filter{margin:0}.orange-incidents-filters h3{margin-bottom:14px}.orange-incident-unread-filter{margin:0;align-self:center}}
+
+/* Communications reuse the incident sidebar and keep their own existing filters. */
+.orange-communications-filter-form .orange-filter-field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.orange-communications-filter-form label{font-size:.82rem;font-weight:700;margin:0}
+.orange-communications-filter-form .form-control,.orange-communications-filter-form .custom-select{width:100%;min-width:0;max-width:100%;font-size:.82rem}
+.orange-communications-filters .orange-incident-reset{margin-top:12px}
+
+/* Five personal Orange indicators; account and logout remain Moodle's user menu. */
+.orange-personal-updates{display:flex;align-items:center;gap:4px;padding:0 6px}
+body .navbar .orange-update{position:relative;display:flex;align-items:center;justify-content:center;width:38px;height:44px;color:#ff7900!important;text-decoration:none;border-radius:4px}
+.orange-update svg{display:block;flex-shrink:0}
+.orange-update-count{position:absolute;top:0;right:-2px;min-width:17px;padding:1px 4px;border-radius:9px;background:#ff7900;color:#000;font-size:10px;font-weight:700;line-height:15px;text-align:center}
+.orange-update:not(.has-updates) .orange-update-count{background:#333;color:#fff}
+body .navbar .orange-update:hover,body .navbar .orange-update:focus-visible{background:#333;outline:2px solid #ff7900;outline-offset:-2px}
+@media(max-width:767px){.orange-personal-updates{gap:1px;padding:0 2px}.navbar .orange-personal-updates .orange-update{width:27px;height:42px}.orange-update svg{width:19px;height:19px}.orange-update-count{font-size:9px;min-width:14px;padding:0 3px;right:-1px}}
+
+/* Communications: reading is conveyed by the envelope, with three content columns. */
+.orange-notifications-table td:first-child{width:60%}
+.orange-notifications-table td:last-child{white-space:nowrap}

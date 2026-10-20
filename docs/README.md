@@ -6,7 +6,7 @@ El portal local está en http://localhost:8080. Los usuarios ficticios y la revi
 
 | Caso | Guía | Cómo se gestiona |
 | --- | --- | --- |
-| Logo, colores y tipografía | [Marca](01-marca.md) | Ajustes nativos de Moove |
+| Logo, colores y tipografía | [Marca](01-marca.md) | Tema hijo Orange y ajustes nativos de tema/cohorte |
 | Menú y sección de entrada | [Navegación](02-navegacion.md) | Configuración Moodle y hooks del plugin |
 | Roles, permisos y colectivos | [Usuarios y permisos](03-usuarios-y-permisos.md) | Usuarios, roles, cohortes y grupos nativos |
 | Árbol RPV/CENTREX y documentos | [Biblioteca](04-biblioteca.md) | Categorías, cursos y recursos nativos |
@@ -17,3 +17,5 @@ El portal local está en http://localhost:8080. Los usuarios ficticios y la revi
 | Avisos externos de incidencias | [Integración con Teams](10-integracion-teams.md) | Evaluación de plugins y configuración de Microsoft pendiente |
 
 La [decisión de implementación](implementacion.md) explica qué necesita código y por qué. Ningún archivo original de Moodle o Moove se ha modificado.
+
+- [Indicadores personales, contadores y fecha de incorporación](10-indicadores-personales.md).

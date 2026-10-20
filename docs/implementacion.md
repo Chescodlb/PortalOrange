@@ -6,9 +6,9 @@ La primera versión mantiene Moodle 4.5.1 y Moove 4.5.1 como dependencias sin mo
 
 | Requisito | Solución | Motivo |
 | --- | --- | --- |
-| Logo editable | Archivo de logo en Moove | Existe en sus ajustes General |
-| Naranja, negro, Arial y estilos | Ajustes de color y SCSS de Moove | Existe una interfaz administrativa para personalizar el tema |
-| Página inicial configurable | Ajuste de navegación de Moodle | El plugin registra las secciones como opciones; el cliente decide desde Moodle |
+| Logo editable y aislado | Archivo nativo de `theme_orange` | No cambia el logo del tema general |
+| Naranja, negro, Arial y estilos | Tema hijo propio `theme_orange`, con SCSS adicional configurable | Mantiene la marca fuera de Moove global y sin modificarlo |
+| Página inicial configurable solo para Orange | Ajuste del plugin y hooks condicionados por cohorte | La portada nativa del resto del sitio no cambia |
 | Roles y permisos | Capacidades y roles de Moodle | No se crea un modelo de identidad paralelo |
 | Colectivos | Cohortes y grupos de Moodle | Reutiliza pertenencia y matriculación nativas |
 | Árbol de biblioteca | Categorías nativas | Editable desde Administrar cursos y categorías |
@@ -56,3 +56,7 @@ El plugin está separado de Moodle y Moove. `assets/orange-theme.scss` se copia 
 La matriz original y su extracción se mantienen fuera de Git, igual que `.env`, los datos y los respaldos. Los ajustes efectivos de Moodle están en la base de datos: los archivos de Git no sustituyen una copia de seguridad de esa base y de `moodledata`.
 
 La gestión de categorías de Biblioteca y Cursos se presenta en el formulario del portal, con la misma estructura visual que los avisos. Utiliza `core_course_category::create()` y `update()` y valida raíz, permisos, categoría superior y ciclos. La interfaz general de Moodle sigue disponible, pero no es el destino de Gestionar biblioteca/cursos porque mezcla raíces y navegación secundaria.
+
+## Convivencia con el campus existente
+
+La experiencia se habilita por una cohorte nativa de sistema y un tema hijo de Moove. La marca se selecciona con **Permitir temas de cohortes** y **Forzar tema: Orange**; no se fuerza desde código ni se guarda un tema personalizado en cada usuario. `experience::member()` centraliza la pertenencia para el menú, los hooks de presentación, los formularios del portal, las redirecciones, las alertas automáticas y el acceso por URL. El tema base del sitio se conserva. Ver [configuración y límites](02-navegacion.md). No requiere nuevas tablas ni modifica Moodle o Moove.

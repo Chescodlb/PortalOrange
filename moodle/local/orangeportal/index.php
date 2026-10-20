@@ -5,9 +5,12 @@ use local_orangeportal\service;
 $section = optional_param('section', 'library', PARAM_ALPHA);
 $category = optional_param('category', 0, PARAM_INT);
 $query = optional_param('q', '', PARAM_TEXT);
+$document = $section === 'library' ? optional_param('document', 0, PARAM_INT) : 0;
 $status = optional_param('state', '', PARAM_ALPHA);
 $impact = optional_param('impact', '', PARAM_ALPHA);
 $pending = optional_param('pending', 0, PARAM_BOOL);
+$unread = optional_param('unread', 0, PARAM_BOOL);
+$personal = optional_param('personal', 0, PARAM_BOOL);
 $datefrom = in_array($section, ['incidents', 'notifications']) ? optional_param('datefrom', '', PARAM_RAW_TRIMMED) : '';
 $dateto = in_array($section, ['incidents', 'notifications']) ? optional_param('dateto', '', PARAM_RAW_TRIMMED) : '';
 $titles = array_combine(['library', 'courses', 'incidents', 'notifications'], array_map(
@@ -16,8 +19,16 @@ if (!isset($titles[$section])) { throw new invalid_parameter_exception('Sección
 $url = orange_link('index.php', ['section' => $section, 'category' => $category, 'q' => $query,
     'state' => $status, 'impact' => $impact, 'pending' => $pending, 'datefrom' => $datefrom, 'dateto' => $dateto]);
 orange_page($titles[$section], $section, $url);
+if ($section === 'library') { $PAGE->requires->js('/local/orangeportal/library_browser.js'); }
+if ($document) { $PAGE->url->param('document', $document); }
 if (in_array($section, ['incidents', 'notifications'])) {
     $PAGE->add_body_class('orange-wide-listing');
+}
+if ($section === 'incidents') {
+    echo $OUTPUT->header();
+    echo \local_orangeportal\incident_browser::render();
+    echo $OUTPUT->footer();
+    exit;
 }
 $dateerror = '';
 $datebounds = [];
@@ -39,7 +50,7 @@ $descriptions = ['library' => 'Procedimientos, manuales y guías para tu operati
     'courses' => 'Aprende, evalúa tus conocimientos y comparte tu valoración.',
     'incidents' => 'Consulta los avisos que afectan a tu equipo y sigue su evolución.',
     'notifications' => 'Noticias, comunicados y alertas dirigidos a ti.'];
-echo orange_intro('ORANGE · PORTAL DE AGENTES', $titles[$section], $descriptions[$section]);
+echo orange_intro('', $titles[$section], $descriptions[$section]);
 if (in_array($section, ['library', 'courses']) ?
         has_capability('moodle/category:manage', context_coursecat::instance((int)get_config('local_orangeportal',
             $section == 'library' ? 'librarycategory' : 'coursescategory'))) : service::manager()) {
@@ -69,6 +80,11 @@ if (in_array($section, ['library', 'courses'])) {
         }
     }
     if ($actions) { echo html_writer::div($actions, 'orange-toolbar orange-content-actions'); }
+}
+if ($section === 'library') {
+    echo \local_orangeportal\library_browser::render($category, $query, $document, optional_param('order', '', PARAM_ALPHA));
+    echo $OUTPUT->footer();
+    exit;
 }
 $filterfield = function(string $id, string $label, string $control, string $extra = ''): string {
     return html_writer::div(html_writer::tag('label', s($label), ['for' => $id]) . $control,
@@ -114,15 +130,31 @@ if (in_array($section, ['incidents', 'notifications'])) {
             1 => get_string('pendingconfirmations', 'local_orangeportal')], 'pending', $pending, false,
             ['id' => 'orange-confirmations', 'class' => 'custom-select']));
 }
-$search .= html_writer::tag('button', 'Buscar', ['type' => 'submit', 'class' => 'btn btn-primary']);
-echo html_writer::tag('form', $search, ['method' => 'get', 'action' => orange_link('index.php')->out(false), 'class' => 'orange-search orange-list-filters']);
+if ($section === 'notifications') {
+    $search .= $filterfield('orange-unread', get_string('updates_reading', 'local_orangeportal'),
+        html_writer::select([0 => get_string('updates_allreading', 'local_orangeportal'),
+            1 => get_string('updates_unread', 'local_orangeportal')], 'unread', $unread, false,
+            ['id' => 'orange-unread', 'class' => 'custom-select']));
+}
+if ($personal) { $search .= html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'personal', 'value' => 1]); }
+if ($section === 'courses' && $unread) {
+    $search .= html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'unread', 'value' => 1]);
+    $search .= html_writer::link(orange_link('index.php', ['section' => 'courses']), get_string('updates_showall', 'local_orangeportal'));
+}
+$search .= html_writer::tag('button', get_string('search'), ['type' => 'submit', 'class' => 'btn btn-primary']);
+$searchform = html_writer::tag('form', $search, ['method' => 'get', 'action' => orange_link('index.php')->out(false),
+    'class' => $section === 'notifications' ? 'orange-communications-filter-form' : 'orange-search orange-list-filters']);
+if ($section !== 'notifications') { echo $searchform; }
 if ($dateerror) { echo $OUTPUT->notification($dateerror, 'error'); }
 $tree = ''; $cards = ''; $rows = ''; $count = 0;
 if (in_array($section, ['library', 'courses'])) {
     $rootid = (int)get_config('local_orangeportal', $section == 'library' ? 'librarycategory' : 'coursescategory');
     $courses = orange_native_courses($rootid);
     $tree = orange_library_tree($rootid, $category, $courses, $section);
+    $access = \local_orangeportal\personal_updates::course_access();
+    $joined = \local_orangeportal\personal_updates::joined();
     foreach ($courses as $course) {
+        if ($unread && !\local_orangeportal\personal_updates::new_course($course, $access, $joined)) { continue; }
         $cat = $DB->get_record('course_categories', ['id' => $course->category]);
         if ($category && !in_array($category, explode('/', $cat->path))) { continue; }
         if ($query && stripos($course->fullname . ' ' . strip_tags($course->summary), $query) === false) { continue; }
@@ -155,6 +187,7 @@ if (in_array($section, ['library', 'courses'])) {
     $cats = $DB->get_records('local_orange_category', ['kind' => $section]);
     $selectedids = $category && isset($cats[$category]) ? service::category_descendants($category, $cats) : [];
     foreach ($notices as $notice) {
+        if ($personal && !\local_orangeportal\personal_updates::recipient($notice)) { continue; }
         if ($dateerror) { continue; }
         if (isset($datebounds['datefrom']) && $notice->timecreated < $datebounds['datefrom']) { continue; }
         if (isset($datebounds['dateto']) && $notice->timecreated >= $datebounds['dateto']) { continue; }
@@ -163,6 +196,7 @@ if (in_array($section, ['library', 'courses'])) {
         if ($status && $notice->state !== $status) { continue; }
         if ($section === 'incidents' && $impact && $notice->impact !== $impact) { continue; }
         $receipt = service::get_receipt($notice, (int)$USER->id);
+        if ($unread && $receipt && ($receipt->readtime || $receipt->confirmed)) { continue; }
         if ($pending && $receipt && $receipt->confirmed) { continue; }
         service::receipt($notice, 'received');
         $count++;
@@ -181,7 +215,8 @@ if (in_array($section, ['library', 'courses'])) {
                 html_writer::span('', 'orange-incident-icon', ['aria-hidden' => 'true']) :
                 html_writer::empty_tag('img', [
                 'src' => $OUTPUT->image_url($iconname . ($isread ? '-read' : '-unread'), 'local_orangeportal'),
-                'alt' => '', 'aria-hidden' => 'true', 'width' => 28, 'height' => 28,
+                'alt' => get_string($isread ? 'libraryread' : 'incidentunread', 'local_orangeportal'),
+                'title' => get_string($isread ? 'libraryread' : 'incidentunread', 'local_orangeportal'), 'width' => 28, 'height' => 28,
                 'class' => $section === 'incidents' ? 'orange-incident-icon' : 'orange-notification-envelope',
             ]);
             $titlecontent = html_writer::div($readingicon . html_writer::div($titlecontent),
@@ -195,22 +230,15 @@ if (in_array($section, ['library', 'courses'])) {
             $cells .= html_writer::tag('td', html_writer::span(s(service::states()[$notice->state]),
                 'orange-status orange-status-' . $notice->state));
         }
-        $readingkey = $receipt && $receipt->confirmed ? 'incidentconfirmed' :
-            ($receipt && $receipt->readtime ? 'incidentreadpending' : 'incidentunread');
-        if ($receipt && $receipt->readtime && !service::can_view($notice, (int)$USER->id, false)) {
-            $readingkey = 'managementread';
-        }
-        $readingtext = get_string($readingkey, 'local_orangeportal');
-        $cells .= html_writer::tag('td', $readingtext);
         $rows .= html_writer::tag('tr', $cells);
     }
 }
 if ($rows) {
     $headers = '';
     $columns = $section === 'incidents' ? ['title', 'category', 'date', 'impact', 'state', 'reading'] :
-        ['title', 'category', 'date', 'reading'];
+        ['title', 'category', 'date'];
     foreach ($columns as $column) {
-        $key = $section === 'notifications' && $column === 'title' ? 'notificationcolumntitle' : 'incidentcolumn' . $column;
+        $key = $section === 'notifications' && $column === 'title' ? 'communicationcolumntitle' : 'incidentcolumn' . $column;
         $headers .= html_writer::tag('th', get_string($key, 'local_orangeportal'), ['scope' => 'col']);
     }
     $table = html_writer::tag('caption', $titles[$section], ['class' => 'sr-only']) .
@@ -223,7 +251,14 @@ if ($rows) {
 }
 $content = html_writer::tag('p', $count . ' ' . ($section == 'library' ? 'colecciones disponibles' : 'resultados'), ['class' => 'orange-result-count']) .
     $listing;
-if ($tree) {
+if ($section === 'notifications') {
+    $filtertitle = get_string('communicationfilters', 'local_orangeportal');
+    $reset = html_writer::link(orange_link('index.php', ['section' => 'notifications']),
+        get_string('incidentclearfilters', 'local_orangeportal'), ['class' => 'orange-incident-reset']);
+    echo html_writer::div(html_writer::tag('aside', html_writer::tag('h3', $filtertitle) . $searchform . $reset,
+        ['class' => 'orange-incidents-filters orange-communications-filters', 'aria-label' => $filtertitle]) .
+        html_writer::div($content, 'orange-incidents-results'), 'orange-incidents-layout orange-communications-layout');
+} else if ($tree) {
     $tree = html_writer::tag('h3', $section == 'library' ? 'Explorar biblioteca' : 'Categorías') .
         html_writer::link(orange_link('index.php', ['section' => $section]), 'Ver todo', ['class' => 'orange-tree-all']) . $tree;
     echo html_writer::div(html_writer::tag('aside', $tree, ['class' => 'orange-sidebar', 'aria-label' => 'Árbol de categorías']) .

@@ -12,6 +12,12 @@ class notice extends \moodleform {
         $m->addElement('hidden', 'kind', $kind); $m->setType('kind', PARAM_ALPHA);
         $m->addElement('text', 'title', get_string('noticetitle', 'local_orangeportal'), ['size' => 70, 'maxlength' => 255]);
         $m->setType('title', PARAM_TEXT); $m->addRule('title', get_string('entertitle', 'local_orangeportal'), 'required', null, 'client');
+        if ($kind === 'incidents') {
+            foreach (['client', 'product'] as $field) {
+                $m->addElement('text', $field, get_string('incident' . $field, 'local_orangeportal'), ['maxlength' => 255]);
+                $m->setType($field, PARAM_TEXT);
+            }
+        }
         $m->addElement('select', 'categoryid', get_string('category'), \orange_category_options($kind));
         $m->addRule('categoryid', get_string('categoryrequired', 'local_orangeportal'), 'required');
         $m->addElement('editor', 'body', get_string('noticecontent', 'local_orangeportal'), null,

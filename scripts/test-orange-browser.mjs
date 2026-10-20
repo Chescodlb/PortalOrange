@@ -63,13 +63,203 @@ try {
   };
   const nav = () => evaluate(`Array.from(document.querySelectorAll('.primary-navigation .nav-link')).filter(x=>x.textContent.trim()!=='').map(x=>x.textContent.trim()).filter(x=>!['Más','More'].includes(x))`);
   await send('Page.enable'); await send('Runtime.enable');
-  if (process.argv.includes('--admin-languages-only')) {
+  if (process.argv.includes('--personal-updates-only')) {
+    await login('agente.orange', env.ORANGE_DEMO_PASSWORD);
+    await navigate('/local/orangeportal/index.php?section=notifications&lang=es');
+    await wait(`!!document.querySelector('.orange-communications-layout')`);
+    check(await evaluate(`document.querySelector('.orange-communications-filters').getBoundingClientRect().right<document.querySelector('.orange-communications-layout .orange-incidents-results').getBoundingClientRect().left`), 'Comunicados con filtros a la izquierda');
+    check(await evaluate(`['q','category','datefrom','dateto','pending','unread'].every(n=>document.querySelector('.orange-communications-filters [name="'+n+'"]'))`), 'Búsqueda, categoría, fechas, confirmación y lectura en lateral');
+    check(await evaluate(`document.querySelectorAll('.orange-personal-updates .orange-update').length===5&&!document.querySelector('#nav-notification-popover-container')&&!document.querySelector('[data-region="popover-region-messages"]')`), 'Cinco indicadores Orange sin iconos nativos de avisos y mensajes');
+    const keys=['incidents','critical','courses','library','notifications'];
+    for (const key of keys) {
+      const link=await evaluate(`document.querySelector('[data-update="${key}"]').href`);
+      const count=await evaluate(`Number(document.querySelector('[data-update="${key}"]').dataset.count)`);
+      await navigate(link);
+      check(await evaluate(`!document.querySelector('.alert-danger')&&!document.body.innerText.includes('[[updates_')&&!!document.querySelector('[data-update="${key}"] svg')`),'Indicador accesible y traducido: '+key);
+      const rows=await evaluate(key==='library'?`document.querySelectorAll('.orange-library-document').length`:key==='courses'?`document.querySelectorAll('.orange-card').length`:key==='notifications'?`document.querySelectorAll('.orange-notifications-table tbody tr').length`:`document.querySelectorAll('.orange-incidents-table tbody tr').length`);
+      check(rows===count,'Contador coincide con su listado: '+key);
+    }
+    await navigate('/local/orangeportal/index.php?section=notifications&lang=en');
+    check(await evaluate(`document.querySelector('.orange-communications-filters h3').textContent==='Filter announcements'&&document.querySelector('[data-update="courses"]').title.includes('New unopened training')`), 'Filtros e indicadores en inglés');
+    await navigate('/local/orangeportal/index.php?section=notifications&lang=es');
+    await screenshot('comunicados-filtros-e-indicadores');
+    await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+    await navigate('/local/orangeportal/index.php?section=notifications');
+    check(await evaluate(`document.documentElement.scrollWidth<=innerWidth&&Array.from(document.querySelectorAll('.orange-update')).every(e=>{const r=e.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth})`),'Indicadores y Comunicados sin desbordamiento en móvil');
+    await screenshot('comunicados-indicadores-movil');
+    await send('Emulation.clearDeviceMetricsOverride');
+    await logout();
+    await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
+    check(await evaluate(`document.querySelectorAll('.orange-update').length===5&&!!document.querySelector('.primary-navigation a[href*="manage.php"]')`),'Formador conserva indicadores y acceso de gestión');
+    await navigate('/local/orangeportal/index.php?section=notifications');
+    check(await evaluate(`!!document.querySelector('[name="pending"]')&&!!document.querySelector('.orange-communications-filters')`),'Formador conserva filtro de confirmación y lateral');
+    console.log('Verificaciones personales completas: '+results.length);
+  } else if (process.argv.includes('--incidents-workflow-only')) {
+  await login('agente.orange',env.ORANGE_DEMO_PASSWORD);
+  await navigate('/local/orangeportal/index.php?section=incidents');
+  await wait(`!!document.querySelector('.orange-incidents-layout')`);
+  check(await evaluate(`document.querySelector('.orange-incidents-filters').getBoundingClientRect().right<document.querySelector('.orange-incidents-results').getBoundingClientRect().left`),'Filtros a la izquierda de la tabla');
+  check(await evaluate(`!document.querySelector('[name="pending"]')&&!document.querySelector('.orange-incident-tracking-link')&&!Array.from(document.querySelectorAll('.orange-incidents-table th:not(:first-child)')).some(h=>h.textContent.trim()==='Lectura')`),'Agente sin confirmaciones, columna Lectura ni seguimiento administrativo');
+  check(await evaluate(`!!document.querySelector('[name="incidentclient"]')&&!!document.querySelector('[name="incidentproduct"]')&&!document.querySelector('option[value="closedonly"]')`),'Filtros cliente/producto y solo estados abiertos para el agente');
+  const target=await evaluate(`document.querySelector('.orange-incident-title')?.href`);
+  check(!!target,'Incidencia abierta accesible');
+  await screenshot('incidencias-agente-filtros-laterales');
+  await navigate(target);
+  check(await evaluate(`!document.querySelector('input[name="action"][value="confirm"]')&&!document.querySelector('input[name="action"][value="state"]')`),'Detalle del agente sin confirmar ni cambiar estado');
+  await navigate('/local/orangeportal/index.php?section=incidents');
+  const id=new URL(target).searchParams.get('id');
+  check(await evaluate(`!document.querySelector('tr[data-incident-id="${id}"] [role="img"]')`),'La exclamación desaparece tras abrir la incidencia');
+  await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+  check(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),'Incidencias sin desbordamiento de página en móvil');
+  await send('Emulation.clearDeviceMetricsOverride');await logout();
+  await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
+  await navigate('/local/orangeportal/index.php?section=incidents');
+  check(await evaluate(`!!document.querySelector('.orange-incident-tracking-link')&&!!document.querySelector('option[value="closedonly"]')`),'Formador con seguimiento y filtro de cerradas');
+  await navigate('/local/orangeportal/manage.php?kind=incidents&new=1');
+  check(await evaluate(`!!document.querySelector('[name="client"]')&&!!document.querySelector('[name="product"]')&&!!document.querySelector('[name="state"]')`),'Formador puede crear incidencias con cliente y producto');
+  await screenshot('incidencias-formador-crear');
+  await navigate(target);
+  check(await evaluate(`!!document.querySelector('input[name="action"][value="state"]')&&!document.querySelector('input[name="action"][value="confirm"]')`),'Solo formador puede actualizar estado; no hay confirmación');
+  await navigate('/local/orangeportal/incident_tracking.php');
+  check(await evaluate(`document.body.innerText.includes('Destinatarios actuales')&&document.body.innerText.includes('Destinatarios que la abrieron')`),'Seguimiento con destinatarios y aperturas');
+  await screenshot('incidencias-seguimiento-formador');await logout();
+  await login('coordinador.orange',env.ORANGE_DEMO_PASSWORD);
+  await navigate('/local/orangeportal/index.php?section=incidents');
+  check(await evaluate(`!!document.querySelector('.orange-incident-tracking-link')&&!!document.querySelector('option[value="closedonly"]')`),'Coordinador accede a todas y al seguimiento');
+  await navigate(target);
+  check(await evaluate(`!document.querySelector('input[name="action"][value="state"]')`),'Coordinador sin control para cambiar estado');
+  await navigate('/local/orangeportal/incident_tracking.php?id='+id);
+  check(await evaluate(`document.body.innerText.includes('Histórico de estados')&&document.body.innerText.includes('Histórico de aperturas por versión')`),'Seguimiento individual con historial y lecturas');
+  await navigate('/local/orangeportal/index.php?section=incidents&lang=en');
+  check(await evaluate(`document.querySelector('.orange-incidents-filters h3').textContent==='Filter incidents'&&document.querySelector('.orange-incident-tracking-link').textContent==='Incident tracking'&&!document.body.innerText.includes('[[')`),'Nueva interfaz traducida al inglés');
+  await writeFile('backups/previews/incident-workflow-checks.json',JSON.stringify({date:new Date().toISOString(),results},null,2));
+  console.log('Verificaciones: '+results.length);
+  } else if (process.argv.includes('--library-reading-only')) {
+  await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
+  const states=()=>evaluate(`Object.fromEntries(Array.from(document.querySelectorAll('.orange-library-document')).map(a=>[new URL(a.href).searchParams.get('document'),a.classList.contains('is-read')]))`);
+  const otherstates=await states();
+  check(Object.keys(otherstates).length>0,'Segundo usuario con documentos accesibles');
+  await logout();
+  await login('agente.orange',env.ORANGE_DEMO_PASSWORD);
+  check(await evaluate(`document.querySelector('#orange-library-order').value==='newest'`),'Más recientes es el orden predeterminado');
+  check(await evaluate(`Array.from(document.querySelectorAll('.orange-library-document.is-unread')).every(e=>e.querySelector('.orange-library-read-icon').getAttribute('aria-label')==='Sin leer')`),'Documentos sin leer identificados con distintivo');
+  await screenshot('biblioteca-documentos-sin-leer');
+  check(await evaluate(`(()=>{const s=document.querySelector('#orange-library-order'),h=document.querySelector('.orange-library-results-heading h3'),r=s.getBoundingClientRect(),t=h.getBoundingClientRect();return r.height<=30&&Math.abs((r.top+r.height/2)-(t.top+t.height/2))<2&&r.left>t.right&&!s.form.querySelector('button');})()`),'Selector compacto a la derecha del título, sin botón');
+  await evaluate(`const s=document.querySelector('#orange-library-order');s.value='name';s.dispatchEvent(new Event('change',{bubbles:true}))`);
+  await wait(`new URL(location.href).searchParams.get('order')==='name'&&document.readyState!=='loading'`);
+  check(await evaluate(`(()=>{const names=Array.from(document.querySelectorAll('.orange-library-document strong')).map(e=>e.textContent);return names.join('|')===[...names].sort((a,b)=>a.localeCompare(b,'es')).join('|');})()`),'Orden alfabético aplicable desde el formulario');
+  const unread=await evaluate(`(()=>{const a=document.querySelector('.orange-library-document.is-unread')||document.querySelector('.orange-library-document');return a?{href:a.href,id:new URL(a.href).searchParams.get('document'),wasread:a.classList.contains('is-read')}:null;})()`);
+  check(!!unread,'Documento accesible para comprobar apertura');
+  await navigate(unread.href);
+  check(await evaluate(`document.querySelector('.orange-library-document.is-selected').classList.contains('is-read')===${JSON.stringify(unread.wasread)}`),'Seleccionar la ficha no marca el documento como leído');
+  const nativeurl=await evaluate(`document.querySelector('.orange-library-open').href`);
+  await navigate(nativeurl);await wait(`!!document.querySelector('#region-main')`);
+  await navigate('/local/orangeportal/index.php?section=library&order=newest');
+  check(await evaluate(`Array.from(document.querySelectorAll('.orange-library-document')).find(a=>new URL(a.href).searchParams.get('document')===${JSON.stringify(unread.id)}).classList.contains('is-read')`),'Abrir el recurso nativo registra lectura individual');
+  await screenshot('biblioteca-documentos-leidos');
+  await screenshot('biblioteca-orden-compacto');
+  await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+  check(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),'Orden y distintivos sin desbordamiento móvil');
+  await send('Emulation.clearDeviceMetricsOverride');
+  await logout();await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
+  check(JSON.stringify(await states())===JSON.stringify(otherstates),'La apertura de un agente no cambia la lectura del formador');
+  await navigate('/local/orangeportal/index.php?section=library&lang=en');
+  check(await evaluate(`document.querySelector('label[for="orange-library-order"]').textContent==='Sort documents'&&document.querySelector('#orange-library-order option[value="newest"]').textContent==='Most recent'`),'Orden y lectura traducidos al inglés');
+  await writeFile('backups/previews/library-reading-checks.json',JSON.stringify({date:new Date().toISOString(),results},null,2));
+  } else if (process.argv.includes('--library-columns-only')) {
+  await login('agente.orange',env.ORANGE_DEMO_PASSWORD);
+  check(await evaluate(`!!document.querySelector('.orange-library-browser')&&!document.querySelector('#orange-menu-library')&&!document.querySelector('.primary-navigation a[href*="section=library"]').hasAttribute('aria-expanded')`),'Biblioteca abre página sin desplegable');
+  check(await evaluate(`document.querySelector('.orange-library-browser').innerText.includes('RPV')&&document.querySelector('.orange-library-browser').innerText.includes('CENTREX')&&!document.querySelector('.orange-library-open')`),'Ámbitos separados y botón oculto antes de seleccionar documento');
+  const categorylink=async text=>{
+    const href=await evaluate(`Array.from(document.querySelectorAll('.orange-library-category')).find(a=>a.querySelector('span').textContent===${JSON.stringify(text)})?.href`);
+    check(!!href,'Categoría disponible: '+text);await navigate(href);await wait(`!!document.querySelector('.orange-library-browser')`);
+  };
+  await categorylink('RPV');await categorylink('ALTA');await categorylink('Alta con terminal');await categorylink('SIM Física');
+  check(await evaluate(`Array.from(document.querySelectorAll('.orange-library-column h3')).map(e=>e.textContent).join('|')==='Biblioteca|RPV|ALTA|Alta con terminal|Documentos'`),'Columnas con nombres de categorías y panel Documentos');
+  check(await evaluate(`!!document.querySelector('.orange-library-document')&&!document.querySelector('.orange-library-open')`),'Documentos nativos en lugar de tarjetas de colección');
+  const docurl=await evaluate(`document.querySelector('.orange-library-document').href`);
+  const docname=await evaluate(`document.querySelector('.orange-library-document strong').textContent`);
+  await navigate(docurl);await wait(`!!document.querySelector('.orange-library-open')`);
+  check(await evaluate(`document.querySelector('.orange-library-open').href.includes('/mod/')&&document.querySelector('.orange-library-detail h4').textContent===${JSON.stringify(docname)}`),'Selección muestra ficha y apertura del recurso nativo');
+  await screenshot('biblioteca-columnas-sim-fisica');
+  const nativeurl=await evaluate(`document.querySelector('.orange-library-open').href`);
+  await navigate(nativeurl);check(await evaluate(`!!document.querySelector('#region-main')&&!document.querySelector('.alert-danger')`),'Abrir documento conserva control y vista nativa de Moodle');
+  await navigate('/local/orangeportal/index.php?section=library&q='+encodeURIComponent(docname));
+  check(await evaluate(`document.querySelector('.orange-library-results').innerText.includes(${JSON.stringify(docname)})&&document.querySelector('.orange-library-results').innerText.includes('toda la biblioteca')`),'Búsqueda global por nombre');
+  await screenshot('biblioteca-columnas-busqueda');
+  await navigate('/local/orangeportal/index.php?section=library&q=Contenido%20demostrativo');
+  check(await evaluate(`document.querySelectorAll('.orange-library-document').length>0`),'Búsqueda por descripción');
+  await navigate('/local/orangeportal/index.php?section=library&q=ZZZSINRESULTADOSZZZ');
+  check(await evaluate(`!document.querySelector('.orange-library-document')&&document.querySelector('.orange-library-empty').textContent.includes('coincidan')`),'Búsqueda sin resultados clara');
+  await navigate(docurl);
+  await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+  check(await evaluate(`document.documentElement.scrollWidth<=innerWidth&&document.querySelector('.orange-library-browser').scrollWidth>document.querySelector('.orange-library-browser').clientWidth`),'Móvil: desplazamiento contenido dentro de la biblioteca');
+  await screenshot('biblioteca-columnas-movil');
+  await send('Emulation.clearDeviceMetricsOverride');
+  await navigate('/local/orangeportal/index.php?section=library&lang=en');
+  check(await evaluate(`document.querySelector('.orange-library-results h3').textContent==='Documents'&&document.querySelector('label[for="orange-library-search"]').textContent==='Search the entire library'`),'Biblioteca traducida al inglés');
+  await navigate('/local/orangeportal/index.php?section=courses&lang=es');
+  check(await evaluate(`!document.querySelector('#orange-menu-courses')&&!document.querySelector('.orange-library-browser')&&!!document.querySelector('.orange-card')`),'Formaciones conserva su vista sin desplegable');
+  await writeFile('backups/previews/library-columns-checks.json',JSON.stringify({date:new Date().toISOString(),results},null,2));
+  console.log('Verificaciones: '+results.length);
+  } else if (process.argv.includes('--isolation-only')) {
+  await send('Emulation.setFocusEmulationEnabled',{enabled:true});
+  const genericlogin=async(username,password)=>{
+    await navigate('/login/index.php');await wait(`!!document.querySelector('#username')`);
+    await evaluate(`document.querySelector('#username').value=${JSON.stringify(username)};document.querySelector('#password').value=${JSON.stringify(password)};document.querySelector('#loginbtn').click()`);
+    await wait(`!location.pathname.includes('/login/') && document.readyState!=='loading'`);
+  };
+  const themename=()=>evaluate(`document.querySelector('link[href*="/theme/styles.php/"]')?.href||Array.from(document.styleSheets).map(x=>x.href).filter(Boolean).join(' ')`);
+  const nonorange=async()=>{
+    check(!(await nav()).some(x=>['Biblioteca','Incidencias','Notificaciones'].includes(x)), 'Usuario externo conserva menú nativo');
+    check(!(await themename()).includes('/orange/'), 'Usuario externo no usa el tema Orange');
+    check(await evaluate(`!document.querySelector('.orange-nav-panel')&&!document.querySelector('script[src*="orangeportal/navigation"]')`),'Usuario externo sin desplegables Orange');
+  };
+  await navigate('/login/index.php');
+  check(!(await themename()).includes('/orange/'),'Acceso común con tema del sitio');
+  await screenshot('aislamiento-login-comun');
+  await login('agente.orange',env.ORANGE_DEMO_PASSWORD);
+  check((await themename()).includes('/orange/'),'Miembro Orange usa el tema hijo');
+  check((await nav()).join('|')==='Biblioteca|Comunicados|Incidencias|Formaciones','Menú Orange conservado');
+  check(await evaluate(`getComputedStyle(document.querySelector('.navbar')).backgroundColor==='rgb(0, 0, 0)'`),'Marca Orange conservada');
+  check(await evaluate(`document.querySelector('.navbar-brand img')?.src.includes('theme_orange')||document.querySelector('.navbar-brand img')?.src.includes('/orange/')`),'Logo independiente de Moove');
+  await screenshot('aislamiento-orange-biblioteca');
+  for(const section of ['courses','incidents','notifications']){
+    await navigate('/local/orangeportal/index.php?section='+section);
+    check(await evaluate(`!!document.querySelector('.orange-intro')&&!document.querySelector('.alert-danger')`),'Orange: '+section+' disponible');
+  }
+  await navigate('/user/preferences.php');
+  check((await themename()).includes('/orange/')&&await evaluate(`document.body.innerText.includes('Mi cuenta')`),'Orange conserva apariencia y breadcrumb personal');
+  await logout();
+  await genericlogin('usuario.externo',env.ORANGE_DEMO_PASSWORD);
+  check(!await evaluate(`location.pathname.includes('/local/orangeportal/')`),'Usuario externo no redirigido al portal');
+  await nonorange();await screenshot('aislamiento-usuario-externo');
+  for(const section of ['library','courses','incidents','notifications']){
+    await navigate('/local/orangeportal/index.php?section='+section);
+    check(await evaluate(`document.body.innerText.includes('no pertenece a la cohorte')&&!document.querySelector('.orange-intro')`),'Acceso directo ajeno bloqueado: '+section);
+  }
+  await navigate('/user/preferences.php');await nonorange();
+  check(!await evaluate(`document.body.innerText.includes('Mi cuenta')`),'Breadcrumb personal externo conserva Moodle');
+  await navigate('/my/');await logout();
+  await genericlogin('editor.orange',env.ORANGE_DEMO_PASSWORD);
+  await navigate('/local/orangeportal/manage.php?kind=notifications');
+  check((await themename()).includes('/orange/')&&await evaluate(`!!document.querySelector('a[href*="new=1"]')`),'Editor Orange conserva gestión y marca');
+  await screenshot('aislamiento-editor-orange');await logout();
+  await genericlogin(env.MOODLE_ADMIN_USER||'admin',env.MOODLE_ADMIN_PASSWORD);
+  await navigate('/admin/settings.php?section=local_orangeportal');
+  check(await evaluate(`!!document.querySelector('select[name="s_local_orangeportal_audiencecohort"]')`),'Administrador general puede elegir cohorte desde Moodle');
+  check(!(await themename()).includes('/orange/'),'Administrador general fuera de cohorte conserva tema del sitio');
+  await navigate('/admin/settings.php?section=themesettingorange');
+  check(await evaluate(`document.body.innerText.includes('SCSS')&&!document.body.innerText.includes('Excepción')`),'Logo y SCSS Orange gestionables desde ajustes propios');
+  await writeFile('backups/previews/isolation-checks.json',JSON.stringify({date:new Date().toISOString(),results},null,2));
+  console.log('Verificaciones: '+results.length);
+  } else if (process.argv.includes('--admin-languages-only')) {
     await login('editor.orange', env.ORANGE_DEMO_PASSWORD);
     for (const language of ['es', 'en']) {
       const en = language === 'en';
       for (const kind of ['incidents', 'notifications']) {
         await navigate('/local/orangeportal/manage.php?kind=' + kind + '&lang=' + language);
-        check(await evaluate(`document.querySelector('.orange-intro h2').textContent===${JSON.stringify(en ? 'Orange publications' : 'Publicaciones Orange')} && document.querySelector('.orange-admin-links .active').textContent===${JSON.stringify(en ? (kind==='incidents'?'Incidents':'Notifications') : (kind==='incidents'?'Incidencias':'Notificaciones'))}`), language+' / '+kind+': cabecera y pestaña traducidas');
+        check(await evaluate(`document.querySelector('.orange-intro h2').textContent===${JSON.stringify(en ? 'Orange publications' : 'Publicaciones Orange')} && document.querySelector('.orange-admin-links .active').textContent===${JSON.stringify(en ? (kind==='incidents'?'Incidents':'Announcements') : (kind==='incidents'?'Incidencias':'Comunicados'))}`), language+' / '+kind+': cabecera y pestaña traducidas');
         check(await evaluate(`Array.from(document.querySelectorAll('table th')).map(n=>n.textContent).join('|')===${JSON.stringify(en?'Title|Category|Publication|Status|Actions':'Título|Categoría|Publicación|Estado|Acciones')}`),language+' / '+kind+': tabla traducida');
         check(await evaluate(`document.querySelector('h1').textContent.trim()===${JSON.stringify(en?'Publish and manage notices':'Publicar y gestionar avisos')} && document.title.includes(${JSON.stringify(en?'Publish and manage notices':'Publicar y gestionar avisos')})`),language+' / '+kind+': título y encabezado de página traducidos');
         const editurl=await evaluate(`document.querySelector('table a[href*="manage.php"][href*="id="]')?.href`);
@@ -80,7 +270,7 @@ try {
       }
       for(const kind of ['library','courses','incidents','notifications']){
         await navigate('/local/orangeportal/categories.php?kind='+kind+'&lang='+language);
-        const label=en?({library:'Library',courses:'Courses',incidents:'Incidents',notifications:'Notifications'})[kind]:({library:'Biblioteca',courses:'Cursos',incidents:'Incidencias',notifications:'Notificaciones'})[kind];
+        const label=en?({library:'Library',courses:'Training',incidents:'Incidents',notifications:'Announcements'})[kind]:({library:'Biblioteca',courses:'Formaciones',incidents:'Incidencias',notifications:'Comunicados'})[kind];
         check(await evaluate(`document.querySelector('.orange-intro h2').textContent===${JSON.stringify(en?'Categories: '+label:'Categorías de '+label)} && document.querySelector('.orange-category-tabs .active').textContent===${JSON.stringify(label)}`),language+' / '+kind+': cabecera y sección de categorías traducidas');
         check(await evaluate(`document.querySelector('#id_submitbutton').value===${JSON.stringify(en?'Save category':'Guardar categoría')} && document.querySelector('label[for="id_parentid"]').textContent.includes(${JSON.stringify(en?'Parent category':'Categoría superior')})`),language+' / '+kind+': formulario de categorías traducido');
         if(en && kind==='library')await screenshot('administracion-categorias-ingles');
@@ -157,7 +347,7 @@ try {
         for (const path of paths) {
           await navigate(path + '&lang=' + language);
           const items = await evaluate(`Array.from(document.querySelectorAll('.breadcrumb li')).map(li=>({text:li.textContent.trim(),href:li.querySelector('a')?.href || ''}))`);
-          const label = language === 'es' ? (section === 'library' ? 'Biblioteca' : 'Cursos') : (section === 'library' ? 'Library' : 'Courses');
+          const label = language === 'es' ? (section === 'library' ? 'Biblioteca' : 'Formaciones') : (section === 'library' ? 'Library' : 'Training');
           check((items.length === 0 && path !== activityurl) || (items.length > 0 && items[0].text === label && items[0].href.includes('section=' + section) &&
             !items.some(item=>['Página Principal','Home'].includes(item.text))), language + ' / ' + section + ': raíz correcta en ' + new URL(path, base).pathname);
           if (path === activityurl) {
@@ -212,7 +402,7 @@ try {
         check(await evaluate(`!document.querySelector('.secondary-navigation .nav-link')`), section + ': sin barra Categoría/Más');
         check(await evaluate(`!document.querySelector('.breadcrumb')?.textContent.includes('Administrar cursos y categorías')`), section + ': ruta sin administración de categorías');
         const breadcrumb = await evaluate(`Array.from(document.querySelectorAll('.breadcrumb li')).map(li=>({text:li.textContent.trim(), href:li.querySelector('a')?.href || ''}))`);
-        const sectionLabel = language === 'es' ? (section === 'library' ? 'Biblioteca' : 'Cursos') : (section === 'library' ? 'Library' : 'Courses');
+        const sectionLabel = language === 'es' ? (section === 'library' ? 'Biblioteca' : 'Formaciones') : (section === 'library' ? 'Library' : 'Training');
         check(breadcrumb.length === 2 && breadcrumb[0].text === sectionLabel &&
           breadcrumb[0].href.includes('section=' + section) && !breadcrumb.some(item=>item.text.includes('Página Principal')),
           section + ': breadcrumb empieza en la sección correcta');
@@ -228,57 +418,42 @@ try {
     }
     console.log('Verificaciones de creación: ' + results.length);
   } else if (process.argv.includes('--navigation-only')) {
-    const openMenu = async section => {
-      await wait(`!!document.querySelector('.primary-navigation [aria-controls="orange-menu-${section}"]')`);
-      await evaluate(`document.querySelector('.primary-navigation [aria-controls="orange-menu-${section}"]').click()`);
-      await wait(`!document.getElementById('orange-menu-${section}').hidden`);
-    };
-    await login(env.MOODLE_ADMIN_USER || 'admin', env.MOODLE_ADMIN_PASSWORD);
-    for (const section of ['library', 'courses', 'incidents', 'notifications']) {
-      await openMenu(section);
-      check(await evaluate(`document.querySelector('#orange-menu-${section} .orange-tree-all').href.includes('section=${section}')`), 'Desplegable ' + section + ': Ver todo');
-      if (section === 'library') {
-        check(await evaluate(`document.querySelector('#orange-menu-library').innerText.includes('RPV/CENTREX') && document.querySelectorAll('#orange-menu-library details').length>10`), 'Árbol completo de Biblioteca en barra superior');
-        globalThis.adminTreeCount = await evaluate(`document.querySelectorAll('#orange-menu-library .orange-tree-link').length`);
-        await screenshot('menu-biblioteca-admin');
+    await login('agente.orange', env.ORANGE_DEMO_PASSWORD);
+    for (const [lang, labels] of [
+      ['es', ['Biblioteca', 'Comunicados', 'Incidencias', 'Formaciones']],
+      ['en', ['Library', 'Announcements', 'Incidents', 'Training']],
+    ]) {
+      await navigate('/local/orangeportal/index.php?section=library&lang=' + lang);
+      check((await nav()).join('|') === labels.join('|'), 'Etiquetas del menú: ' + lang);
+      for (const [i, section] of ['library', 'notifications', 'incidents', 'courses'].entries()) {
+        check(await evaluate(`!document.querySelector('.orange-nav-panel')&&!document.querySelector('.orange-nav-trigger')&&!document.querySelector('script[src*="orangeportal/navigation.js"]')`), 'Sin paneles ni script de desplegables: ' + section + ' / ' + lang);
+        await evaluate(`document.querySelector('.primary-navigation a[href*="section=${section}"]').click()`);
+        await wait(`new URL(location.href).searchParams.get('section')==='${section}'&&document.readyState==='complete'`);
+        check(await evaluate(`!!document.querySelector('.primary-navigation a.active[href*="section=${section}"]')&&document.body.innerText.includes(${JSON.stringify(labels[i])})`), 'Acceso directo y sección activa: ' + section + ' / ' + lang);
       }
-      if (section === 'incidents') {
-        check(await evaluate(`document.querySelector('#orange-menu-incidents .orange-count').textContent !== ''`), 'Contadores de incidencias en desplegable');
-      }
-      await evaluate(`document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))`);
-      check(await evaluate(`document.getElementById('orange-menu-${section}').hidden && document.activeElement.getAttribute('aria-expanded')==='false'`), 'Escape cierra y devuelve foco: ' + section);
     }
-    await openMenu('library');
-    await evaluate(`document.querySelector('#orange-menu-library .orange-tree-link').click()`);
-    await wait(`location.search.includes('category=') && !!document.querySelector('.orange-intro')`);
-    check(await evaluate(`new URL(location.href).searchParams.get('category')>0`), 'Categoría del menú navega con filtro');
-    await logout(); await login('agente.orange', env.ORANGE_DEMO_PASSWORD);
-    await openMenu('library');
-    check(await evaluate(`document.querySelectorAll('#orange-menu-library .orange-tree-link').length===${globalThis.adminTreeCount}`), 'Agente ve el mismo árbol completo que administrador');
-    await screenshot('menu-biblioteca-agente');
-    await navigate('/local/orangeportal/index.php?section=incidents');
-    await openMenu('incidents');
-    check(await evaluate(`document.querySelectorAll('.orange-incidents-table tbody tr').length>=2 && JSON.stringify(Array.from(document.querySelectorAll('#orange-menu-incidents .orange-count')).map(n=>n.textContent))===JSON.stringify(Array.from(document.querySelectorAll('.orange-sidebar .orange-count')).map(n=>n.textContent))`), 'Contadores del menú coinciden con las incidencias accesibles');
     await send('Emulation.setDeviceMetricsOverride', {width:390,height:844,deviceScaleFactor:1,mobile:true});
-    await navigate('/local/orangeportal/index.php?section=library');
+    await navigate('/local/orangeportal/index.php?section=library&lang=es');
     await evaluate(`document.querySelector('[data-target="theme_moove-drawers-primary"]').click()`);
     await wait(`!!document.querySelector('.drawer-primary.show')`);
-    await evaluate(`document.querySelector('.drawer-primary [aria-controls="orange-menu-library"]').click()`);
-    await wait(`!document.getElementById('orange-menu-library').hidden`);
-    check(await evaluate(`document.getElementById('orange-menu-library').getBoundingClientRect().right<=innerWidth && document.documentElement.scrollWidth<=innerWidth+2`), 'Desplegable móvil sin desbordamiento');
-    await screenshot('menu-biblioteca-movil');
+    check(await evaluate(`!document.querySelector('.drawer-primary .orange-nav-trigger')&&!!document.querySelector('.drawer-primary a[href*="section=courses"]')`), 'Menú móvil con enlaces directos');
+    await evaluate(`document.querySelector('.drawer-primary a[href*="section=courses"]').click()`);
+    await wait(`new URL(location.href).searchParams.get('section')==='courses'&&document.readyState==='complete'`);
+    check(await evaluate(`document.body.innerText.includes('Formaciones')&&!document.querySelector('.orange-nav-panel')`), 'Formaciones accesible desde móvil');
+    await screenshot('navegacion-directa-movil');
     await send('Emulation.clearDeviceMetricsOverride');
-    await logout(); await login('agente.otro', env.ORANGE_DEMO_PASSWORD);
-    await openMenu('library');
-    check(await evaluate(`document.querySelectorAll('#orange-menu-library .orange-tree-link').length===${globalThis.adminTreeCount} && document.querySelectorAll('.orange-card').length===0`), 'Otro equipo ve árbol completo sin contenidos restringidos');
-    await openMenu('incidents');
-    check(await evaluate(`Array.from(document.querySelectorAll('#orange-menu-incidents .orange-count')).every(n=>n.textContent==='0')`), 'Otro equipo no ve contadores ajenos');
+    await navigate('/local/orangeportal/index.php?section=library&lang=es');
+    await logout();
+    await navigate('/login/index.php');
+    await evaluate(`document.querySelector('#username').value='usuario.externo';document.querySelector('#password').value=${JSON.stringify(env.ORANGE_DEMO_PASSWORD)};document.querySelector('#loginbtn').click()`);
+    await wait(`location.pathname!=='/login/index.php'&&document.readyState==='complete'`);
+    check(await evaluate(`!document.querySelector('.primary-navigation a[href*="/local/orangeportal/"]')`), 'Usuario externo conserva navegación nativa');
     await writeFile('backups/previews/navigation-checks.json', JSON.stringify({date:new Date().toISOString(),results},null,2));
     console.log('Verificaciones de navegación completas: ' + results.length);
   } else {
   await login(env.MOODLE_ADMIN_USER || 'admin', env.MOODLE_ADMIN_PASSWORD);
   console.log('NAV ADMIN ' + JSON.stringify(await nav()));
-  check((await nav()).join('|') === 'Biblioteca|Cursos|Incidencias|Notificaciones|Administración', 'Menú administrador: cuatro secciones y Administración');
+  check((await nav()).join('|') === 'Biblioteca|Comunicados|Incidencias|Formaciones|Administración', 'Menú administrador: cuatro secciones y Administración');
   check(await evaluate(`document.querySelector('.orange-sidebar').innerText.includes('RPV/CENTREX')`), 'Árbol RPV/CENTREX');
   check(await evaluate(`document.querySelector('.navbar img.logo').naturalWidth > 0`), 'Logo cargado desde Moove');
   await screenshot('biblioteca-admin');
@@ -294,7 +469,7 @@ try {
   await logout();
   await login('agente.orange', env.ORANGE_DEMO_PASSWORD);
   console.log('NAV AGENTE ' + JSON.stringify(await nav()));
-  check((await nav()).join('|') === 'Biblioteca|Cursos|Incidencias|Notificaciones', 'Agente sin menú de administración ni Inicio');
+  check((await nav()).join('|') === 'Biblioteca|Comunicados|Incidencias|Formaciones', 'Agente sin menú de administración ni Inicio');
   check(await evaluate(`document.querySelectorAll('.orange-card').length===2`), 'Agente ve sus dos colecciones nativas');
   await screenshot('biblioteca-agente');
   await navigate('/local/orangeportal/index.php?section=incidents');

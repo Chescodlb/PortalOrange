@@ -3,6 +3,7 @@ require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/locallib.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_login();
+\local_orangeportal\experience::require_access();
 require_capability('local/orangeportal:viewreports', context_system::instance());
 admin_externalpage_setup('orangeportalreports');
 $PAGE->set_heading(get_string('reportstitle', 'local_orangeportal'));
@@ -58,7 +59,9 @@ foreach ($notices as $notice) {
         $r = \local_orangeportal\service::get_receipt($notice, (int)$u->id);
         $table->data[] = [html_writer::link(orange_link('reports.php', ['noticeid' => $notice->id]), s($notice->title)),
             s(fullname($u)), $r && $r->received ? userdate($r->received) : get_string('pending', 'local_orangeportal'),
-            $r && $r->readtime ? userdate($r->readtime) : get_string('pending', 'local_orangeportal'), $r && $r->confirmed ? userdate($r->confirmed) : get_string('pending', 'local_orangeportal')];
+            $r && $r->readtime ? userdate($r->readtime) : get_string('pending', 'local_orangeportal'),
+            $notice->kind === 'incidents' ? get_string('incidentnotapplicable', 'local_orangeportal') :
+                ($r && $r->confirmed ? userdate($r->confirmed) : get_string('pending', 'local_orangeportal'))];
     }
 }
 echo html_writer::table($table);
@@ -68,7 +71,7 @@ if ($noticeid) {
         $u = core_user::get_user($r->userid);
         $table->data[] = [$r->revision, s($u ? fullname($u) : get_string('deleteduser', 'local_orangeportal')),
             $r->received ? userdate($r->received) : get_string('pending', 'local_orangeportal'), $r->readtime ? userdate($r->readtime) : get_string('pending', 'local_orangeportal'),
-            $r->confirmed ? userdate($r->confirmed) : get_string('pending', 'local_orangeportal')];
+            $notice->kind === 'incidents' ? get_string('incidentnotapplicable', 'local_orangeportal') : ($r->confirmed ? userdate($r->confirmed) : get_string('pending', 'local_orangeportal'))];
     }
     echo html_writer::tag('h3', get_string('confirmationhistory', 'local_orangeportal')); echo html_writer::table($table);
     foreach ($DB->get_records('local_orange_revision', ['noticeid' => $noticeid], 'revision DESC') as $revision) {

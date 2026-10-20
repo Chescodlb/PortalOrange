@@ -3,6 +3,7 @@ defined('MOODLE_INTERNAL') || die();
 function orange_page(string $title, string $section, moodle_url $url): void {
     global $PAGE;
     require_login();
+    \local_orangeportal\experience::require_access();
     $PAGE->set_context(context_system::instance());
     $PAGE->set_url($url);
     $PAGE->set_pagelayout('standard');
@@ -15,13 +16,16 @@ function orange_link(string $file, array $params = []): moodle_url {
     return new moodle_url('/local/orangeportal/' . $file, $params);
 }
 function orange_intro(string $eyebrow, string $title, string $description): string {
-    return html_writer::div(html_writer::span(s($eyebrow), 'orange-eyebrow') .
+    return html_writer::div(($eyebrow !== '' ? html_writer::span(s($eyebrow), 'orange-eyebrow') : '') .
         html_writer::tag('h2', s($title)) . html_writer::tag('p', s($description)), 'orange-intro');
 }
 function orange_admin_navigation(string $active, string $kind = 'incidents'): string {
     $links = [];
+    if (\local_orangeportal\incident_workflow::all()) {
+        $links['incidenttracking'] = [get_string('incidenttracking', 'local_orangeportal'), orange_link('incident_tracking.php')];
+    }
     if (has_capability('local/orangeportal:manage', context_system::instance())) {
-        $links = [
+        $links += [
             'incidents' => [get_string('incidents', 'local_orangeportal'), orange_link('manage.php', ['kind' => 'incidents'])],
             'notifications' => [get_string('notifications', 'local_orangeportal'), orange_link('manage.php', ['kind' => 'notifications'])],
         ];
