@@ -7,6 +7,9 @@ $page->add(new admin_setting_configcheckbox('local_orangeportal/enabled', get_st
 $page->add(new admin_setting_configselect('local_orangeportal/audiencecohort',
     get_string('audiencecohort', 'local_orangeportal'), get_string('audiencecohort_desc', 'local_orangeportal'), 0,
     [0 => get_string('none')] + $DB->get_records_menu('cohort', ['contextid' => context_system::instance()->id], 'name', 'id, name')));
+$page->add(new admin_setting_configmultiselect('local_orangeportal/managedcohorts',
+    get_string('orangemanagedcohorts', 'local_orangeportal'), get_string('orangemanagedcohorts_desc', 'local_orangeportal'), [],
+    $DB->get_records_menu('cohort', ['component' => ''], 'name', 'id,name')));
 $page->add(new admin_setting_configselect('local_orangeportal/landingsection',
     get_string('landingsection', 'local_orangeportal'), get_string('landingsection_desc', 'local_orangeportal'), 'library',
     array_combine(['library', 'courses', 'incidents', 'notifications'], array_map(

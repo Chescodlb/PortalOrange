@@ -68,18 +68,18 @@ class library_browser {
         return $category === $rootid ? $trail : [];
     }
 
-    private static function url(array $params): \moodle_url {
+    private static function url(array $params, string $section = 'library'): \moodle_url {
         if (optional_param('unread', 0, PARAM_BOOL)) { $params['unread'] = 1; }
-        return \orange_link('index.php', ['section' => 'library'] + $params);
+        return \orange_link('index.php', ['section' => $section] + $params);
     }
 
-    private static function column(string $name, array $children, array $selected, string $order): string {
+    public static function column(string $name, array $children, array $selected, string $order, string $section = 'library'): string {
         $items = '';
         foreach ($children as $child) {
             $active = in_array((int)$child->id, $selected, true);
             $attrs = ['class' => 'orange-library-category' . ($active ? ' is-selected' : '')];
             if ($active) { $attrs['aria-current'] = 'step'; }
-            $items .= \html_writer::tag('li', \html_writer::link(self::url(['category' => $child->id, 'order' => $order]),
+            $items .= \html_writer::tag('li', \html_writer::link(self::url(['category' => $child->id, 'order' => $order], $section),
                 \html_writer::span(s($child->name)) . \html_writer::span('›', '', ['aria-hidden' => 'true']), $attrs));
         }
         return \html_writer::tag('section', \html_writer::tag('h3', s($name)) .
@@ -140,16 +140,12 @@ class library_browser {
         foreach ($documents as $doc) {
             $attrs = ['class' => 'orange-library-document' . ($doc->readtime ? ' is-read' : ' is-unread') . ($doc->id === $selecteddocument ? ' is-selected' : '')];
             if ($doc->id === $selecteddocument) { $attrs['aria-current'] = 'true'; }
-            $path = implode(' › ', array_map(fn($cat) => $cat->name, self::trail($doc->category, $rootid, $categories)));
             $list .= \html_writer::tag('li', \html_writer::link(self::url(['category' => $doc->category,
                 'document' => $doc->id, 'q' => $query, 'order' => $order]),
                 \html_writer::span($doc->readtime ? '✓' : '●', 'orange-library-read-icon', ['role' => 'img',
                     'aria-label' => get_string($doc->readtime ? 'libraryread' : 'libraryunread', 'local_orangeportal'),
                     'title' => get_string($doc->readtime ? 'libraryread' : 'libraryunread', 'local_orangeportal')]) .
-                \html_writer::span(\html_writer::tag('strong', s($doc->name), ['title' => $doc->name]) .
-                    \html_writer::span(s($doc->description ?: get_string('librarynodescription', 'local_orangeportal')),
-                        'orange-library-document-description', ['title' => $doc->description]) .
-                    \html_writer::span(s($path), 'orange-library-document-path', ['title' => $path]),
+                \html_writer::span(\html_writer::tag('strong', s($doc->name), ['title' => $doc->name]),
                     'orange-library-document-text'), $attrs));
         }
         $resulttitle = \html_writer::tag('h3', get_string('librarydocuments', 'local_orangeportal'));

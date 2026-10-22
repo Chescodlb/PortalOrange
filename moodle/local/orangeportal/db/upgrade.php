@@ -85,5 +85,10 @@ function xmldb_local_orangeportal_upgrade($oldversion): bool {
         }
         upgrade_plugin_savepoint(true, 2026102002, 'local', 'orangeportal');
     }
+    if ($oldversion < 2026102003) {
+        update_capabilities('local_orangeportal');
+        \local_orangeportal\orange_administration::install_roles();
+        upgrade_plugin_savepoint(true, 2026102003, 'local', 'orangeportal');
+    }
     return true;
 }

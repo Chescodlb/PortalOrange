@@ -19,7 +19,7 @@ if (!isset($titles[$section])) { throw new invalid_parameter_exception('Sección
 $url = orange_link('index.php', ['section' => $section, 'category' => $category, 'q' => $query,
     'state' => $status, 'impact' => $impact, 'pending' => $pending, 'datefrom' => $datefrom, 'dateto' => $dateto]);
 orange_page($titles[$section], $section, $url);
-if ($section === 'library') { $PAGE->requires->js('/local/orangeportal/library_browser.js'); }
+if (in_array($section, ['library', 'courses'])) { $PAGE->requires->js('/local/orangeportal/library_browser.js'); }
 if ($document) { $PAGE->url->param('document', $document); }
 if (in_array($section, ['incidents', 'notifications'])) {
     $PAGE->add_body_class('orange-wide-listing');
@@ -64,7 +64,8 @@ if (in_array($section, ['library', 'courses'])) {
     $root = core_course_category::get($rootid, MUST_EXIST, true);
     $actions = '';
     if ($section === 'library' && array_filter(orange_native_courses($rootid), fn($c) =>
-            has_capability('mod/resource:addinstance', context_course::instance($c->id)) &&
+            (has_capability('mod/resource:addinstance', context_course::instance($c->id)) ||
+                has_capability('mod/page:addinstance', context_course::instance($c->id))) &&
             has_capability('moodle/course:manageactivities', context_course::instance($c->id)))) {
         $actions .= html_writer::link(orange_link('add_document.php'), 'Nuevo documento', ['class' => 'btn btn-primary']);
     }
@@ -83,6 +84,14 @@ if (in_array($section, ['library', 'courses'])) {
 }
 if ($section === 'library') {
     echo \local_orangeportal\library_browser::render($category, $query, $document, optional_param('order', '', PARAM_ALPHA));
+    echo $OUTPUT->footer();
+    exit;
+}
+if ($section === 'courses') {
+    if (has_capability('local/orangeportal:viewreports', context_system::instance())) {
+        echo html_writer::div(html_writer::link(orange_link('reports.php'), get_string('trainingresults', 'local_orangeportal')), 'orange-toolbar');
+    }
+    echo \local_orangeportal\training_browser::render($category, $query, optional_param('course', 0, PARAM_INT), optional_param('order', '', PARAM_ALPHA));
     echo $OUTPUT->footer();
     exit;
 }
@@ -115,6 +124,8 @@ if ($section == 'incidents') {
     $search .= $filterfield('orange-state', get_string('incidentcolumnstate', 'local_orangeportal'),
         html_writer::select(['' => get_string('allstates', 'local_orangeportal')] + service::states(),
             'state', $status, false, ['id' => 'orange-state', 'class' => 'custom-select']));
+}
+if (in_array($section, ['incidents', 'notifications'])) {
     $search .= $filterfield('orange-impact', get_string('incidentcolumnimpact', 'local_orangeportal'),
         html_writer::select(['' => get_string('allimpacts', 'local_orangeportal')] + service::impacts(),
             'impact', $impact, false, ['id' => 'orange-impact', 'class' => 'custom-select']));
@@ -194,7 +205,7 @@ if (in_array($section, ['library', 'courses'])) {
         if ($category && !in_array($notice->categoryid, $selectedids)) { continue; }
         if ($query && stripos($notice->title . ' ' . strip_tags($notice->content), $query) === false) { continue; }
         if ($status && $notice->state !== $status) { continue; }
-        if ($section === 'incidents' && $impact && $notice->impact !== $impact) { continue; }
+        if ($impact && $notice->impact !== $impact) { continue; }
         $receipt = service::get_receipt($notice, (int)$USER->id);
         if ($unread && $receipt && ($receipt->readtime || $receipt->confirmed)) { continue; }
         if ($pending && $receipt && $receipt->confirmed) { continue; }

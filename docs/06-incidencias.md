@@ -57,3 +57,12 @@ Para otorgar los permisos a otro usuario: **Administración del sitio > Usuarios
 Los nuevos campos pertenecen a `local_orange_notice`, en la misma base de datos Moodle. Las aperturas permanecen en `local_orange_receipt`, por usuario y versión, y los cambios de estado en `local_orange_state_log`. Los catálogos se guardan en `config_plugins`; las pertenencias y capacidades son nativas de Moodle. No se modifica el core ni Moove. La actualización habitual de plugins crea los campos, adapta los roles propios existentes y conserva los datos. Los campos personales y actores de cierre/baja se incluyen en exportación y eliminación mediante privacidad de Moodle.
 
 Prueba de modelo reversible: `docker compose exec -T web php local/orangeportal/cli/check_incident_workflow.php`. Prueba de navegador: `node scripts/test-orange-browser.mjs --incidents-workflow-only`. El navegador consulta publicaciones existentes y registra esas aperturas reales; no cierra ni elimina contenido del usuario. La prueba de modelo revierte sus incidencias, lecturas, cambios y catálogos temporales.
+
+
+## Detalle de incidencia con tabla · 20/10/2026
+
+Al abrir una incidencia, la ficha muestra su identificador y título, una tabla con fecha de apertura, fecha de cierre, impacto, estado, cliente afectado, producto y categoría, y finalmente la descripción completa. Los campos vacíos se representan con «—». La tabla puede desplazarse horizontalmente dentro de su contenedor en pantallas pequeñas.
+
+Formador y Administración conservan los enlaces de edición/seguimiento junto al título; el cambio de estado y su histórico están en el bloque desplegable **Gestión e histórico de estados**, antes de la descripción. Coordinación dispone de consulta/seguimiento sin controles de modificación. Los agentes solo consultan los datos y la descripción. Abrir la ficha sigue registrando la lectura individual antes de dibujar la cabecera, sin confirmación manual ni cambio de estado.
+
+`classes/incident_detail.php` genera la ficha y `view.php` conserva la autorización y las operaciones. No se altera el detalle de Comunicados, la base de datos, Moodle ni Moove. Los encabezados y controles están en español e inglés.

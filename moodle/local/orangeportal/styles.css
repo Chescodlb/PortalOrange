@@ -89,9 +89,9 @@ body.orange-wide-listing .orange-intro p{width:100%;max-width:none;box-sizing:bo
 .orange-library-search-controls{display:flex;align-items:center;gap:12px}
 .orange-library-search-controls .form-control{flex:1;min-width:0}
 .orange-library-clear{display:inline-block;margin-top:8px;font-size:.85rem}
-.orange-library-browser{display:flex;align-items:stretch;gap:8px;overflow-x:auto;max-width:100%;padding-bottom:12px;scrollbar-width:thin}
+.orange-library-browser{position:relative;display:flex;align-items:stretch;gap:8px;overflow-x:auto;width:100%;min-width:0;max-width:100%;padding-bottom:12px;scrollbar-width:thin}
 .orange-library-browser:focus-visible{outline:2px solid #000;outline-offset:3px}
-.orange-library-column{flex:0 0 clamp(170px,15vw,220px);min-width:0;border:1px solid #dedde0;border-radius:8px;padding:16px 12px;background:#fff}
+.orange-library-column{flex:1 0 220px;min-width:0;max-width:360px;border:1px solid #dedde0;border-radius:8px;padding:16px 12px;background:#fff}
 .orange-library-column h3{font-size:1rem;font-weight:700;line-height:1.4;margin:0 0 12px;padding-bottom:12px;border-bottom:1px solid #dedde0;overflow-wrap:anywhere}
 .orange-library-branches,.orange-library-documents{list-style:none;padding:0;margin:0;max-height:440px;overflow-y:auto;overscroll-behavior:contain}
 .orange-library-branches li,.orange-library-documents li{margin:0 0 4px}
@@ -100,7 +100,7 @@ body.orange-wide-listing .orange-intro p{width:100%;max-width:none;box-sizing:bo
 .orange-library-category:hover,.orange-library-document:hover{background:#f5f5f5}
 body .orange-library-category.is-selected,body .orange-library-document.is-selected{border-left-color:#ff7900;background:#fff0e5;color:#ff7900;font-weight:700}
 .orange-library-category:focus-visible,.orange-library-document:focus-visible{outline:2px solid #000;outline-offset:-2px}
-.orange-library-results{flex:1 0 300px;display:flex;flex-direction:column}
+.orange-library-results{flex:1.5 0 340px;max-width:none;display:flex;flex-direction:column}
 .orange-library-result-count,.orange-library-empty{font-size:.85rem;color:#595959;line-height:1.5}
 .orange-library-documents{max-height:320px}
 .orange-library-document{display:flex;align-items:center;gap:12px;padding:10px 8px;border-left:3px solid transparent;border-radius:4px;color:#242424;font-size:.9rem;line-height:1.5;overflow-wrap:anywhere}
@@ -110,7 +110,7 @@ body .orange-library-category.is-selected,body .orange-library-document.is-selec
 .orange-library-resource-type{font-size:.8rem;color:#595959;display:block;margin-bottom:12px}
 .orange-library-open{display:inline-block;max-width:100%;white-space:normal}
 .orange-library-manage{display:block;margin-top:12px;font-size:.85rem}
-@media(max-width:575px){.orange-library-column{flex-basis:180px}.orange-library-results{flex-basis:calc(100vw - 64px)}.orange-library-browser{scroll-snap-type:x proximity}.orange-library-column{scroll-snap-align:start}.orange-library-search-controls{gap:8px}}
+@media(max-width:575px){.orange-library-column{flex:0 0 85%;max-width:none}.orange-library-results{flex:0 0 100%}.orange-library-browser{scroll-snap-type:x proximity}.orange-library-column{scroll-snap-align:start}.orange-library-search-controls{gap:8px}}
 
 /* Personal reading state and explicit ordering, independent of course completion. */
 .orange-library-results-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid #dedde0}
@@ -170,3 +170,34 @@ body .navbar .orange-update:hover,body .navbar .orange-update:focus-visible{back
 /* Communications: reading is conveyed by the envelope, with three content columns. */
 .orange-notifications-table td:first-child{width:60%}
 .orange-notifications-table td:last-child{white-space:nowrap}
+
+/* Incident detail: title, one metadata table, description last. */
+.orange-incident-detail{margin-top:24px;min-width:0}
+.orange-incident-detail-heading{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:24px}
+.orange-incident-detail-heading h2{flex:1 1 360px;min-width:0;font-size:1.65rem;font-weight:700;margin:0;overflow-wrap:anywhere}
+.orange-incident-detail-actions{display:flex;flex-wrap:wrap;gap:8px;margin-left:auto}
+.orange-incident-detail-actions .btn{font-size:.8rem;white-space:normal}
+.orange-incident-data-scroll{width:100%;max-width:100%;overflow-x:auto;margin-bottom:24px}
+.orange-incident-data-scroll:focus-visible{outline:2px solid #ff7900;outline-offset:2px}
+.orange-incident-data-table{width:100%;min-width:850px;border-collapse:collapse;font-size:.9rem}
+.orange-incident-data-table th,.orange-incident-data-table td{text-align:left;vertical-align:top;padding:14px 12px;border-bottom:1px solid #dedde0}
+.orange-incident-data-table th{font-size:.8rem;font-weight:700;background:#f5f5f5}
+.orange-incident-data-table td{overflow-wrap:anywhere}
+.orange-incident-detail-management{padding:12px 0;border-bottom:1px solid #dedde0;margin-bottom:24px}
+.orange-incident-detail-management summary{font-size:.9rem;font-weight:700;cursor:pointer}
+.orange-incident-state-form{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:16px 0}
+.orange-incident-state-form .custom-select{width:auto;max-width:100%}
+.orange-incident-description h3{font-size:1rem;font-weight:700;margin:0 0 12px}
+.orange-incident-description-content{border:1px solid #dedde0;border-radius:6px;padding:20px;overflow-wrap:anywhere}
+.orange-incident-description-content>:last-child{margin-bottom:0}
+@media(max-width:575px){.orange-incident-detail-heading h2{flex-basis:100%;font-size:1.35rem}.orange-incident-detail-actions{margin-left:0}.orange-incident-description-content{padding:14px}}
+
+/* Critical unread alerts share the same severity across announcements and incidents. */
+body .navbar .orange-update.is-critical{color:#e60000!important}
+.orange-update.is-critical .orange-update-count{background:#e60000;color:#fff}
+body .navbar .orange-update.is-critical:hover,body .navbar .orange-update.is-critical:focus-visible{outline-color:#e60000}
+.orange-notice-impact{font-weight:700;margin-bottom:1rem}
+
+/* Hide optional user-menu tools for Orange consumers, including on mobile. */
+body.orange-agent-menu .usermenu a[href*="/calendar/view.php"],
+body.orange-agent-menu .usermenu a[href*="/user/files.php"]{display:none!important}

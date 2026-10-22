@@ -14,9 +14,9 @@ Solo se eliminan categorías vacías. Si hay subcategorías, usar **Editar / mov
 
 ## Publicar y confirmar
 
-Crear una publicación, escribir su título y contenido, elegir la categoría y seleccionar individuos, cohortes o grupos de cursos. Marcar Publicado para hacerla visible a sus destinatarios.
+Crear una publicación, escribir su título y contenido, elegir la categoría y el **Impacto** (Normal, Alto o Crítico, según el catálogo configurado) y seleccionar individuos, cohortes o grupos de cursos. Marcar Publicado para hacerla visible a sus destinatarios.
 
-La recepción en el listado, la apertura y la confirmación explícita se registran separadamente. La opción **Pendientes de confirmar** permite localizar lo que queda por confirmar. Cambiar el texto genera una nueva versión y conserva el histórico de la anterior.
+La recepción en el listado, la apertura y la confirmación explícita se registran separadamente. La opción **Pendientes de confirmar** permite localizar lo que queda por confirmar. Cambiar el título, contenido o impacto genera una nueva versión y conserva el histórico de la anterior.
 
 La apertura desde un perfil con permiso de gestión también guarda la vista individual de la versión actual. Si el editor no es destinatario, el listado muestra **Visto** y el sobre abierto; no se registra recepción ni confirmación, ni se añade al usuario a los destinatarios. La confirmación explícita solo está disponible cuando el usuario es destinatario de la publicación publicada.
 
@@ -26,7 +26,7 @@ La sección **Comunicados** presenta una tabla con título y descripción, categ
 
 A la izquierda del título de cada notificación aparece un sobre cerrado naranja si la notificación está pendiente de lectura, o un sobre abierto blanco con borde naranja si el usuario ya la abrió. Se utiliza el registro de lectura del destinatario para la versión actual de la publicación; no hace falta configurar nada ni se añaden campos a la base de datos. Consultar el listado registra recepción, pero no marca la publicación como leída. El icono tiene texto alternativo y ayuda Leído/Sin leer; no existe una columna de Lectura. Una publicación abierta puede seguir pendiente de confirmación explícita, que se consulta en su detalle. Los iconos son informativos, no botones. Esta presentación se implementa en el plugin (`index.php`, `styles.css` y los SVG de `pix/`), sin cambios en el core ni en Moove; no existe un ajuste nativo para estos iconos del listado personalizado.
 
-El formulario permite combinar búsqueda, categoría (incluidas subcategorías), fecha y pendientes de confirmar. Seleccionar una categoría en el desplegable; **Todas las categorías** elimina esa restricción. **Desde** y **Hasta** filtran por la fecha de creación mostrada en la tabla: se puede usar solo uno o ambos, e incluyen los días completos según la zona horaria del usuario. Pulsar **Buscar** aplica los filtros. Si el rango está invertido o una fecha es inválida, se muestra un mensaje para corregirla. Los enlaces del árbol lateral conservan la búsqueda, las fechas y el filtro de confirmaciones. Solo se muestran los avisos a los que el usuario tiene acceso. En móvil la tabla se desplaza horizontalmente dentro del listado y también se puede enfocar con el teclado.
+El formulario permite combinar búsqueda, categoría (incluidas subcategorías), impacto, fecha y pendientes de confirmar. Seleccionar una categoría en el desplegable; **Todas las categorías** elimina esa restricción. **Desde** y **Hasta** filtran por la fecha de creación mostrada en la tabla: se puede usar solo uno o ambos, e incluyen los días completos según la zona horaria del usuario. Pulsar **Buscar** aplica los filtros. Si el rango está invertido o una fecha es inválida, se muestra un mensaje para corregirla. Los enlaces del árbol lateral conservan la búsqueda, las fechas y el filtro de confirmaciones. Solo se muestran los avisos a los que el usuario tiene acceso. En móvil la tabla se desplaza horizontalmente dentro del listado y también se puede enfocar con el teclado.
 
 La presentación comparte el código y estilos de la tabla de incidencias en `local/orangeportal/index.php` y `styles.css`, con encabezados en español e inglés. No existe un ajuste nativo de Moodle para cambiar la presentación de este listado del plugin; no se modifica el core ni Moove.
 
@@ -40,7 +40,7 @@ La alerta no contiene una nota oculta ni se envía a otros miembros del equipo. 
 
 ## Mensajería y avisos nativos de Moodle
 
-El icono de mensajes de la barra conserva la mensajería de Moodle. Sus conversaciones, preferencias y permisos se gestionan con los ajustes nativos. Las notificaciones de Moodle también conservan su icono y preferencias.
+En la experiencia Orange, los cuatro indicadores personales sustituyen los iconos nativos de mensajes y avisos; los subsistemas de Moodle permanecen activos y los demás temas conservan sus accesos nativos.
 
 La sección Comunicados Orange añade los comunicados categorizados y su confirmación trazable. Abrir o marcar como leído un mensaje nativo no confirma un comunicado del portal; son registros distintos.
 
@@ -64,3 +64,9 @@ Comunicados usa el mismo diseño de filtros a la izquierda y tabla a la derecha 
 Se reutilizan la consulta y los permisos existentes del listado; no se requiere configurar Moodle ni se modifica su core. Ver [indicadores personales](10-indicadores-personales.md).
 
 La tabla de Comunicados tiene tres columnas: **Título y descripción**, **Categoría** y **Fecha**. El sobre permanece a la izquierda del título. Retirar la columna de Lectura no modifica los registros, los filtros ni la confirmación del detalle.
+
+## Impacto y alerta crítica · 21/10/2026
+
+La categoría organiza el comunicado; **Impacto** indica su gravedad. En el formulario de publicación, seleccionar Crítico para activar la campana roja de los destinatarios que aún no lo han leído. No crear una categoría especial para ello. La campana cuenta solo las críticas sin leer y abre ese listado; el total pendiente se consulta al pasar el cursor. Después de leer la última crítica vuelve a naranja y muestra todos los pendientes. El detalle muestra el impacto y el filtro lateral permite seleccionarlo manualmente.
+
+Se reutiliza el campo `local_orange_notice.impact` y el catálogo compartido de Impactos. No hay tablas nuevas ni migración de publicaciones existentes. Cambiar el impacto solicita una nueva lectura de la versión actual, conservando los registros anteriores. Este formulario y los indicadores pertenecen al plugin y no pueden configurarse desde un ajuste estándar de Moodle; no se modifica core/Moove ni los otros temas. Ver [indicadores personales](10-indicadores-personales.md).

@@ -114,7 +114,7 @@ $string['coursegroups'] = 'Moodle course groups';
 $string['audiencenote'] = 'Recipients are combined: membership in any selected audience grants access. Membership is checked on each visit.';
 $string['publishlabel'] = 'Published';
 $string['visibleforrecipients'] = 'Visible to recipients';
-$string['revisionnote'] = 'Changing the title or content requires recipients to read and confirm the new version.';
+$string['revisionnote'] = 'Changing the title, content or impact requires recipients to read and confirm the new version.';
 $string['savepublication'] = 'Save publication';
 $string['entercontent'] = 'Enter the content';
 $string['recipientsrequired'] = 'Select at least one individual recipient, cohort or group';
@@ -151,10 +151,10 @@ $string['automaticalerts_desc'] = 'Create private alerts when a course is comple
 $string['publishmanage'] = 'Publish and manage notices';
 $string['noticecategories'] = 'Incident and notification categories';
 $string['collectiondestination'] = 'Document collection';
-$string['documentinstructions'] = 'The next step lets you enter a title and upload the document using the Moodle file form.';
+$string['documentinstructions'] = 'File lets you upload an attachment; Page lets you write the document directly in the editor without an attachment. The next step opens the corresponding native Moodle form.';
 $string['adddocument'] = 'Add document';
 $string['newdocument'] = 'New document';
-$string['documentdestinationintro'] = 'Choose the collection where you want to publish the file.';
+$string['documentdestinationintro'] = 'Choose the collection and how to create the document.';
 $string['categoriesfor'] = 'Categories: {$a}';
 $string['sectionroot'] = '{$a} · section root';
 $string['quizreport'] = 'Assessment: {$a}';
@@ -252,7 +252,7 @@ $string['incidentstatekind'] = 'State type';
 $string['communicationfilters'] = 'Filter announcements';
 
 $string['personalupdates'] = 'Personal updates';
-$string['updates_incidents'] = 'Unread non-critical incidents';
+$string['updates_incidents'] = 'Unread incidents';
 $string['updates_critical'] = 'Unread critical incidents';
 $string['updates_courses'] = 'New unopened training';
 $string['updates_library'] = 'New unread documents';
@@ -266,3 +266,108 @@ $string['updates_allpriority'] = 'All priorities';
 $string['updates_noncritical'] = 'Non-critical';
 
 $string['communicationcolumntitle'] = 'Title and description';
+
+$string['documenttype'] = 'Document type';
+
+$string['documentfile'] = 'Attached file (PDF, Word or another file)';
+
+$string['documentpage'] = 'Page: write content without an attachment';
+
+$string['documenttypenotallowed'] = 'You cannot create this document type in the selected collection. Choose another collection or type.';
+
+$string['nodocumentdestination'] = 'You have no collections where you can create files or pages.';
+
+$string['orangeportal:administer'] = 'Manage users and audiences within Orange';
+
+$string['orangeportal:exportreports'] = 'Export Orange reports';
+
+$string['orangeusers'] = 'Orange users';
+
+$string['orangecollectives'] = 'Orange audiences';
+
+$string['orangeusersintro'] = 'Manage Orange portal users. New accounts must change their password at first login.';
+
+$string['orangecollectivesintro'] = 'Organise Orange audiences. Assign members from Orange users.';
+
+$string['orangecreateuser'] = 'Create Orange user';
+
+$string['orangecreatecohort'] = 'Create audience';
+
+$string['orangeexport'] = 'Export users (CSV)';
+
+$string['orangerevoke'] = 'Remove Orange access';
+
+$string['orangeconfirmrevoke'] = 'Remove {$a} from Orange and its audiences? The Moodle account will be retained.';
+
+$string['orangerevoked'] = 'Orange access removed. The Moodle account is retained.';
+
+$string['orangeprotected'] = 'Protected account';
+
+$string['orangeprotecteduser'] = 'This user must be managed by the site administrator.';
+
+$string['outsideorange'] = 'The requested item is outside the authorised Orange scope.';
+
+$string['orangesharedaccount'] = 'This account is not exclusive to Orange. You can manage its Orange audiences here; its global account details are maintained by the site administrator.';
+
+$string['orangeinvalidaccount'] = 'Check first name, surname, username and email. Username and email must be valid and available.';
+
+$string['invalidpassword'] = 'The password does not meet Moodle policy: {$a}';
+
+$string['orangeinvalidcohort'] = 'Enter a valid audience name.';
+
+$string['orangecohortinuse'] = 'The audience has members, publications or enrolments. Remove those associations before deleting it.';
+
+$string['orangeconfirmdeletecohort'] = 'Delete the empty audience {$a}?';
+
+$string['orangeenrolcohort'] = 'Add enrolment in collections or training';
+
+$string['orangeenrolhint'] = 'Selected courses add a cohort synchronisation using the Student role. Existing enrolments are retained. To remove a synchronisation, use the course enrolment methods with an authorised manager.';
+
+$string['orangereadingexport'] = 'Export readings (CSV)';
+
+$string['orangetrainingexport'] = 'Export training (CSV)';
+
+$string['orangemanagedcohorts'] = 'Existing audiences delegated to Orange';
+
+$string['orangemanagedcohorts_desc'] = 'Only the site administrator selects existing native cohorts. They are available only when all members belong to Orange and they do not enrol users outside Orange courses. New audiences are identified automatically by the local_orangeportal component.';
+
+$string['incidentdetaildata'] = 'Incident details';
+
+$string['incidentdetailmanagement'] = 'State management and history';
+
+$string['trainingsearch'] = 'Search all training';
+
+$string['trainingsearchplaceholder'] = 'Training name or description…';
+
+$string['trainingcourses'] = 'Courses';
+
+$string['trainingexplorer'] = 'Explore training';
+
+$string['trainingcoursecount'] = '{$a} accessible courses in this branch';
+
+$string['trainingglobalresults'] = '{$a} results across all training';
+
+$string['trainingnocourses'] = 'No accessible courses for this selection.';
+
+$string['trainingselect'] = 'Select a course to view its details and open it.';
+
+$string['trainingunavailable'] = 'The selected course is unavailable for this selection.';
+
+$string['trainingopen'] = 'Open training';
+
+$string['trainingedit'] = 'Edit course';
+
+$string['trainingnewquiz'] = 'New assessment';
+
+$string['trainingresults'] = 'View results and progress →';
+
+$string['trainingsort'] = 'Sort courses';
+
+$string['trainingviewed'] = 'Viewed';
+
+$string['trainingunviewed'] = 'Not opened';
+
+$string['trainingcourseone'] = '1 accessible course in this branch';
+$string['trainingglobalresultone'] = '1 result across all training';
+
+$string['updates_criticalsummary'] = 'Unread critical: {$a->critical}. Total unread: {$a->total}';

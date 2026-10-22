@@ -19,3 +19,5 @@ El portal local está en http://localhost:8080. Los usuarios ficticios y la revi
 La [decisión de implementación](implementacion.md) explica qué necesita código y por qué. Ningún archivo original de Moodle o Moove se ha modificado.
 
 - [Indicadores personales, contadores y fecha de incorporación](10-indicadores-personales.md).
+
+- [Administrador de Orange: cuentas, colectivos, contenidos y exportación](11-administrador-orange.md).

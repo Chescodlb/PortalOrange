@@ -203,6 +203,7 @@ class service {
             $table = ['user' => 'user', 'cohort' => 'cohort', 'group' => 'groups'][$type] ?? null;
             if (!$table) { throw new \invalid_parameter_exception('Invalid audience'); }
             foreach ($ids as $id) {
+                if (!orange_scope::target($type, (int)$id)) { throw new \moodle_exception('outsideorange', 'local_orangeportal'); }
                 $record = $DB->get_record($table, ['id' => $id], '*', MUST_EXIST);
                 if ($type == 'user' && ($record->deleted || $record->suspended || isguestuser($record))) {
                     throw new \invalid_parameter_exception('Inactive recipient');
@@ -235,8 +236,8 @@ class service {
                 $DB->insert_record('local_orange_state_log', (object)['noticeid' => $data->id, 'userid' => $USER->id,
                     'oldstate' => $old->state, 'newstate' => $data->state, 'timecreated' => time()]);
             }
-            // Require a fresh reading/confirmation when published text changes.
-            if ($old->title !== $data->title || $old->content !== $data->content ||
+            // Text or impact changes require a fresh reading of the current version.
+            if ($old->title !== $data->title || $old->content !== $data->content || $old->impact !== $data->impact ||
                     ($data->kind === 'incidents' && ($old->client !== $data->client || $old->product !== $data->product))) {
                 $data->revision++;
             }

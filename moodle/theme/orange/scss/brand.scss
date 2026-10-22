@@ -140,3 +140,8 @@ body .btn-link:hover, body .btn-link:focus { color: var(--orange-ink); text-deco
 #page-footer .footer-columns .btn-link { color: var(--orange-surface); }
 #page-login-index .loginform .d-flex.mt-2 { flex-wrap: wrap; align-items: center; gap: 8px; }
 #page-login-index .loginform .d-flex.mt-2 > .btn-link { padding: 0; white-space: nowrap; }
+
+// Moodle limits the competency navigation to the course content width; keep the course menu aligned.
+body.path-admin.path-admin-tool-lp .secondary-navigation .navigation .nav-tabs {
+  max-width: none;
+}

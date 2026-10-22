@@ -80,8 +80,21 @@ Los títulos y cuerpos de publicaciones, nombres de categorías, cursos, colecti
 El enlace superior **Biblioteca** abre directamente su página de exploración; no tiene desplegable. Las categorías se recorren allí en columnas y los recursos aparecen en **Documentos**, con búsqueda global. Las otras tres secciones también abren directamente sus páginas. Ver [gestión y recorrido de Biblioteca](04-biblioteca.md).
 
 
-## Cinco indicadores personales · 20/10/2026
+## Cuatro indicadores personales · 21/10/2026
 
-El lado derecho de la barra muestra campana, triángulo de incidencia crítica, libro abierto, biblioteca y burbuja de comunicados. Sustituyen los iconos nativos de avisos y mensajería exclusivamente dentro del tema Orange para sus miembros. Cada cifra cuenta pendientes personales y abre la sección filtrada; no abre desplegables. Ver [reglas, fechas y configuración](10-indicadores-personales.md).
+El lado derecho de la barra muestra campana de Comunicados, triángulo de Incidencias, libro abierto de Formaciones y biblioteca. Campana y triángulo pasan a rojo si hay críticas sin leer: cuentan solo esas críticas y abren su filtro; el total pendiente aparece al pasar el cursor. Sustituyen los iconos nativos de avisos y mensajería exclusivamente dentro del tema Orange para sus miembros. Cada cifra cuenta pendientes personales y abre la sección filtrada; no abre desplegables. Ver [reglas, fechas y configuración](10-indicadores-personales.md).
 
 Las portadas de sección muestran directamente su título y descripción, sin el rótulo «ORANGE · PORTAL DE AGENTES» ni variantes según el rol.
+
+Formaciones también utiliza navegación por columnas con las ramas iniciales Formación inicial y Formación continua, y un panel final Cursos. Comparte la interacción y los anchos de Biblioteca. Ver [gestión de formaciones](05-cursos-y-encuestas.md).
+
+
+## Alineación del menú en Competencias · 21/10/2026
+
+La página nativa de competencias de un curso utiliza una regla de Boost que limita las pestañas a 830 px y las centra. En Orange se elimina ese máximo únicamente para la navegación secundaria de `path-admin-tool-lp`, manteniendo el ancho y alineación del menú del curso. El ajuste está en `theme/orange/scss/brand.scss`; no modifica los permisos, las competencias, el core ni Moove, y no afecta a los otros temas del campus.
+
+## Menú de usuario del agente · 21/10/2026
+
+Se ocultan **Calendario** y **Archivos privados** del menú de usuario para los agentes de Orange, tanto en escritorio como en móvil. Perfil, calificaciones, preferencias, idioma y cerrar sesión se conservan. Los perfiles con permisos de administración, publicación, seguimiento, gestión de opciones o exportación mantienen ambos accesos; si alguien combina agente y formador/coordinador, prevalece su acceso de responsable. Los usuarios externos a Orange no reciben este ajuste.
+
+Moodle permite editar estos enlaces para todo el campus en **Administración del sitio > Apariencia > Temas > Ajustes de temas > Elementos del menú de usuario**. Ese ajuste global no permite distinguir agentes Orange de otros perfiles, por lo que aquí se utiliza una clase de presentación asignada según pertenencia y permisos en `local/orangeportal/classes/hooks.php`, con estilos limitados al menú de usuario en `styles.css`. Solo se ocultan accesos: no se revocan permisos ni se eliminan archivos o eventos. No se modifica core ni Moove.

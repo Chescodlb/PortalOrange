@@ -3,7 +3,7 @@
     const reveal = function() {
         const board = document.querySelector('.orange-library-browser');
         const params = new URL(window.location.href).searchParams;
-        if (!board || !['category', 'document', 'q'].some(key => params.get(key))) { return; }
+        if (!board || !['category', 'document', 'course', 'q'].some(key => params.get(key))) { return; }
         let target = board.querySelector('.orange-library-results');
         if (board.dataset.focus === 'detail') {
             target = board.querySelector('.orange-library-detail');

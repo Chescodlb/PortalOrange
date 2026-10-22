@@ -24,7 +24,8 @@ try {
     $ids = [];
     foreach ([['incidents', 'normal', 'open', 1, $agent->id], ['incidents', 'critical', 'open', 1, $agent->id],
             ['notifications', 'normal', 'open', 1, $agent->id], ['incidents', 'normal', 'closed', 1, $agent->id],
-            ['notifications', 'normal', 'open', 0, $agent->id], ['incidents', 'normal', 'open', 1, $trainer->id]] as $i => $fixture) {
+            ['notifications', 'normal', 'open', 0, $agent->id], ['incidents', 'normal', 'open', 1, $trainer->id],
+            ['notifications', 'critical', 'open', 1, $agent->id]] as $i => $fixture) {
         [$kind, $impact, $state, $published, $recipient] = $fixture;
         $id = $DB->insert_record('local_orange_notice', (object)['kind' => $kind,
             'categoryid' => $DB->get_field('local_orange_category', 'id', ['kind' => $kind], IGNORE_MULTIPLE),
@@ -34,20 +35,58 @@ try {
         $ids[] = $id;
     }
     $after = updates::counts();
-    updates_check($after['incidents'] === $before['incidents'] + 1 && $after['critical'] === $before['critical'] + 1 &&
-        $after['notifications'] === $before['notifications'] + 1, 'Pendientes personales sin duplicar críticas, cerradas, borradores ni destinatarios ajenos');
+    updates_check($after['incidents'] === $before['incidents'] + 2 && $after['incidentscritical'] === $before['incidentscritical'] + 1 &&
+        $after['notifications'] === $before['notifications'] + 2 &&
+        $after['notificationscritical'] === $before['notificationscritical'] + 1, 'Pendientes personales sin duplicar críticas, cerradas, borradores ni destinatarios ajenos');
+    $dom = new DOMDocument();
+    $dom->loadHTML('<?xml encoding="UTF-8">' . updates::navbar());
+    $xpath = new DOMXPath($dom);
+    updates_check($xpath->query('//a')->length === 4, 'Solo cuatro indicadores');
+    foreach (['incidents', 'notifications'] as $kind) {
+        $link = $xpath->query('//a[@data-update="' . $kind . '"]')->item(0);
+        parse_str(parse_url(html_entity_decode($link->getAttribute('href')), PHP_URL_QUERY), $params);
+        updates_check(str_contains($link->getAttribute('class'), 'is-critical') &&
+            (int)$link->getAttribute('data-count') === $after[$kind . 'critical'] &&
+            (int)$link->getAttribute('data-total') === $after[$kind] &&
+            str_contains($link->getAttribute('title'), (string)$after[$kind]) &&
+            ($params[$kind === 'incidents' ? 'priority' : 'impact'] ?? '') === 'critical' &&
+            $params['unread'] == 1 && $params['personal'] == 1, 'Alerta roja, cuenta crítica, total y destino filtrado: ' . $kind);
+    }
     $notice = $DB->get_record('local_orange_notice', ['id' => $ids[0]]);
     service::receipt($notice, 'received');
     updates_check(updates::counts()['incidents'] === $after['incidents'], 'Ver el listado no reduce pendientes');
     service::receipt($notice, 'readtime');
-    updates_check(updates::counts()['incidents'] === $before['incidents'], 'Abrir incidencia reduce solo su contador y conserva contenido');
+    updates_check(updates::counts()['incidents'] === $before['incidents'] + 1, 'Abrir incidencia reduce solo su contador y conserva contenido');
     $notification = $DB->get_record('local_orange_notice', ['id' => $ids[2]]);
     service::receipt($notification, 'readtime');
-    updates_check(updates::counts()['notifications'] === $before['notifications'] && !service::get_receipt($notification, $agent->id)->confirmed,
+    updates_check(updates::counts()['notifications'] === $before['notifications'] + 1 && !service::get_receipt($notification, $agent->id)->confirmed,
         'Comunicado leído baja contador aunque siga pendiente de confirmación');
     $notification->revision++;
     $DB->update_record('local_orange_notice', $notification);
     updates_check(updates::counts()['notifications'] === $after['notifications'], 'Nueva versión del comunicado vuelve a ser pendiente');
+    // Reuse the real save path: changing only impact renews personal reading evidence.
+    service::receipt($notification, 'readtime');
+    \core\session\manager::set_user($trainer);
+    $revision = $notification->revision;
+    $notification->impact = 'critical';
+    service::save_notice($notification, ['user' => [$agent->id]]);
+    \core\session\manager::set_user($agent);
+    $notification = $DB->get_record('local_orange_notice', ['id' => $notification->id]);
+    updates_check((int)$notification->revision === $revision + 1 && !service::get_receipt($notification, $agent->id),
+        'Cambio de impacto renueva lectura sin borrar el histórico');
+    updates_check(updates::counts()['notificationscritical'] === $after['notificationscritical'] + 1,
+        'Escalar comunicado leído a crítico activa alerta');
+    // Clear personal critical fixtures and existing critical notices inside this rollback transaction.
+    foreach (['incidents', 'notifications'] as $kind) {
+        foreach (service::visible($kind) as $pendingnotice) {
+            if (updates::recipient($pendingnotice) && $pendingnotice->impact === 'critical') {
+                service::receipt($pendingnotice, 'readtime');
+            }
+        }
+    }
+    $html = updates::navbar();
+    updates_check(!str_contains($html, 'is-critical') && !str_contains($html, 'priority=critical') &&
+        !str_contains($html, 'impact=critical'), 'Al leer todas las críticas vuelve naranja y abre pendientes generales');
     \core\session\manager::set_user($trainer);
     updates_check(!updates::recipient($notice), 'Formador no cuenta vistas de gestión sin ser destinatario');
     \core\session\manager::set_user($agent);

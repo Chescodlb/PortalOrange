@@ -114,7 +114,7 @@ $string['coursegroups'] = 'Grupos de cursos Moodle';
 $string['audiencenote'] = 'Se aplica la unión de destinatarios: basta pertenecer a uno de los colectivos seleccionados. La pertenencia se comprueba en cada acceso.';
 $string['publishlabel'] = 'Publicado';
 $string['visibleforrecipients'] = 'Visible para sus destinatarios';
-$string['revisionnote'] = 'Si cambias el título o contenido, los destinatarios deberán volver a leer y confirmar la nueva versión.';
+$string['revisionnote'] = 'Si cambias el título, contenido o impacto, los destinatarios deberán volver a leer y confirmar la nueva versión.';
 $string['savepublication'] = 'Guardar publicación';
 $string['entercontent'] = 'Escribe el contenido';
 $string['recipientsrequired'] = 'Selecciona al menos un destinatario individual, cohorte o grupo';
@@ -151,10 +151,10 @@ $string['automaticalerts_desc'] = 'Crea avisos privados al completar un curso o 
 $string['publishmanage'] = 'Publicar y gestionar avisos';
 $string['noticecategories'] = 'Categorías de incidencias y notificaciones';
 $string['collectiondestination'] = 'Colección documental';
-$string['documentinstructions'] = 'El siguiente paso permite escribir el título y subir el documento con el formulario de archivos de Moodle.';
+$string['documentinstructions'] = 'Archivo permite subir un adjunto; Página permite escribir el documento directamente en el editor, sin adjunto. El siguiente paso abre el formulario nativo de Moodle correspondiente.';
 $string['adddocument'] = 'Añadir documento';
 $string['newdocument'] = 'Nuevo documento';
-$string['documentdestinationintro'] = 'Elige la colección en la que quieres publicar el archivo.';
+$string['documentdestinationintro'] = 'Elige la colección y cómo quieres crear el documento.';
 $string['categoriesfor'] = 'Categorías de {$a}';
 $string['sectionroot'] = '{$a} · raíz de la sección';
 $string['quizreport'] = 'Evaluación: {$a}';
@@ -252,7 +252,7 @@ $string['incidentstatekind'] = 'Tipo de estado';
 $string['communicationfilters'] = 'Filtrar comunicados';
 
 $string['personalupdates'] = 'Novedades personales';
-$string['updates_incidents'] = 'Incidencias sin leer (no críticas)';
+$string['updates_incidents'] = 'Incidencias sin leer';
 $string['updates_critical'] = 'Incidencias críticas sin leer';
 $string['updates_courses'] = 'Formaciones nuevas sin abrir';
 $string['updates_library'] = 'Documentos nuevos sin leer';
@@ -266,3 +266,108 @@ $string['updates_allpriority'] = 'Todas las prioridades';
 $string['updates_noncritical'] = 'No críticas';
 
 $string['communicationcolumntitle'] = 'Título y descripción';
+
+$string['documenttype'] = 'Tipo de documento';
+
+$string['documentfile'] = 'Archivo adjunto (PDF, Word u otro archivo)';
+
+$string['documentpage'] = 'Página: escribir contenido sin adjunto';
+
+$string['documenttypenotallowed'] = 'No tienes permiso para crear este tipo de documento en la colección elegida. Elige otra colección o tipo.';
+
+$string['nodocumentdestination'] = 'No tienes colecciones donde puedas crear archivos o páginas.';
+
+$string['orangeportal:administer'] = 'Administrar usuarios y colectivos del ámbito Orange';
+
+$string['orangeportal:exportreports'] = 'Exportar informes Orange';
+
+$string['orangeusers'] = 'Usuarios Orange';
+
+$string['orangecollectives'] = 'Colectivos Orange';
+
+$string['orangeusersintro'] = 'Gestiona usuarios del portal Orange. Las cuentas nuevas deben cambiar su contraseña en el primer acceso.';
+
+$string['orangecollectivesintro'] = 'Organiza los colectivos de Orange. Los usuarios se asignan desde Usuarios Orange.';
+
+$string['orangecreateuser'] = 'Crear usuario Orange';
+
+$string['orangecreatecohort'] = 'Crear colectivo';
+
+$string['orangeexport'] = 'Exportar usuarios (CSV)';
+
+$string['orangerevoke'] = 'Retirar acceso Orange';
+
+$string['orangeconfirmrevoke'] = '¿Retirar a {$a} de Orange y sus colectivos? La cuenta Moodle se conserva.';
+
+$string['orangerevoked'] = 'Acceso Orange retirado. La cuenta Moodle se conserva.';
+
+$string['orangeprotected'] = 'Cuenta protegida';
+
+$string['orangeprotecteduser'] = 'Este usuario debe ser gestionado por la administración general.';
+
+$string['outsideorange'] = 'El elemento solicitado no pertenece al ámbito autorizado de Orange.';
+
+$string['orangesharedaccount'] = 'Esta cuenta no es exclusiva de Orange. Aquí puedes gestionar sus colectivos Orange; sus datos globales se mantienen desde la administración general.';
+
+$string['orangeinvalidaccount'] = 'Revisa nombre, apellidos, usuario y correo. Usuario y correo deben ser válidos y estar disponibles.';
+
+$string['invalidpassword'] = 'La contraseña no cumple la política de Moodle: {$a}';
+
+$string['orangeinvalidcohort'] = 'Indica un nombre válido para el colectivo.';
+
+$string['orangecohortinuse'] = 'El colectivo tiene miembros, publicaciones o matrículas. Retira esas asociaciones antes de eliminarlo.';
+
+$string['orangeconfirmdeletecohort'] = '¿Eliminar el colectivo vacío {$a}?';
+
+$string['orangeenrolcohort'] = 'Añadir matrícula en colecciones o formaciones';
+
+$string['orangeenrolhint'] = 'Los cursos seleccionados añaden una sincronización de cohorte con rol Estudiante. Las matrículas existentes se conservan. Para retirar una sincronización, usa los métodos de matrícula del curso con un responsable autorizado.';
+
+$string['orangereadingexport'] = 'Exportar lecturas (CSV)';
+
+$string['orangetrainingexport'] = 'Exportar formación (CSV)';
+
+$string['orangemanagedcohorts'] = 'Colectivos existentes delegados a Orange';
+
+$string['orangemanagedcohorts_desc'] = 'Solo administración general elige cohortes nativas existentes. Solo se habilitan si todos sus miembros pertenecen a Orange y no matriculan cursos ajenos. Los colectivos nuevos se identifican automáticamente por el componente local_orangeportal.';
+
+$string['incidentdetaildata'] = 'Datos de la incidencia';
+
+$string['incidentdetailmanagement'] = 'Gestión e histórico de estados';
+
+$string['trainingsearch'] = 'Buscar en todas las formaciones';
+
+$string['trainingsearchplaceholder'] = 'Nombre o descripción de la formación…';
+
+$string['trainingcourses'] = 'Cursos';
+
+$string['trainingexplorer'] = 'Explorar formaciones';
+
+$string['trainingcoursecount'] = '{$a} cursos accesibles en esta rama';
+
+$string['trainingglobalresults'] = '{$a} resultados en todas las formaciones';
+
+$string['trainingnocourses'] = 'No hay cursos accesibles para esta selección.';
+
+$string['trainingselect'] = 'Selecciona un curso para consultar su información y abrirlo.';
+
+$string['trainingunavailable'] = 'El curso seleccionado no está disponible para esta selección.';
+
+$string['trainingopen'] = 'Abrir formación';
+
+$string['trainingedit'] = 'Editar curso';
+
+$string['trainingnewquiz'] = 'Nueva evaluación';
+
+$string['trainingresults'] = 'Ver resultados y seguimiento →';
+
+$string['trainingsort'] = 'Ordenar cursos';
+
+$string['trainingviewed'] = 'Consultado';
+
+$string['trainingunviewed'] = 'Sin abrir';
+
+$string['trainingcourseone'] = '1 curso accesible en esta rama';
+$string['trainingglobalresultone'] = '1 resultado en todas las formaciones';
+
+$string['updates_criticalsummary'] = 'Críticas sin leer: {$a->critical}. Total sin leer: {$a->total}';

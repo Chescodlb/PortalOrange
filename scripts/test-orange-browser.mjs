@@ -63,20 +63,103 @@ try {
   };
   const nav = () => evaluate(`Array.from(document.querySelectorAll('.primary-navigation .nav-link')).filter(x=>x.textContent.trim()!=='').map(x=>x.textContent.trim()).filter(x=>!['Más','More'].includes(x))`);
   await send('Page.enable'); await send('Runtime.enable');
-  if (process.argv.includes('--personal-updates-only')) {
+  if (process.argv.includes('--training-columns-only')) {
+    await login('agente.orange',env.ORANGE_DEMO_PASSWORD);
+    await navigate('/local/orangeportal/index.php?section=courses&lang=es');
+    check(await evaluate(`!!document.querySelector('.orange-training-browser')&&!document.querySelector('.orange-card')&&!document.querySelector('.orange-training-open')`),'Formaciones usa columnas sin tarjetas ni selección ficticia');
+    check(await evaluate(`['Formación inicial','Formación continua'].every(t=>Array.from(document.querySelectorAll('.orange-library-category')).some(a=>a.textContent.includes(t)))`),'Dos ramas principales disponibles');
+    const categoryLink=async text=>evaluate(`Array.from(document.querySelectorAll('.orange-library-category')).find(a=>a.querySelector('span').textContent===${JSON.stringify(text)}).href`);
+    const initial=await categoryLink('Formación inicial');const continuous=await categoryLink('Formación continua');
+    await navigate(initial);
+    check(await evaluate(`!!document.querySelector('.orange-library-category.is-selected')&&document.querySelectorAll('.orange-training-course').length>0`),'Rama inicial resaltada y cursos accesibles');
+    const course=await evaluate(`document.querySelector('.orange-training-course').href`);
+    const title=await evaluate(`document.querySelector('.orange-training-course strong').textContent`);
+    await navigate(course);
+    check(await evaluate(`document.querySelector('.orange-library-detail h4').textContent===${JSON.stringify(title)}&&document.querySelector('.orange-training-open').href.includes('/course/view.php')&&!document.querySelector('.orange-create-quiz')`),'Ficha y apertura nativa sin herramientas de edición para agente');
+    await screenshot('formaciones-columnas-inicial');
+    await navigate(continuous);
+    check(await evaluate(`!document.querySelector('.orange-training-open')&&!!document.querySelector('.orange-library-empty')`),'Rama continua preparada sin cursos ficticios');
+    await navigate(continuous+'&q='+encodeURIComponent(title));
+    check(await evaluate(`document.querySelectorAll('.orange-training-course').length>0&&document.querySelector('.orange-library-result-count').textContent.includes('todas las formaciones')`),'Búsqueda global desde otra rama');
+    await evaluate(`document.querySelector('#orange-library-order').value='name';document.querySelector('#orange-library-order').dispatchEvent(new Event('change',{bubbles:true}))`);
+    await wait(`new URL(location.href).searchParams.get('order')==='name'&&document.readyState==='complete'`);
+    check(await evaluate(`document.querySelector('#orange-library-order').value==='name'`),'Orden automático sin botón Aplicar');
+    await navigate('/local/orangeportal/index.php?section=courses&q=ZZZ-SIN-FORMACION');
+    check(await evaluate(`!document.querySelector('.orange-training-course')&&!!document.querySelector('.orange-library-empty')`),'Búsqueda vacía sin acceso ficticio');
+    await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+    await navigate(course);
+    check(await evaluate(`innerWidth<=390&&document.documentElement.scrollWidth<=390&&document.querySelector('.orange-training-browser').scrollWidth>document.querySelector('.orange-training-browser').clientWidth`),'Móvil desplaza columnas dentro de Formaciones');
+    await screenshot('formaciones-columnas-movil');await send('Emulation.clearDeviceMetricsOverride');
+    await navigate('/local/orangeportal/index.php?section=courses&lang=en');
+    check(await evaluate(`document.querySelector('.orange-library-results h3').textContent==='Courses'&&document.querySelector('label[for="orange-training-search"]').textContent==='Search all training'&&!document.body.innerText.includes('[[training')`),'Explorador traducido al inglés');
+    await navigate('/local/orangeportal/index.php?section=library&lang=es');
+    check(await evaluate(`!!document.querySelector('.orange-library-browser')&&!document.querySelector('.orange-training-browser')&&document.querySelector('.orange-library-results h3').textContent==='Documentos'`),'Biblioteca conserva su explorador documental');
+    await logout();await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
+    await navigate(course);
+    check(await evaluate(`!!document.querySelector('.orange-create-quiz')&&!!document.querySelector('.orange-library-detail input[name="edit"]')&&!!document.querySelector('.orange-create-course')`),'Formador conserva creación, edición y evaluaciones');
+    const creation=await evaluate(`document.querySelector('.orange-create-course').href`);
+    check(new URL(creation).searchParams.get('category')===new URL(course).searchParams.get('category'),'Nuevo curso propone la categoría seleccionada');
+    await writeFile('backups/previews/training-columns-checks.json',JSON.stringify({date:new Date().toISOString(),results},null,2));
+    console.log('Verificaciones Formaciones: '+results.length);
+  } else if (process.argv.includes('--orange-admin-only')) {
+    await login('admin.orange',env.ORANGE_DEMO_PASSWORD);
+    await navigate('/local/orangeportal/users.php?lang=es');
+    check(await evaluate(`!!document.querySelector('.orange-admin-links a.active[href*="users.php"]')&&!!document.querySelector('.primary-navigation a[href$="users.php"]')`),'Administración Orange abre Usuarios y marca la pestaña activa');
+    check(await evaluate(`!document.body.innerText.includes('usuario.externo')&&document.body.innerText.includes('Cuenta protegida')`),'Lista limitada a Orange y administradores protegidos');
+    await screenshot('administrador-orange-usuarios');
+    await navigate('/local/orangeportal/users.php?action=new');
+    check(await evaluate(`['username','password','firstname','lastname','email'].every(n=>document.querySelector('[name="'+n+'"]'))`),'Formulario de alta nativa disponible');
+    await navigate('/local/orangeportal/cohorts.php');
+    check(await evaluate(`!!document.querySelector('.orange-admin-links a.active[href*="cohorts.php"]')&&!document.body.innerText.includes('[[')`),'Colectivos con traducciones y pestaña activa');
+    await navigate('/local/orangeportal/cohorts.php?action=new');
+    check(await evaluate(`!!document.querySelector('[name="name"]')&&!!document.querySelector('[name="courses[]"]')`),'Crear colectivo y elegir matrículas Orange');
+    await navigate('/local/orangeportal/manage.php?kind=incidents&new=1');
+    check(await evaluate(`!!document.querySelector('[name="incidentclient"]')||!!document.querySelector('[name="client"]')`),'Administrador puede gestionar incidencias');
+    check(await evaluate(`!Array.from(document.querySelectorAll('[name="users[]"] option')).some(o=>o.textContent.includes('usuario.externo'))`),'Destinatarios no ofrecen usuarios externos');
+    await navigate('/local/orangeportal/reports.php');
+    check(await evaluate(`document.querySelectorAll('a[href*="export.php"]').length===2`),'Exportaciones de lecturas y formación disponibles');
+    const csv=await evaluate(`fetch('/local/orangeportal/export.php?type=users').then(async r=>({ok:r.ok,type:r.headers.get('content-type'),text:await r.text()}))`);
+    check(csv.ok&&csv.type.includes('csv')&&!csv.text.includes('usuario.externo')&&csv.text.includes('admin.orange'),'CSV de usuarios limitado a Orange');
+    await navigate('/admin/search.php');
+    check(await evaluate(`!document.querySelector('#adminsearchquery')&&!document.querySelector('input[name="query"]')`),'Sin buscador de administración general');
+    await navigate('/user/editadvanced.php?id=-1');
+    check(await evaluate(`!document.querySelector('[name="firstname"]')`),'Sin creación global de cuentas Moodle');
+    await navigate('/local/orangeportal/users.php?lang=en');
+    check(await evaluate(`document.querySelector('.orange-intro h2').textContent==='Orange users'&&!document.body.innerText.includes('[[')`),'Administración delegada traducida al inglés');
+    await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+    await navigate('/local/orangeportal/users.php?lang=es');
+    check(await evaluate(`innerWidth<=390&&document.documentElement.scrollWidth<=390`),'Administración de usuarios sin desbordamiento móvil');
+    await send('Emulation.clearDeviceMetricsOverride');
+    await logout();await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
+    check(await evaluate(`!document.querySelector('.orange-admin-links a[href*="users.php"]')`),'Formador no recibe gestión de usuarios');
+    await navigate('/local/orangeportal/users.php');
+    check(await evaluate(`!document.querySelector('a[href*="action=new"]')`),'Formador rechazado también por acceso directo');
+    await writeFile('backups/previews/orange-admin-checks.json',JSON.stringify({date:new Date().toISOString(),results},null,2));
+    console.log('Verificaciones de administración Orange: '+results.length);
+  } else if (process.argv.includes('--personal-updates-only')) {
     await login('agente.orange', env.ORANGE_DEMO_PASSWORD);
     await navigate('/local/orangeportal/index.php?section=notifications&lang=es');
     await wait(`!!document.querySelector('.orange-communications-layout')`);
     check(await evaluate(`document.querySelector('.orange-communications-filters').getBoundingClientRect().right<document.querySelector('.orange-communications-layout .orange-incidents-results').getBoundingClientRect().left`), 'Comunicados con filtros a la izquierda');
-    check(await evaluate(`['q','category','datefrom','dateto','pending','unread'].every(n=>document.querySelector('.orange-communications-filters [name="'+n+'"]'))`), 'Búsqueda, categoría, fechas, confirmación y lectura en lateral');
-    check(await evaluate(`document.querySelectorAll('.orange-personal-updates .orange-update').length===5&&!document.querySelector('#nav-notification-popover-container')&&!document.querySelector('[data-region="popover-region-messages"]')`), 'Cinco indicadores Orange sin iconos nativos de avisos y mensajes');
-    const keys=['incidents','critical','courses','library','notifications'];
+    check(await evaluate(`['q','category','impact','datefrom','dateto','pending','unread'].every(n=>document.querySelector('.orange-communications-filters [name="'+n+'"]'))`), 'Búsqueda, categoría, fechas, confirmación y lectura en lateral');
+    check(await evaluate(`document.querySelectorAll('.orange-personal-updates .orange-update').length===4&&!document.querySelector('#nav-notification-popover-container')&&!document.querySelector('[data-region="popover-region-messages"]')`), 'Cuatro indicadores Orange sin iconos nativos de avisos y mensajes');
+    check(await evaluate(`(async()=>{
+      const icons=['notifications','incidents'].map(key=>document.querySelector('[data-update="'+key+'"]'));
+      const previous=icons.map(e=>e.classList.contains('is-critical'));
+      icons.forEach(e=>e.classList.add('is-critical'));
+      // The theme animates link colors; inspect the settled CSS color.
+      await new Promise(resolve=>setTimeout(resolve,700));
+      const red=icons.every(e=>getComputedStyle(e).color==='rgb(230, 0, 0)'&&getComputedStyle(e.querySelector('.orange-update-count')).backgroundColor==='rgb(230, 0, 0)');
+      icons.forEach((e,i)=>{if(!previous[i])e.classList.remove('is-critical')});
+      return red;
+    })()`),'CSS rojo para icono y contador crítico de ambas secciones');
+    const keys=['notifications','incidents','courses','library'];
     for (const key of keys) {
       const link=await evaluate(`document.querySelector('[data-update="${key}"]').href`);
       const count=await evaluate(`Number(document.querySelector('[data-update="${key}"]').dataset.count)`);
       await navigate(link);
       check(await evaluate(`!document.querySelector('.alert-danger')&&!document.body.innerText.includes('[[updates_')&&!!document.querySelector('[data-update="${key}"] svg')`),'Indicador accesible y traducido: '+key);
-      const rows=await evaluate(key==='library'?`document.querySelectorAll('.orange-library-document').length`:key==='courses'?`document.querySelectorAll('.orange-card').length`:key==='notifications'?`document.querySelectorAll('.orange-notifications-table tbody tr').length`:`document.querySelectorAll('.orange-incidents-table tbody tr').length`);
+      const rows=await evaluate(key==='library'?`document.querySelectorAll('.orange-library-document').length`:key==='courses'?`document.querySelectorAll('.orange-training-course').length`:key==='notifications'?`document.querySelectorAll('.orange-notifications-table tbody tr').length`:`document.querySelectorAll('.orange-incidents-table tbody tr').length`);
       check(rows===count,'Contador coincide con su listado: '+key);
     }
     await navigate('/local/orangeportal/index.php?section=notifications&lang=en');
@@ -90,9 +173,13 @@ try {
     await send('Emulation.clearDeviceMetricsOverride');
     await logout();
     await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
-    check(await evaluate(`document.querySelectorAll('.orange-update').length===5&&!!document.querySelector('.primary-navigation a[href*="manage.php"]')`),'Formador conserva indicadores y acceso de gestión');
+    check(await evaluate(`document.querySelectorAll('.orange-update').length===4&&!!document.querySelector('.primary-navigation a[href*="manage.php"]')`),'Formador conserva indicadores y acceso de gestión');
     await navigate('/local/orangeportal/index.php?section=notifications');
     check(await evaluate(`!!document.querySelector('[name="pending"]')&&!!document.querySelector('.orange-communications-filters')`),'Formador conserva filtro de confirmación y lateral');
+    for (const language of ['es','en']) {
+      await navigate('/local/orangeportal/manage.php?kind=notifications&new=1&lang='+language);
+      check(await evaluate(`!!document.querySelector('select[name="impact"]:not([disabled]) option[value="critical"]')`),language+': Impacto editable en nuevos Comunicados');
+    }
     console.log('Verificaciones personales completas: '+results.length);
   } else if (process.argv.includes('--incidents-workflow-only')) {
   await login('agente.orange',env.ORANGE_DEMO_PASSWORD);
@@ -193,13 +280,13 @@ try {
   check(await evaluate(`!document.querySelector('.orange-library-document')&&document.querySelector('.orange-library-empty').textContent.includes('coincidan')`),'Búsqueda sin resultados clara');
   await navigate(docurl);
   await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
-  check(await evaluate(`document.documentElement.scrollWidth<=innerWidth&&document.querySelector('.orange-library-browser').scrollWidth>document.querySelector('.orange-library-browser').clientWidth`),'Móvil: desplazamiento contenido dentro de la biblioteca');
+  check(await evaluate(`innerWidth<=390&&document.documentElement.scrollWidth<=390&&document.querySelector('.orange-library-browser').scrollWidth>document.querySelector('.orange-library-browser').clientWidth`),'Móvil: desplazamiento contenido dentro de la biblioteca');
   await screenshot('biblioteca-columnas-movil');
   await send('Emulation.clearDeviceMetricsOverride');
   await navigate('/local/orangeportal/index.php?section=library&lang=en');
   check(await evaluate(`document.querySelector('.orange-library-results h3').textContent==='Documents'&&document.querySelector('label[for="orange-library-search"]').textContent==='Search the entire library'`),'Biblioteca traducida al inglés');
   await navigate('/local/orangeportal/index.php?section=courses&lang=es');
-  check(await evaluate(`!document.querySelector('#orange-menu-courses')&&!document.querySelector('.orange-library-browser')&&!!document.querySelector('.orange-card')`),'Formaciones conserva su vista sin desplegable');
+  check(await evaluate(`!document.querySelector('#orange-menu-courses')&&!!document.querySelector('.orange-training-browser')`),'Formaciones usa columnas sin desplegable');
   await writeFile('backups/previews/library-columns-checks.json',JSON.stringify({date:new Date().toISOString(),results},null,2));
   console.log('Verificaciones: '+results.length);
   } else if (process.argv.includes('--isolation-only')) {

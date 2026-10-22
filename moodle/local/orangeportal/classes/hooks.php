@@ -38,7 +38,7 @@ class hooks {
             $key = $category && in_array($rootid, array_map('intval', explode('/', $category->path))) ? 'library' : 'courses';
             $PAGE->set_primary_active_tab('orange_' . $key);
         }
-        if (is_siteadmin() || has_capability('local/orangeportal:manage', \context_system::instance()) ||
+        if (is_siteadmin() || has_capability('local/orangeportal:administer', \context_system::instance()) || has_capability('local/orangeportal:manage', \context_system::instance()) ||
                 has_capability('local/orangeportal:viewreports', \context_system::instance()) ||
                 has_capability('local/orangeportal:manageoptions', \context_system::instance())) {
             // Delegated roles have portal capabilities, not site configuration access.
@@ -46,6 +46,7 @@ class hooks {
                 (has_capability('local/orangeportal:manage', \context_system::instance()) ?
                     '/local/orangeportal/manage.php' : (has_capability('local/orangeportal:viewreports', \context_system::instance()) ?
                         '/local/orangeportal/reports.php' : '/local/orangeportal/options.php'));
+            if (!is_siteadmin() && has_capability('local/orangeportal:administer', \context_system::instance())) { $adminpath = '/local/orangeportal/users.php'; }
             $nav->add(get_string('administration'), new \moodle_url($adminpath),
                 \navigation_node::TYPE_SITE_ADMIN, null, 'siteadminnode');
         }
@@ -57,6 +58,13 @@ class hooks {
             return;
         }
         $PAGE->requires->css(new \moodle_url('/local/orangeportal/styles.css', ['v' => filemtime(__DIR__ . '/../styles.css')]));
+        // Consumer menus omit optional tools; combined staff roles retain their menu.
+        $staffcaps = ['administer', 'manage', 'viewreports', 'manageoptions', 'viewallincidents', 'exportreports'];
+        $staff = is_siteadmin();
+        foreach ($staffcaps as $cap) {
+            $staff = $staff || has_capability('local/orangeportal:' . $cap, \context_system::instance());
+        }
+        if (!$staff) { $PAGE->add_body_class('orange-agent-menu'); }
         course_creation::presentation();
         breadcrumb::apply();
         // Error pages may default PAGE->url to the site root; use the actual request.

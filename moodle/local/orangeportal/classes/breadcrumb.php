@@ -83,7 +83,7 @@ class breadcrumb {
         } else if ($file === 'manage.php') {
             // admin_externalpage_setup uses a canonical URL without the current kind.
             $section = optional_param('kind', 'incidents', PARAM_ALPHA);
-        } else if (in_array($file, ['reports.php', 'options.php'])) {
+        } else if (in_array($file, ['reports.php', 'options.php', 'users.php', 'cohorts.php'])) {
             $section = 'administration';
         }
         if (!in_array($section, ['library', 'courses', 'incidents', 'notifications', 'administration'], true)) { return; }

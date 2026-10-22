@@ -26,7 +26,7 @@ class notice extends \moodleform {
         $current = $this->_customdata['current'] ?? null;
         $impact = $current->impact ?? \local_orangeportal\notice_options::default_code('impacts');
         $state = $current->state ?? \local_orangeportal\notice_options::default_code('states');
-        $m->addElement('select', 'impact', 'Impacto', \local_orangeportal\service::impacts(true, $impact));
+        $m->addElement('select', 'impact', get_string('incidentcolumnimpact', 'local_orangeportal'), \local_orangeportal\service::impacts(true, $impact));
         $m->addElement('select', 'state', get_string('sharedstate', 'local_orangeportal'), \local_orangeportal\service::states(true, $state));
         // Frozen selects export their configured value, not the first option.
         $m->setDefault('impact', $impact);
@@ -34,18 +34,19 @@ class notice extends \moodleform {
         if ($kind === 'notifications') {
             // Read-only values must override stale or altered hidden POST fields.
             $m->setConstant('state', $state);
-            $m->setConstant('impact', $impact);
-            $m->freeze('state'); $m->freeze('impact');
+            $m->freeze('state');
         }
         $m->addElement('header', 'audience', get_string('recipients', 'local_orangeportal'));
         $users = [];
-        foreach ($DB->get_records_select('user', 'deleted = 0 AND suspended = 0 AND id > 1', [], 'lastname, firstname') as $u) {
-            if (!isguestuser($u)) { $users[$u->id] = fullname($u) . ' (' . $u->username . ')'; }
+        foreach (\local_orangeportal\orange_scope::users() as $u) {
+            if (!$u->suspended && !isguestuser($u)) { $users[$u->id] = fullname($u) . ' (' . $u->username . ')'; }
         }
         $cohorts = [];
-        foreach ($DB->get_records('cohort', null, 'name') as $c) { $cohorts[$c->id] = $c->name; }
+        foreach (\local_orangeportal\orange_scope::cohorts() as $c) { $cohorts[$c->id] = $c->name; }
+        $audience = $DB->get_record('cohort', ['id' => (int)get_config('local_orangeportal', 'audiencecohort')]);
+        if ($audience) { $cohorts[$audience->id] = $audience->name; }
         $groups = [];
-        foreach ($DB->get_records_sql('SELECT g.*, c.fullname AS coursename FROM {groups} g JOIN {course} c ON c.id = g.courseid ORDER BY c.fullname, g.name') as $g) {
+        foreach (\local_orangeportal\orange_scope::groups() as $g) {
             $groups[$g->id] = $g->coursename . ' / ' . $g->name;
         }
         foreach (['users' => [get_string('individualusers', 'local_orangeportal'), $users], 'cohorts' => [get_string('globalcohorts', 'local_orangeportal'), $cohorts],

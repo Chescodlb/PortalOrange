@@ -18,7 +18,7 @@ if (!$id) {
     $table = new html_table();
     $table->head = array_map(fn($key) => get_string($key, 'local_orangeportal'),
         ['incidentidentification', 'incidentopened', 'incidentcloseddate', 'incidentcolumnstate', 'incidentclient', 'incidentproduct', 'incidentassigned', 'incidentreadusers']);
-    $users = $DB->get_records_select('user', 'id > 1 AND deleted = 0 AND suspended = 0');
+    $users = \local_orangeportal\orange_scope::users();
     foreach ($DB->get_records('local_orange_notice', ['kind' => 'incidents'], 'timecreated DESC, id DESC') as $n) {
         $assigned = 0; $read = 0;
         foreach ($users as $u) {
@@ -50,7 +50,7 @@ if (!$id) {
     }
     $audience = new html_table();
     $audience->head = array_map(fn($key) => get_string($key, 'local_orangeportal'), ['recipient', 'received', 'read']);
-    foreach ($DB->get_records_select('user', 'id > 1 AND deleted = 0 AND suspended = 0', [], 'lastname, firstname') as $u) {
+    foreach (\local_orangeportal\orange_scope::users() as $u) {
         if (!service::assigned($id, (int)$u->id)) { continue; }
         $r = service::get_receipt($n, (int)$u->id);
         $audience->data[] = [s(fullname($u)), $r && $r->received ? userdate($r->received, '%d/%m/%Y %H:%M') : get_string('pending', 'local_orangeportal'),

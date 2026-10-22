@@ -21,6 +21,10 @@ function orange_intro(string $eyebrow, string $title, string $description): stri
 }
 function orange_admin_navigation(string $active, string $kind = 'incidents'): string {
     $links = [];
+    if (has_capability('local/orangeportal:administer', context_system::instance())) {
+        $links['users'] = [get_string('orangeusers', 'local_orangeportal'), orange_link('users.php')];
+        $links['cohorts'] = [get_string('orangecollectives', 'local_orangeportal'), orange_link('cohorts.php')];
+    }
     if (\local_orangeportal\incident_workflow::all()) {
         $links['incidenttracking'] = [get_string('incidenttracking', 'local_orangeportal'), orange_link('incident_tracking.php')];
     }

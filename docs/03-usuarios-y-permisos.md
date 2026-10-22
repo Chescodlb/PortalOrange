@@ -21,7 +21,8 @@ Abrir **Usuarios > Permisos > Definir roles** para crear o modificar un perfil. 
 | Coordinación | Profesor sin edición en sus cursos y rol global Coordinación Orange | Consulta todas las incidencias y su seguimiento, resultados autorizados y catálogos; no cambia estados ni publica |
 | Responsable documental | Profesor con edición en las colecciones documentales que gestiona | Publicación y mantenimiento de recursos; no requiere ser administrador global |
 | Antiguo editor/comunicaciones | Integrado en Formador Orange | Se conserva el ID del rol para no perder asignaciones; `editor.orange` queda como cuenta histórica de pruebas de ese mismo perfil |
-| Administrador | Administrador del sitio | Configuración general y todas las funciones |
+| Administrador de Orange | Rol delegado del portal, sin administración del sitio | Usuarios y colectivos Orange, contenidos y exportación de informes de ese ámbito |
+| Administrador general | Administrador del sitio | Configuración global y asignación de perfiles privilegiados |
 
 Las capacidades del plugin se pueden buscar al definir un rol:
 
@@ -56,3 +57,7 @@ Para asignarlo a otro usuario desde Moodle: abrir **Administración > Cursos > A
 El usuario `formador.orange` tiene Profesor con permiso de edición en las dos colecciones de Biblioteca y en el curso de ejemplo. En las tarjetas correspondientes ve **Editar documentos** o **Editar curso**, que activan la edición nativa. Un agente no ve esos botones. Además, tiene el rol **Creación de contenidos Orange**, con `moodle/course:create`, asignado únicamente en las raíces Biblioteca y Cursos. Permite crear colecciones y cursos dentro de ellas, sin administración general ni creación en categorías ajenas.
 
 Para autorizar a otro responsable a crear contenidos, asignar **Creación de contenidos Orange** desde **Permisos > Asignar roles** en Biblioteca y/o Cursos. Moodle configura el rol del creador en un curso nuevo mediante **Usuarios > Permisos > Políticas de usuario > Rol de los creadores en nuevos cursos**; aquí es Profesor con permiso de edición. La edición de contenidos existentes sigue dependiendo del rol asignado en cada curso o colección. `editor.orange` no recibe este rol y conserva únicamente gestión de publicaciones de avisos y de categorías.
+
+## Administración delegada de Orange
+
+Formación matricula usuarios existentes; Administración crea las cuentas y mantiene los colectivos. Consultar [configuración, límites y procedimientos del Administrador Orange](11-administrador-orange.md). La cuenta local es `admin.orange`, con la contraseña de pruebas de `.env`.

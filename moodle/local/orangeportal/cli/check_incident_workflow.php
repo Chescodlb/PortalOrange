@@ -26,21 +26,23 @@ try {
     $data = (object)['kind' => 'incidents', 'title' => 'TEST workflow incident', 'content' => '<p>TEST incident</p>',
         'categoryid' => $category, 'impact' => notice_options::default_code('impacts'),
         'state' => notice_options::default_code('states'), 'client' => 'Cliente de prueba', 'product' => 'Producto de prueba', 'published' => 1];
+    $progress = isset(service::states(true)['progress']) ? 'progress' :
+        notice_options::save('states', '', 'Estado abierto de prueba', true, false);
     $targets = ['user' => [$users['agente.orange']->id], 'cohort' => [], 'group' => []];
     $id = service::save_notice($data, $targets);
     $notice = $DB->get_record('local_orange_notice', ['id' => $id], '*', MUST_EXIST);
     incident_check($notice->client === 'Cliente de prueba' && $notice->product === 'Producto de prueba', 'Cliente y producto guardados');
     \core\session\manager::set_user($users['agente.orange']);
     incident_check(service::can_view($notice), 'Agente asignado consulta una incidencia abierta');
-    incident_denied(fn() => service::change_state($notice, 'progress'), 'Agente no puede cambiar ningún estado');
+    incident_denied(fn() => service::change_state($notice, $progress), 'Agente no puede cambiar ningún estado');
     incident_denied(fn() => service::receipt($notice, 'confirmed'), 'Incidencia rechaza confirmación manual incluso por POST');
     $receipt = service::receipt($notice, 'readtime');
     incident_check($receipt->readtime > 0 && !$receipt->confirmed, 'Apertura registrada automáticamente sin confirmación');
     \core\session\manager::set_user($users['formador.orange']);
-    service::change_state($notice, 'progress');
+    service::change_state($notice, $progress);
     $notice = $DB->get_record('local_orange_notice', ['id' => $id]);
     \core\session\manager::set_user($users['agente.orange']);
-    incident_check(service::can_view($notice), 'En seguimiento sigue siendo abierta para el agente');
+    incident_check(service::can_view($notice), 'Un estado no cerrado sigue siendo visible para el agente');
     \core\session\manager::set_user($users['formador.orange']);
     service::change_state($notice, 'closed');
     $notice = $DB->get_record('local_orange_notice', ['id' => $id]);

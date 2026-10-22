@@ -48,13 +48,13 @@ La gestión general de Moodle sigue disponible para un administrador en **Admini
 
 Con `formador.orange`, Biblioteca muestra **Nuevo documento** y **Nueva colección documental**.
 
-1. Para un archivo nuevo, pulsar **Nuevo documento**, elegir una colección editable y pulsar **Añadir documento**. Se abre el formulario nativo Archivo: indicar el nombre, subir el PDF o documento y guardar.
+1. Para un archivo nuevo, pulsar **Nuevo documento**, elegir una colección editable, seleccionar **Archivo adjunto** y pulsar **Añadir documento**. Se abre el formulario nativo Archivo: indicar el nombre, subir el PDF o documento y guardar.
 2. Para una nueva colección, pulsar **Nueva colección documental**. El formulario nativo de Moodle crea un curso documental en Biblioteca. Si se ha seleccionado una categoría del árbol, se propone esa categoría. Elegir **Guardar y mostrar** para entrar en la colección nueva y activar edición.
 3. Añadir recursos Archivo, Carpeta, Página, Libro o URL desde la colección. Las evaluaciones se reservan normalmente a Cursos.
 4. En Participantes, matricular los usuarios o colectivos destinatarios y asignar los responsables. Una colección nueva no hereda automáticamente los destinatarios de otra.
 5. Probar con un agente matriculado.
 
-El selector Nuevo documento solo contiene colecciones de Biblioteca donde se pueden gestionar actividades y añadir archivos. La subida, almacenamiento y permisos de archivos son los del módulo nativo de Moodle. La nueva colección queda bajo la responsabilidad de su creador con el rol nativo Profesor con permiso de edición, según el ajuste de Moodle para creadores de cursos.
+El selector Nuevo documento solo contiene colecciones de Biblioteca donde se pueden gestionar actividades y añadir archivos o páginas. Cada combinación de colección y tipo se valida con sus permisos nativos. La subida, almacenamiento y permisos de archivos son los del módulo nativo de Moodle. La nueva colección queda bajo la responsabilidad de su creador con el rol nativo Profesor con permiso de edición, según el ajuste de Moodle para creadores de cursos.
 
 ## Restringir documentos y secciones
 
@@ -108,10 +108,28 @@ La generación de columnas, la consulta de recursos permitidos y la búsqueda se
 
 El listado se abre por defecto con **Más recientes**, usando la fecha de última actualización del recurso nativo. El selector compacto está a la derecha de **Documentos** en la misma línea. Permite cambiar a **Nombre** y aplica el orden automáticamente, sin botón; esta mejora usa JavaScript. La elección se conserva al navegar por las categorías o buscar, mediante el parámetro de URL `order`. No modifica un orden compartido para otros usuarios.
 
-Cada documento se presenta en una fila: indicador naranja a la izquierda, centrado verticalmente, y a su lado nombre, descripción y breadcrumb en tres líneas. El check indica **Leído**; el punto y el título destacado indican **Sin leer**. Los indicadores tienen etiquetas accesibles y texto al pasar el cursor. Las líneas largas se abrevian visualmente con puntos suspensivos y conservan el texto completo al pasar el cursor. La fecha no aparece en la fila; se utiliza para ordenar. La marca es individual y se registra al abrir realmente el recurso nativo; seleccionar su ficha no lo marca. Se mantiene al volver a entrar. No se exige activar finalización académica ni se concede acceso adicional a contenidos.
+Cada documento se presenta en una fila: indicador naranja a la izquierda, centrado verticalmente, y a su lado únicamente el título. La descripción y la ruta se muestran en la ficha del documento seleccionado. El check indica **Leído**; el punto y el título destacado indican **Sin leer**. Los indicadores tienen etiquetas accesibles y texto al pasar el cursor. Las líneas largas se abrevian visualmente con puntos suspensivos y conservan el texto completo al pasar el cursor. La fecha no aparece en la fila; se utiliza para ordenar. La marca es individual y se registra al abrir realmente el recurso nativo; seleccionar su ficha no lo marca. Se mantiene al volver a entrar. No se exige activar finalización académica ni se concede acceso adicional a contenidos.
 
 El plugin observa el evento nativo `course_module_viewed` para recursos de Biblioteca y miembros Orange. Guarda únicamente usuario, ID del módulo y primera fecha de apertura en `local_orange_doc_read`, con una clave única por usuario/recurso. También aprovecha registros existentes de la tabla nativa `course_modules_viewed` cuando los hay; no depende de registros de actividad que puedan purgarse y no reconstruye aperturas antiguas sin evidencia. La marca indica una apertura del recurso, no una confirmación explícita de lectura ni el versionado de sus archivos. Editar un documento cambia su fecha y posición entre los recientes, pero no reinicia esta marca de lectura.
 
 Los registros nuevos se incluyen en las herramientas de privacidad de Moodle para exportación y eliminación. Al eliminar un módulo, se limpian sus marcas. Actualizar el plugin desde Administración > Notificaciones o con `admin/cli/upgrade.php --non-interactive` crea la tabla sin modificar tablas nativas ni Moove. La apariencia de los usuarios externos no cambia.
 
 Prueba reversible: `docker compose exec -T web php local/orangeportal/cli/check_document_reads.php`. Comprueba fechas frente a lectura, orden alfabético, ficha sin apertura, lectura por usuario, reapertura sin duplicados, vistas nativas previas, exclusión de usuarios externos y limpieza de registros y privacidad.
+
+
+## Documentos sin adjunto · 20/10/2026
+
+**Biblioteca > Nuevo documento** permite elegir la colección y el tipo: **Archivo adjunto** o **Página: escribir contenido sin adjunto**. Página abre el formulario nativo de Moodle para escribir nombre y contenido en su editor. Guardar publica el recurso según su visibilidad y las matrículas/restricciones de la colección. El documento aparece en el mismo explorador y usa la misma lectura individual que los archivos.
+
+Archivo sigue exigiendo subir un fichero: es una validación nativa de ese recurso. Para texto sin fichero se utiliza Página, sin modificar ni relajar el formulario Archivo. El selector comprueba gestión de actividades y el permiso nativo para añadir el tipo elegido dentro de la colección. No concede permisos nuevos. También se puede crear desde **Gestionar colección > Añadir una actividad o un recurso > Página**.
+
+
+## Ancho adaptable de columnas · 20/10/2026
+
+Las categorías ya no quedan limitadas a 220 px mientras Documentos ocupa todo el espacio sobrante. Cada columna parte de 220 px y crece hasta 360 px según el ancho disponible; Documentos parte de 340 px y recibe una proporción mayor del espacio libre. Si hay más niveles de los que caben, el desplazamiento horizontal conserva anchos legibles sin comprimir las categorías.
+
+En pantallas de hasta 575 px, cada columna de categorías ocupa el 85 % del explorador y deja visible el comienzo de la siguiente. Documentos ocupa el ancho del explorador. Las medidas dependen del contenedor, respetando los márgenes de Moodle. Se mantienen la selección naranja y el avance a la siguiente columna; no cambian contenido, orden ni permisos. El ajuste está en `local/orangeportal/styles.css` y no modifica Moodle ni Moove.
+
+El explorador establece su propio contexto de posición para contener también las etiquetas accesibles de sus controles. Esto evita que una etiqueta de una columna fuera de vista ensanche la página en tablet o móvil. Revisión visual a 1920, 1440, 768 y 390 px: el desbordamiento queda dentro del explorador y la cabecera permanece dentro de la pantalla.
+
+El listado de Documentos muestra solo el título y el indicador personal de lectura. Seleccionar un título conserva la ficha con ruta, descripción y botón Abrir documento. La búsqueda continúa consultando nombre y descripción aunque esta última no aparezca en cada fila.

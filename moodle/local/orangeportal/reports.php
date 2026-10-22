@@ -13,6 +13,11 @@ $noticeid = optional_param('noticeid', 0, PARAM_INT);
 echo $OUTPUT->header();
 echo orange_intro(get_string('administration'), get_string('reportstitle', 'local_orangeportal'), get_string('reportsintro', 'local_orangeportal'));
 echo orange_admin_navigation('reports');
+if (has_capability('local/orangeportal:exportreports', context_system::instance())) {
+    foreach (['readings' => 'orangereadingexport', 'training' => 'orangetrainingexport'] as $type => $label) {
+        echo html_writer::link(orange_link('export.php', ['type' => $type]), get_string($label, 'local_orangeportal'), ['class' => 'btn btn-outline-secondary mr-2']);
+    }
+}
 $courses = orange_native_courses((int)get_config('local_orangeportal', 'coursescategory'));
 $table = new html_table(); $table->head = [get_string('course'), get_string('activeparticipants', 'local_orangeportal'), get_string('completions', 'local_orangeportal'), get_string('averagegrade', 'local_orangeportal'), get_string('moodlereports', 'local_orangeportal')];
 foreach ($courses as $course) {
@@ -23,6 +28,7 @@ foreach ($courses as $course) {
     $participants = $DB->get_records_sql("SELECT u.id FROM {user} u JOIN ($enrolledsql) eu ON eu.id = u.id
         WHERE u.deleted = 0 AND u.suspended = 0", $params);
     $completed = 0; $grades = [];
+    $participants = array_filter($participants, fn($p) => \local_orangeportal\experience::member((int)$p->id));
     foreach ($participants as $participant) {
         if ($DB->record_exists_select('course_completions', 'course = ? AND userid = ? AND timecompleted > 0', [$course->id, $participant->id])) { $completed++; }
         $grade = $DB->get_record_sql("SELECT gg.id, gg.finalgrade, gi.grademin, gi.grademax FROM {grade_grades} gg
@@ -50,7 +56,7 @@ echo html_writer::link(orange_link('reports.php'), get_string('allcourses', 'loc
 echo html_writer::tag('h3', get_string('receiptreport', 'local_orangeportal'));
 echo html_writer::tag('p', get_string('receiptexplanation', 'local_orangeportal'));
 $table = new html_table(); $table->head = [get_string('publication', 'local_orangeportal'), get_string('currentrecipient', 'local_orangeportal'), get_string('received', 'local_orangeportal'), get_string('read', 'local_orangeportal'), get_string('confirmed', 'local_orangeportal')];
-$users = $DB->get_records_select('user', 'deleted = 0 AND suspended = 0 AND id > 1');
+$users = \local_orangeportal\orange_scope::users();
 $notices = $noticeid ? [$DB->get_record('local_orange_notice', ['id' => $noticeid], '*', MUST_EXIST)] :
     $DB->get_records('local_orange_notice', ['published' => 1], 'timecreated DESC');
 foreach ($notices as $notice) {
