@@ -13,20 +13,21 @@ if ($type === 'users') {
     $columns = ['name' => get_string('fullnameuser'), 'username' => get_string('username'), 'email' => get_string('email')];
     foreach ($users as $u) { $rows[] = ['name' => fullname($u), 'username' => $u->username, 'email' => $u->email]; }
 } else if ($type === 'readings') {
+    $kind = optional_param('kind', '', PARAM_ALPHA);
+    $data = \local_orangeportal\reading_report::data($kind, optional_param('noticeid', 0, PARAM_INT),
+        optional_param('userid', 0, PARAM_INT), optional_param('reading', '', PARAM_ALPHA), 0, 0);
     $columns = ['publication' => get_string('publication', 'local_orangeportal'), 'user' => get_string('fullnameuser'),
-        'received' => get_string('received', 'local_orangeportal'), 'read' => get_string('read', 'local_orangeportal'), 'confirmed' => get_string('confirmed', 'local_orangeportal')];
-    foreach ($DB->get_records_select('local_orange_notice', 'published = 1 AND deleted = 0') as $n) {
-        foreach ($users as $u) {
-            if (!\local_orangeportal\service::assigned($n->id, $u->id)) { continue; }
-            $r = \local_orangeportal\service::get_receipt($n, $u->id);
-            $date = fn($v) => $v ? userdate($v, '%Y-%m-%d %H:%M') : '';
-            $rows[] = ['publication' => $n->title, 'user' => fullname($u), 'received' => $date($r->received ?? 0),
-                'read' => $date($r->readtime ?? 0), 'confirmed' => $n->kind === 'notifications' ? $date($r->confirmed ?? 0) : ''];
-        }
+        'received' => get_string('received', 'local_orangeportal'), 'read' => get_string('read', 'local_orangeportal')];
+    $date = fn($v) => $v ? userdate($v, '%Y-%m-%d %H:%M') : '';
+    foreach ($data['rows'] as $row) {
+        $rows[] = ['publication' => $row->title, 'user' => fullname($row),
+            'received' => $date($row->received), 'read' => $date($row->readtime)];
     }
 } else if ($type === 'training') {
     $columns = ['course' => get_string('course'), 'user' => get_string('fullnameuser'), 'grade' => get_string('grade', 'grades'), 'completed' => get_string('completed')];
+    $courseid = optional_param('courseid', 0, PARAM_INT);
     foreach (orange_native_courses((int)get_config('local_orangeportal', 'coursescategory')) as $course) {
+        if ($courseid && (int)$course->id !== $courseid) { continue; }
         $context = context_course::instance($course->id);
         if (!has_capability('moodle/grade:viewall', $context)) { continue; }
         foreach ($users as $u) {

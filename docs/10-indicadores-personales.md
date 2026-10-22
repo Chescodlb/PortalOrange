@@ -21,9 +21,9 @@ Los cuatro iconos muestran su cantidad, también cuando es cero, y tienen etique
 2. Publicar y asignar comunicados/incidencias mediante los formularios del portal. Solo cuentan los avisos asignados al usuario por individuo, cohorte o grupo activo. Los borradores, las vistas de gestión sin asignación y las incidencias cerradas quedan fuera de los contadores.
 3. Gestionar matrículas y restricciones documentales/formativas desde Moodle. Los indicadores reutilizan esos controles y no conceden acceso adicional.
 4. En **Administración Orange > Comunicados/Incidencias > Crear publicación**, elegir **Impacto > Crítico**, destinatarios y Publicado. También puede editarse una publicación existente. Los impactos se mantienen en **Estados e impactos > Impactos**; no hace falta crear una categoría Crítico. El estado de Comunicados sigue sin editarse.
-5. Los filtros laterales de Comunicados incluyen Impacto, combinable con categoría, fechas, lectura y confirmación. El detalle muestra el impacto.
+5. Los filtros laterales de Comunicados incluyen Impacto, combinable con categoría, fechas, lectura. El detalle muestra el impacto.
 6. Cambiar título, contenido o impacto genera una nueva versión: solicita una nueva lectura y conserva los registros anteriores. Así, escalar un comunicado ya leído a Crítico activa la alerta personal. Cambiar solo el estado de una incidencia no solicita una nueva lectura.
-7. La apertura reduce el contador individual; no elimina publicaciones, cambia estados ni completa actividades. En Comunicados, confirmar sigue siendo una acción separada: leer reduce el contador aunque quede pendiente la confirmación.
+7. La apertura reduce el contador individual; no elimina publicaciones, cambia estados ni completa actividades. Comunicados tampoco requiere confirmación manual: abrir reduce su contador.
 
 «Nuevo» se calcula con la fecha nativa de creación de la formación (`course.timecreated`) o incorporación del recurso (`course_modules.added`), comparada con la entrada en Orange. No hay fecha independiente de publicación de recursos: hacer visible un recurso antiguo no reinicia su antigüedad. Actualizar un documento tampoco lo convierte en un documento nuevo. La evidencia de apertura formativa es `user_lastaccess`; para documentos se reutilizan las lecturas existentes del portal y de Moodle.
 

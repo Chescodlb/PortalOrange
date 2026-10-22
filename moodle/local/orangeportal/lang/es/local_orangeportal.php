@@ -86,7 +86,7 @@ $string['deleteoptionconfirm'] = '¿Quieres eliminar la opción «{$a}»? Esta a
 $string['deleteoptionnamed'] = 'Eliminar la opción {$a}';
 $string['myaccount'] = 'Mi cuenta';
 $string['managecategories'] = 'Gestionar categorías';
-$string['confirmationsresults'] = 'Confirmaciones y resultados';
+$string['confirmationsresults'] = 'Seguimiento';
 $string['portalmanagement'] = 'Gestión del portal';
 $string['categoryroot'] = 'Raíz';
 $string['categorysaved'] = 'Categoría guardada';
@@ -114,12 +114,12 @@ $string['coursegroups'] = 'Grupos de cursos Moodle';
 $string['audiencenote'] = 'Se aplica la unión de destinatarios: basta pertenecer a uno de los colectivos seleccionados. La pertenencia se comprueba en cada acceso.';
 $string['publishlabel'] = 'Publicado';
 $string['visibleforrecipients'] = 'Visible para sus destinatarios';
-$string['revisionnote'] = 'Si cambias el título, contenido o impacto, los destinatarios deberán volver a leer y confirmar la nueva versión.';
+$string['revisionnote'] = 'Si cambias el título, contenido o impacto, los destinatarios deberán volver a leer la nueva versión.';
 $string['savepublication'] = 'Guardar publicación';
 $string['entercontent'] = 'Escribe el contenido';
 $string['recipientsrequired'] = 'Selecciona al menos un destinatario individual, cohorte o grupo';
-$string['reportstitle'] = 'Resultados y confirmaciones';
-$string['reportsintro'] = 'Seguimiento de formación y trazabilidad de avisos para usuarios autorizados.';
+$string['reportstitle'] = 'Seguimiento';
+$string['reportsintro'] = 'Selecciona Incidencias, Comunicados, Formación o Usuarios para consultar su seguimiento.';
 $string['activeparticipants'] = 'Participantes activos';
 $string['completions'] = 'Finalizaciones';
 $string['averagegrade'] = 'Nota media (%)';
@@ -128,8 +128,8 @@ $string['completionreport'] = 'Finalización';
 $string['nogrades'] = 'Sin notas';
 $string['reporttraining'] = 'Formación';
 $string['allcourses'] = 'Ver todos los cursos';
-$string['receiptreport'] = 'Recepción, lectura y confirmación';
-$string['receiptexplanation'] = 'Recibido significa mostrado en el listado del portal; leído significa abierto; confirmado requiere pulsar el botón. No acredita recepción en Teams o correo.';
+$string['receiptreport'] = 'Recepción y lectura';
+$string['receiptexplanation'] = 'Recibido significa mostrado en el listado del portal; leído significa abierto. La lectura se registra automáticamente y no acredita recepción en Teams o correo.';
 $string['currentrecipient'] = 'Destinatario actual';
 $string['received'] = 'Recibido';
 $string['read'] = 'Leído';
@@ -138,7 +138,7 @@ $string['pending'] = 'Pendiente';
 $string['version'] = 'Versión';
 $string['recipient'] = 'Destinatario';
 $string['deleteduser'] = 'Usuario eliminado';
-$string['confirmationhistory'] = 'Histórico de confirmaciones por versión';
+$string['confirmationhistory'] = 'Histórico de lecturas por versión';
 $string['configuration'] = 'Configuración Orange';
 $string['portalenabled'] = 'Navegación Orange';
 $string['portalenabled_desc'] = 'Muestra las cuatro secciones y dirige la entrada a la página seleccionada en Navegación.';
@@ -163,14 +163,14 @@ $string['unknownsection'] = 'Sección desconocida';
 $string['invalidsection'] = 'Sección no válida';
 $string['categorycycle'] = 'No se puede crear un ciclo en el árbol';
 $string['changessaved'] = 'Cambio guardado';
-$string['noticerevisionchanged'] = 'El aviso ha cambiado. Recarga antes de confirmar.';
+$string['noticerevisionchanged'] = 'El aviso ha cambiado. Vuelve a abrirlo para registrar la lectura de su nueva versión.';
 $string['unknownaction'] = 'Acción desconocida';
 $string['backtolist'] = '← Volver al listado';
 $string['noticeversiondate'] = 'Versión {$a->version} · Publicado el {$a->date}';
 $string['receiptdates'] = 'Recibido: {$a->received} · Leído: {$a->read}';
 $string['confirmedon'] = 'Lectura confirmada el {$a}';
 $string['confirmreading'] = 'Confirmar que he leído este aviso';
-$string['managementpreview'] = 'Vista de gestión: marcada como vista para tu usuario. La confirmación solo está disponible para los destinatarios asignados.';
+$string['managementpreview'] = 'Vista de gestión: marcada como vista para tu usuario.';
 $string['managementread'] = 'Visto';
 $string['currentstatus'] = 'Estado: {$a}';
 $string['newstatus'] = 'Nuevo estado';
@@ -371,3 +371,70 @@ $string['trainingcourseone'] = '1 curso accesible en esta rama';
 $string['trainingglobalresultone'] = '1 resultado en todas las formaciones';
 
 $string['updates_criticalsummary'] = 'Críticas sin leer: {$a->critical}. Total sin leer: {$a->total}';
+
+$string['reportrowcount'] = '{$a} resultados';
+
+$string['reportallpublications'] = 'Todas las publicaciones';
+
+$string['reportallrecipients'] = 'Todos los destinatarios';
+
+$string['reportnotraining'] = 'No hay formaciones con permiso de consulta de resultados para tu perfil.';
+
+$string['reportnoresults'] = 'No hay lecturas o destinatarios que coincidan con los filtros.';
+
+$string['reportclearfilters'] = 'Limpiar filtros de este bloque';
+
+$string['manualconfirmationdisabled'] = 'La lectura se registra al abrir la publicación. No se requiere confirmación manual.';
+
+$string['reportsection'] = 'Tipo de seguimiento';
+
+$string['reportrecipients'] = 'Destinatarios';
+
+$string['reportreadcount'] = 'Leídos';
+
+$string['reportunreadcount'] = 'Sin leer';
+
+$string['reportselectnotice'] = 'Selecciona una publicación para consultar el detalle de lectura por usuarios. Los totales corresponden a la versión actual y sus destinatarios actuales.';
+
+$string['reportreadingsummary'] = 'Destinatarios: {$a->total} · Sin leer: {$a->unread} · Leídos: {$a->read}';
+
+// Reading percentages and individual tracking.
+$string['reportperiod'] = 'Periodo de lecturas';
+$string['reportweek'] = 'Últimos 7 días';
+$string['reportmonth'] = 'Últimos 30 días';
+$string['reportalltime'] = 'Todo el histórico';
+$string['reportperiodexplanation'] = 'Lecturas de la versión actual según su fecha de publicación/revisión. Los cambios de estado no reinician el periodo. Formación muestra la situación actual, sin este filtro de fechas.';
+$string['reportratio'] = '{$a->percent} % — {$a->part}/{$a->total}';
+$string['reportnotapplicable'] = 'Sin asignaciones';
+$string['reportdate'] = 'Fecha de publicación / revisión';
+$string['reportusers'] = 'Usuarios';
+$string['reportsearchuser'] = 'Buscar por nombre o CE (Número de ID)';
+$string['reportallcollectives'] = 'Todos los colectivos';
+$string['reportorder'] = 'Ordenar por';
+$string['reportmostpending'] = 'Más lecturas pendientes';
+$string['reportincidentunread'] = 'Incidencias sin leer';
+$string['reportincidentread'] = 'Incidencias leídas';
+$string['reportnotificationunread'] = 'Comunicados sin leer';
+$string['reportnotificationread'] = 'Comunicados leídos';
+$string['reportcriticalunread'] = 'Críticas sin leer · histórico';
+$string['reportcriticalexplanation'] = 'Críticas pendientes de todo el histórico vigente; excluye incidencias cerradas. El orden por pendientes usa el periodo seleccionado.';
+$string['reporttrainingfinished'] = 'Formaciones finalizadas';
+$string['reporttrainingrestricted'] = 'Sin formaciones autorizadas para seguimiento';
+$string['reportfinished'] = 'Finalizada';
+$string['reportinprogress'] = 'En curso';
+$string['reportnotstarted'] = 'Sin iniciar';
+$string['reportoverview'] = 'Resumen';
+$string['reportsurveys'] = 'Encuestas';
+$string['reportusersections'] = 'Seguimiento individual';
+$string['reporttrainingexplanation'] = 'Matrículas activas en formaciones autorizadas. Finalizada indica finalización registrada; En curso indica inicio o actividad registrada. Las notas y los intentos se muestran según los permisos de consulta.';
+$string['reportanonymoussurvey'] = 'Anónima: sin atribución individual';
+$string['reportnosurveys'] = 'Sin encuestas autorizadas para consulta.';
+$string['reportfinishdate'] = 'Fecha de finalización';
+$string['reportstartdate'] = 'Fecha de inicio';
+$string['reportresult'] = 'Resultado';
+$string['reportnogradecriterion'] = 'Sin nota visible o sin criterio de aprobado';
+$string['reportpassed'] = 'Aprobada';
+$string['reportnotpassed'] = 'No aprobada';
+$string['reportattempt'] = 'Intento';
+$string['reportattemptlimit'] = 'Se muestran los 25 intentos más recientes. Consulta el informe nativo para el histórico completo.';
+$string['reportcollectivecentre'] = 'Colectivo / centro';

@@ -121,7 +121,8 @@ class incident_browser {
         }
         $actions = '';
         if ($all) {
-            $actions .= \html_writer::link(\orange_link('incident_tracking.php'), get_string('incidenttracking', 'local_orangeportal'),
+            $actions .= \html_writer::link((has_capability('local/orangeportal:viewreports', \context_system::instance()) ?
+                \orange_link('reports.php', ['section' => 'incidents']) : \orange_link('incident_tracking.php')), get_string('incidenttracking', 'local_orangeportal'),
                 ['class' => 'btn btn-outline-secondary orange-incident-tracking-link']);
         }
         if (service::manager() && has_capability('local/orangeportal:changestate', \context_system::instance())) {

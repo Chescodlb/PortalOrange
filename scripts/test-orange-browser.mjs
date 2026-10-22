@@ -63,7 +63,115 @@ try {
   };
   const nav = () => evaluate(`Array.from(document.querySelectorAll('.primary-navigation .nav-link')).filter(x=>x.textContent.trim()!=='').map(x=>x.textContent.trim()).filter(x=>!['Más','More'].includes(x))`);
   await send('Page.enable'); await send('Runtime.enable');
-  if (process.argv.includes('--training-columns-only')) {
+  if (process.argv.includes('--user-reports-only')) {
+    for(const username of ['formador.orange','coordinador.orange','calidad.orange','admin.orange']) {
+      await login(username,env.ORANGE_DEMO_PASSWORD);
+      for(const language of ['es','en']) {
+        await navigate('/local/orangeportal/reports.php?section=users&lang='+language);
+        check(await evaluate(`!!document.querySelector('.orange-user-summary')&&!document.body.textContent.includes('[[')&&!document.querySelector('.alert-danger')`),username+' / '+language+': directorio individual traducido');
+        check(await evaluate(`document.querySelector('#report-period').value==='month'&&!!document.querySelector('#user_search')&&!!document.querySelector('#user_cohort')&&!document.querySelector('#user_centre')`),username+' / '+language+': periodo y filtros de nombre/CE, colectivo/centro');
+        const profile=await evaluate(`Array.from(document.querySelectorAll('.orange-user-summary tbody tr')).find(r=>r.cells[0].textContent.includes('Agente Orange'))?.querySelector('a')?.href`);
+        check(!!profile,username+' / '+language+': ficha del agente accesible');
+        await navigate(profile);
+        check(await evaluate(`document.querySelectorAll('.orange-user-tabs a').length===5&&!document.body.textContent.includes('[[')`),username+' / '+language+': resumen individual con cinco secciones');
+        const training=await evaluate(`Array.from(document.querySelectorAll('.orange-user-tabs a')).find(a=>a.href.includes('user_tab=training')).href`);
+        await navigate(training);
+        check(await evaluate(`!document.body.textContent.includes('[[')&&!document.querySelector('.alert-danger')`),username+' / '+language+': formación sin errores ni cadenas pendientes');
+        for(const tab of ['incidents','notifications','surveys']) {
+          const href=await evaluate(`Array.from(document.querySelectorAll('.orange-user-tabs a')).find(a=>a.href.includes('user_tab=${tab}')).href`);
+          await navigate(href);
+          check(await evaluate(`!!document.querySelector('.orange-user-tabs [aria-current="page"]')&&!document.body.textContent.includes('[[')&&!document.querySelector('.alert-danger')`),username+' / '+language+': desglose '+tab+' sin errores');
+        }
+        await navigate(training);
+        if(username==='calidad.orange') {
+          check(await evaluate(`!document.querySelector('a[href*="/mod/quiz/report.php"]')&&!document.querySelector('.orange-training-report')`),'Calidad sin resultados ni intentos de formación');
+        }
+        if(username==='formador.orange'&&language==='es') {await screenshot('seguimiento-usuario-formacion-es');}
+      }
+      if(username==='admin.orange') {
+        await navigate('/local/orangeportal/reports.php?section=users&period=all&lang=es');
+        await screenshot('seguimiento-usuarios-es');
+        await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+        check(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),'Directorio de seguimiento sin desbordamiento móvil');
+        await send('Emulation.clearDeviceMetricsOverride');
+      }
+      await logout();
+    }
+    await login('agente.orange',env.ORANGE_DEMO_PASSWORD);
+    await navigate('/local/orangeportal/reports.php?section=users');
+    check(await evaluate(`!document.querySelector('.orange-user-summary')&&!document.querySelector('.orange-user-tabs')`),'Agente no accede al seguimiento de otras personas');
+    await writeFile('backups/previews/user-report-checks.json',JSON.stringify({date:new Date().toISOString(),results},null,2));
+    console.log('Verificaciones de seguimiento individual: '+results.length);
+  } else if (process.argv.includes('--reading-reports-only')) {
+    await login('admin.orange',env.ORANGE_DEMO_PASSWORD);
+    for(const language of ['es','en']) {
+      for(const section of ['incidents','notifications']) {
+        await navigate('/local/orangeportal/reports.php?section='+section+'&lang='+language);
+        check(await evaluate(`document.querySelectorAll('.orange-category-tabs a').length===4&&document.querySelector('.orange-category-tabs [aria-current="page"]').href.includes('section=${section}')`),language+' / '+section+': selector de Seguimiento activo');
+        check(await evaluate(`!!document.querySelector('.orange-reading-summary')&&!document.querySelector('.orange-reading-detail')&&!document.body.textContent.includes('[[')`),language+' / '+section+': resumen por publicación separado del detalle');
+        check(await evaluate(`Array.from(document.querySelectorAll('.orange-reading-summary tbody tr')).every(r=>Number(r.cells[2].textContent)===Number(r.cells[3].textContent.match(/— (\\d+)\\//)?.[1]||0)+Number(r.cells[4].textContent.match(/— (\\d+)\\//)?.[1]||0))`),language+' / '+section+': total igual a leídos más sin leer');
+        check(await evaluate(`document.querySelectorAll('.orange-reading-summary tbody tr').length<=25`),language+' / '+section+': resumen paginado');
+        const detail=await evaluate(`document.querySelector('.orange-reading-summary tbody a')?.href`);
+        check(!!detail,language+' / '+section+': publicación disponible para abrir detalle');
+        await navigate(detail);
+        check(await evaluate(`!!document.querySelector('.orange-reading-detail')&&!document.querySelector('.orange-reading-summary')&&!!document.querySelector('#report-history-${section}')`),language+' / '+section+': detalle por usuarios e histórico');
+        check(await evaluate(`!Array.from(document.querySelectorAll('.orange-reading-detail th')).some(e=>/confirm/i.test(e.textContent))&&!!document.querySelector('[name="${section}_user"]')&&!!document.querySelector('[name="${section}_reading"]')`),language+' / '+section+': filtros individuales sin Confirmación');
+        const csv=await evaluate(`fetch(document.querySelector('.orange-reading-detail a[href*="export.php"]').href).then(async r=>({type:r.headers.get('content-type'),body:await r.text()}))`);
+        check(csv.type?.includes('csv')&&!/confirm/i.test(csv.body.split(/\r?\n/)[0]),language+' / '+section+': CSV por publicación sin Confirmación');
+        await screenshot('seguimiento-'+section+'-'+language);
+      }
+      await navigate('/local/orangeportal/reports.php?section=courses&lang='+language);
+      check(await evaluate(`!!document.querySelector('.orange-training-report')&&!!document.querySelector('a[href*="/grade/report/grader/"]')&&!document.querySelector('.orange-reading-summary')`),language+': Formación conserva resultados y enlaces');
+    }
+    await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+    await navigate('/local/orangeportal/reports.php?section=notifications');
+    check(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),'Seguimiento sin desbordamiento en móvil');
+    await send('Emulation.clearDeviceMetricsOverride');
+    await logout();await login('agente.orange',env.ORANGE_DEMO_PASSWORD);
+    await navigate('/local/orangeportal/index.php?section=notifications');
+    check(await evaluate(`!document.querySelector('[name="pending"]')`),'Comunicados sin filtro de confirmación');
+    const detail=await evaluate(`document.querySelector('.orange-notification-title')?.href`);
+    check(!!detail,'Comunicado asignado disponible para abrir');
+    await navigate(detail);
+    check(await evaluate(`!!document.querySelector('.orange-notice-content')&&!document.querySelector('input[value="confirm"]')`),'Detalle registra lectura sin botón de confirmar');
+    const blocked=await evaluate(`fetch(location.href,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({action:'confirm',sesskey:M.cfg.sesskey,revision:'1'})}).then(r=>r.text()).then(html=>!new DOMParser().parseFromString(html,'text/html').querySelector('.orange-notice-content'))`);
+    check(blocked,'POST de confirmación antiguo rechazado');
+    await writeFile('backups/previews/reading-report-checks.json',JSON.stringify({date:new Date().toISOString(),results},null,2));
+    console.log('Verificaciones de seguimiento: '+results.length);
+  } else if (process.argv.includes('--consultation-roles-only')) {
+    for(const username of ['coordinador.orange','calidad.orange']) {
+      await login(username,env.ORANGE_DEMO_PASSWORD);
+      for(const language of ['es','en']) {
+        await navigate('/local/orangeportal/reports.php?section=courses&lang='+language);
+        check(await evaluate(`!!document.querySelector('.orange-intro')&&!document.querySelector('.alert-danger')`),username+' / '+language+': consulta de informes');
+        check(await evaluate(`!Array.from(document.querySelectorAll('.orange-admin-links a')).some(e=>/manage.php|options.php|categories.php|users.php|cohorts.php/.test(e.href))&&!document.querySelector('a[href*="export.php"]')`),username+' / '+language+': sin gestión ni exportación');
+        const grades=await evaluate(`document.querySelectorAll('a[href*="/grade/report/grader/"]').length`);
+        check((grades>0)===(username==='coordinador.orange'),username+' / '+language+': notas según perfil');
+      }
+      await screenshot('consulta-'+username.split('.')[0]);
+      const denied=await evaluate(`Promise.all(['options.php','manage.php?kind=notifications&new=1','users.php','categories.php?kind=incidents','export.php?type=readings'].map(async path=>{
+        const r=await fetch('/local/orangeportal/'+path),html=await r.text();
+        const d=new DOMParser().parseFromString(html,'text/html');
+        return {path,denied:!d.querySelector('.orange-intro')&&/permission|permiso|acceso|capabilit/i.test(d.body.textContent)};
+      }))`);
+      for(const result of denied)check(result.denied,username+': acceso directo denegado '+result.path);
+      await navigate('/local/orangeportal/incident_tracking.php');
+      check(await evaluate(`!!document.querySelector('.orange-intro')&&!document.querySelector('.orange-admin-links a[href*="manage.php"]')`),username+': histórico de incidencias sin edición');
+      if(username==='coordinador.orange') {
+        await navigate('/grade/report/grader/index.php?id=4&edit=1');
+        check(await evaluate(`!!document.querySelector('#user-grades')&&!document.querySelector('#user-grades input')`),'Coordinación consulta calificaciones sin campos editables');
+      } else {
+        await navigate('/grade/report/grader/index.php?id=4');
+        check(await evaluate(`!document.querySelector('#user-grades')&&/permission|permiso|acceso|capabilit/i.test(document.body.innerText)`),'Calidad no accede al libro de notas de otros');
+      }
+      await logout();
+    }
+    await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
+    await navigate('/local/orangeportal/manage.php?kind=incidents&new=1');
+    check(await evaluate(`!!document.querySelector('[name="title"]')&&!!document.querySelector('[name="state"]')`),'Formación conserva publicación y estados');
+    await writeFile('backups/previews/consultation-role-checks.json',JSON.stringify({date:new Date().toISOString(),results},null,2));
+    console.log('Verificaciones de consulta: '+results.length);
+  } else if (process.argv.includes('--training-columns-only')) {
     await login('agente.orange',env.ORANGE_DEMO_PASSWORD);
     await navigate('/local/orangeportal/index.php?section=courses&lang=es');
     check(await evaluate(`!!document.querySelector('.orange-training-browser')&&!document.querySelector('.orange-card')&&!document.querySelector('.orange-training-open')`),'Formaciones usa columnas sin tarjetas ni selección ficticia');
@@ -117,7 +225,7 @@ try {
     check(await evaluate(`!!document.querySelector('[name="incidentclient"]')||!!document.querySelector('[name="client"]')`),'Administrador puede gestionar incidencias');
     check(await evaluate(`!Array.from(document.querySelectorAll('[name="users[]"] option')).some(o=>o.textContent.includes('usuario.externo'))`),'Destinatarios no ofrecen usuarios externos');
     await navigate('/local/orangeportal/reports.php');
-    check(await evaluate(`document.querySelectorAll('a[href*="export.php"]').length===2`),'Exportaciones de lecturas y formación disponibles');
+    check(await evaluate(`document.querySelectorAll('a[href*="export.php"]').length===0`),'Resumen sin exportación de destinatarios hasta elegir una publicación');
     const csv=await evaluate(`fetch('/local/orangeportal/export.php?type=users').then(async r=>({ok:r.ok,type:r.headers.get('content-type'),text:await r.text()}))`);
     check(csv.ok&&csv.type.includes('csv')&&!csv.text.includes('usuario.externo')&&csv.text.includes('admin.orange'),'CSV de usuarios limitado a Orange');
     await navigate('/admin/search.php');
@@ -141,7 +249,7 @@ try {
     await navigate('/local/orangeportal/index.php?section=notifications&lang=es');
     await wait(`!!document.querySelector('.orange-communications-layout')`);
     check(await evaluate(`document.querySelector('.orange-communications-filters').getBoundingClientRect().right<document.querySelector('.orange-communications-layout .orange-incidents-results').getBoundingClientRect().left`), 'Comunicados con filtros a la izquierda');
-    check(await evaluate(`['q','category','impact','datefrom','dateto','pending','unread'].every(n=>document.querySelector('.orange-communications-filters [name="'+n+'"]'))`), 'Búsqueda, categoría, fechas, confirmación y lectura en lateral');
+    check(await evaluate(`['q','category','impact','datefrom','dateto','unread'].every(n=>document.querySelector('.orange-communications-filters [name="'+n+'"]'))`), 'Búsqueda, categoría, impacto, fechas y lectura en lateral');
     check(await evaluate(`document.querySelectorAll('.orange-personal-updates .orange-update').length===4&&!document.querySelector('#nav-notification-popover-container')&&!document.querySelector('[data-region="popover-region-messages"]')`), 'Cuatro indicadores Orange sin iconos nativos de avisos y mensajes');
     check(await evaluate(`(async()=>{
       const icons=['notifications','incidents'].map(key=>document.querySelector('[data-update="'+key+'"]'));
@@ -175,7 +283,7 @@ try {
     await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
     check(await evaluate(`document.querySelectorAll('.orange-update').length===4&&!!document.querySelector('.primary-navigation a[href*="manage.php"]')`),'Formador conserva indicadores y acceso de gestión');
     await navigate('/local/orangeportal/index.php?section=notifications');
-    check(await evaluate(`!!document.querySelector('[name="pending"]')&&!!document.querySelector('.orange-communications-filters')`),'Formador conserva filtro de confirmación y lateral');
+    check(await evaluate(`!document.querySelector('[name="pending"]')&&!!document.querySelector('.orange-communications-filters')`),'Formador conserva filtros laterales sin confirmación');
     for (const language of ['es','en']) {
       await navigate('/local/orangeportal/manage.php?kind=notifications&new=1&lang='+language);
       check(await evaluate(`!!document.querySelector('select[name="impact"]:not([disabled]) option[value="critical"]')`),language+': Impacto editable en nuevos Comunicados');
@@ -370,14 +478,16 @@ try {
     await logout();await login('coordinador.orange',env.ORANGE_DEMO_PASSWORD);
     for(const language of ['es','en']){
       const en=language==='en';
-      await navigate('/local/orangeportal/reports.php?lang='+language);
-      check(await evaluate(`document.querySelector('.orange-intro h2').textContent===${JSON.stringify(en?'Results and confirmations':'Resultados y confirmaciones')} && document.querySelector('.orange-admin-links .active').textContent===${JSON.stringify(en?'Confirmations and results':'Confirmaciones y resultados')}`),language+': resultados y navegación traducidos');
-      check(await evaluate(`document.body.innerText.includes(${JSON.stringify(en?'Active participants':'Participantes activos')}) && document.body.innerText.includes(${JSON.stringify(en?'Receipt, reading and confirmation':'Recepción, lectura y confirmación')}) && document.body.innerText.includes(${JSON.stringify(en?'Current recipient':'Destinatario actual')})`),language+': tablas e instrucciones de informes traducidas');
-      check(await evaluate(`document.querySelector('h1').textContent.trim()===${JSON.stringify(en?'Results and confirmations':'Resultados y confirmaciones')} && document.title.includes(${JSON.stringify(en?'Results and confirmations':'Resultados y confirmaciones')})`),language+': título y encabezado de informes traducidos');
-      const noticeurl=await evaluate(`document.querySelector('table a[href*="noticeid="]')?.href`);
+      await navigate('/local/orangeportal/reports.php?section=courses&lang='+language);
+      check(await evaluate(`document.querySelector('.orange-intro h2').textContent===${JSON.stringify(en?'Tracking':'Seguimiento')} && document.querySelector('.orange-admin-links .active').textContent===${JSON.stringify(en?'Tracking':'Seguimiento')}`),language+': resultados y navegación traducidos');
+      await evaluate(`document.querySelectorAll('details.orange-report-panel').forEach(e=>e.open=true)`);
+      check(await evaluate(`document.body.innerText.includes(${JSON.stringify(en?'Active participants':'Participantes activos')}) && !!document.querySelector('.orange-training-report')`),language+': tablas e instrucciones de informes traducidas');
+      check(await evaluate(`document.querySelector('h1').textContent.trim()===${JSON.stringify(en?'Tracking':'Seguimiento')} && document.title.includes(${JSON.stringify(en?'Tracking':'Seguimiento')})`),language+': título y encabezado de informes traducidos');
+      await navigate('/local/orangeportal/reports.php?section=incidents&lang='+language);
+      const noticeurl=await evaluate(`document.querySelector('.orange-reading-summary tbody a')?.href`);
       check(!!noticeurl,language+': aviso disponible para comprobar histórico');
       await navigate(noticeurl);
-      check(await evaluate(`document.body.innerText.includes(${JSON.stringify(en?'Confirmation history by version':'Histórico de confirmaciones por versión')})`),language+': histórico de confirmaciones traducido');
+      check(await evaluate(`document.body.innerText.includes(${JSON.stringify(en?'Reading history by version':'Histórico de lecturas por versión')})`),language+': histórico de confirmaciones traducido');
       if(en)await screenshot('administracion-resultados-ingles');
     }
     await logout();await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
@@ -565,12 +675,7 @@ try {
   await navigate(incidentUrl);
   await wait(`!!document.querySelector('.orange-notice-content')`);
   check(await evaluate(`document.body.innerText.includes('Leído:')`), 'Apertura registra lectura');
-  const canConfirm = await evaluate(`!!document.querySelector('input[name="action"][value="confirm"]')`);
-  if (canConfirm) {
-    await evaluate(`document.querySelector('input[name="action"][value="confirm"]').form.querySelector('button').click()`);
-    await wait(`document.body.innerText.includes('Lectura confirmada el')`);
-  }
-  check(await evaluate(`document.body.innerText.includes('Lectura confirmada el')`), 'Confirmación explícita de incidencia');
+  check(await evaluate(`!document.querySelector('input[value=\"confirm\"]')`), 'Incidencia sin confirmación manual');
   await evaluate(`const f=document.querySelector('input[name="action"][value="state"]').form; f.querySelector('select').value='progress'; f.querySelector('button').click()`);
   await wait(`document.body.innerText.includes('Estado: En seguimiento')`);
   check(await evaluate(`document.body.innerText.includes('Agente Orange')`), 'Estado compartido con autor en histórico');
@@ -579,11 +684,7 @@ try {
   check(await evaluate(`document.querySelectorAll('.orange-notifications-table tbody tr').length>=2`), 'Noticias por grupo y comunicados por cohorte');
   const notificationUrl = await evaluate(`document.querySelector('.orange-notification-title').href`);
   await navigate(notificationUrl);
-  if (await evaluate(`!!document.querySelector('input[name="action"][value="confirm"]')`)) {
-    await evaluate(`document.querySelector('input[name="action"][value="confirm"]').form.querySelector('button').click()`);
-    await wait(`document.body.innerText.includes('Lectura confirmada el')`);
-  }
-  check(await evaluate(`document.body.innerText.includes('Lectura confirmada el')`), 'Confirmación explícita de notificación');
+  check(await evaluate(`!document.querySelector('input[value=\"confirm\"]')`), 'Comunicado sin confirmación manual');
   await send('Emulation.setDeviceMetricsOverride', {width: 390, height: 844, deviceScaleFactor: 1, mobile: true});
   await navigate('/local/orangeportal/index.php?section=library');
   await screenshot('biblioteca-movil');

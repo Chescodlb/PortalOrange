@@ -80,7 +80,8 @@ try {
     $nid = service::save_notice($notification, $targets);
     \core\session\manager::set_user($users['agente.orange']);
     $n = $DB->get_record('local_orange_notice', ['id' => $nid]);
-    incident_check(service::receipt($n, 'confirmed')->confirmed > 0, 'Notificaciones conserva su confirmación manual');
+    incident_check(service::receipt($n, 'readtime')->readtime > 0, 'Comunicados registra apertura automáticamente');
+    incident_denied(fn() => service::receipt($n, 'confirmed'), 'Comunicados rechaza confirmación manual');
 } finally {
     if ($originalstates === false) { unset_config('notice_states', 'local_orangeportal'); }
     else { set_config('notice_states', $originalstates, 'local_orangeportal'); }

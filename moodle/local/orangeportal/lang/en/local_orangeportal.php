@@ -86,7 +86,7 @@ $string['deleteoptionconfirm'] = 'Delete the option “{$a}”? This action cann
 $string['deleteoptionnamed'] = 'Delete option {$a}';
 $string['myaccount'] = 'My account';
 $string['managecategories'] = 'Manage categories';
-$string['confirmationsresults'] = 'Confirmations and results';
+$string['confirmationsresults'] = 'Tracking';
 $string['portalmanagement'] = 'Portal management';
 $string['categoryroot'] = 'Root';
 $string['categorysaved'] = 'Category saved';
@@ -114,12 +114,12 @@ $string['coursegroups'] = 'Moodle course groups';
 $string['audiencenote'] = 'Recipients are combined: membership in any selected audience grants access. Membership is checked on each visit.';
 $string['publishlabel'] = 'Published';
 $string['visibleforrecipients'] = 'Visible to recipients';
-$string['revisionnote'] = 'Changing the title, content or impact requires recipients to read and confirm the new version.';
+$string['revisionnote'] = 'Changing the title, content or impact requires recipients to read the new version again.';
 $string['savepublication'] = 'Save publication';
 $string['entercontent'] = 'Enter the content';
 $string['recipientsrequired'] = 'Select at least one individual recipient, cohort or group';
-$string['reportstitle'] = 'Results and confirmations';
-$string['reportsintro'] = 'Training progress and notice audit records for authorised users.';
+$string['reportstitle'] = 'Tracking';
+$string['reportsintro'] = 'Select Incidents, Announcements, Training or Users to review tracking.';
 $string['activeparticipants'] = 'Active participants';
 $string['completions'] = 'Completions';
 $string['averagegrade'] = 'Average grade (%)';
@@ -128,8 +128,8 @@ $string['completionreport'] = 'Completion';
 $string['nogrades'] = 'No grades';
 $string['reporttraining'] = 'Training';
 $string['allcourses'] = 'View all courses';
-$string['receiptreport'] = 'Receipt, reading and confirmation';
-$string['receiptexplanation'] = 'Received means shown in the portal list; read means opened; confirmed requires pressing the confirmation button. These records do not prove delivery to Teams or email.';
+$string['receiptreport'] = 'Receipt and reading';
+$string['receiptexplanation'] = 'Received means shown in the portal list; read means opened. Reading is recorded automatically and does not prove delivery to Teams or email.';
 $string['currentrecipient'] = 'Current recipient';
 $string['received'] = 'Received';
 $string['read'] = 'Read';
@@ -138,7 +138,7 @@ $string['pending'] = 'Pending';
 $string['version'] = 'Version';
 $string['recipient'] = 'Recipient';
 $string['deleteduser'] = 'Deleted user';
-$string['confirmationhistory'] = 'Confirmation history by version';
+$string['confirmationhistory'] = 'Reading history by version';
 $string['configuration'] = 'Orange settings';
 $string['portalenabled'] = 'Orange navigation';
 $string['portalenabled_desc'] = 'Show the four portal sections and use the entry page selected in Navigation.';
@@ -163,14 +163,14 @@ $string['unknownsection'] = 'Unknown section';
 $string['invalidsection'] = 'Invalid section';
 $string['categorycycle'] = 'A category cannot be placed within its own descendants';
 $string['changessaved'] = 'Change saved';
-$string['noticerevisionchanged'] = 'The notice has changed. Reload it before confirming.';
+$string['noticerevisionchanged'] = 'The notice has changed. Open it again to record reading its new version.';
 $string['unknownaction'] = 'Unknown action';
 $string['backtolist'] = '← Back to list';
 $string['noticeversiondate'] = 'Version {$a->version} · Published on {$a->date}';
 $string['receiptdates'] = 'Received: {$a->received} · Read: {$a->read}';
 $string['confirmedon'] = 'Reading confirmed on {$a}';
 $string['confirmreading'] = 'Confirm that I have read this notice';
-$string['managementpreview'] = 'Management preview: marked as viewed for your user. Confirmation is only available to assigned recipients.';
+$string['managementpreview'] = 'Management preview: recorded as viewed for your account.';
 $string['managementread'] = 'Viewed';
 $string['currentstatus'] = 'Status: {$a}';
 $string['newstatus'] = 'New status';
@@ -371,3 +371,70 @@ $string['trainingcourseone'] = '1 accessible course in this branch';
 $string['trainingglobalresultone'] = '1 result across all training';
 
 $string['updates_criticalsummary'] = 'Unread critical: {$a->critical}. Total unread: {$a->total}';
+
+$string['reportrowcount'] = '{$a} results';
+
+$string['reportallpublications'] = 'All publications';
+
+$string['reportallrecipients'] = 'All recipients';
+
+$string['reportnotraining'] = 'There is no training for which your account can view results.';
+
+$string['reportnoresults'] = 'No reading records or recipients match these filters.';
+
+$string['reportclearfilters'] = 'Clear filters for this section';
+
+$string['manualconfirmationdisabled'] = 'Opening a publication records reading automatically. Manual acknowledgement is not required.';
+
+$string['reportsection'] = 'Tracking type';
+
+$string['reportrecipients'] = 'Recipients';
+
+$string['reportreadcount'] = 'Read';
+
+$string['reportunreadcount'] = 'Unread';
+
+$string['reportselectnotice'] = 'Select a publication to view reading details by user. Totals refer to the current version and current recipients.';
+
+$string['reportreadingsummary'] = 'Recipients: {$a->total} · Unread: {$a->unread} · Read: {$a->read}';
+
+// Reading percentages and individual tracking.
+$string['reportperiod'] = 'Reading period';
+$string['reportweek'] = 'Last 7 days';
+$string['reportmonth'] = 'Last 30 days';
+$string['reportalltime'] = 'All time';
+$string['reportperiodexplanation'] = 'Readings of the current revision by its publication/revision date. Status changes do not reset the period. Training shows current status without this date filter.';
+$string['reportratio'] = '{$a->percent}% — {$a->part}/{$a->total}';
+$string['reportnotapplicable'] = 'No assignments';
+$string['reportdate'] = 'Publication / revision date';
+$string['reportusers'] = 'Users';
+$string['reportsearchuser'] = 'Search by name or employee ID (ID number)';
+$string['reportallcollectives'] = 'All collectives';
+$string['reportorder'] = 'Sort by';
+$string['reportmostpending'] = 'Most unread publications';
+$string['reportincidentunread'] = 'Unread incidents';
+$string['reportincidentread'] = 'Read incidents';
+$string['reportnotificationunread'] = 'Unread announcements';
+$string['reportnotificationread'] = 'Read announcements';
+$string['reportcriticalunread'] = 'Unread critical · all time';
+$string['reportcriticalexplanation'] = 'Pending critical items across all currently published history; closed incidents are excluded. Pending order uses the selected period.';
+$string['reporttrainingfinished'] = 'Completed training';
+$string['reporttrainingrestricted'] = 'No training authorised for tracking';
+$string['reportfinished'] = 'Completed';
+$string['reportinprogress'] = 'In progress';
+$string['reportnotstarted'] = 'Not started';
+$string['reportoverview'] = 'Overview';
+$string['reportsurveys'] = 'Surveys';
+$string['reportusersections'] = 'Individual tracking';
+$string['reporttrainingexplanation'] = 'Active enrolments in authorised training. Completed means recorded course completion; In progress means a recorded start or activity. Grades and attempts are shown according to viewing permissions.';
+$string['reportanonymoussurvey'] = 'Anonymous: no individual attribution';
+$string['reportnosurveys'] = 'No surveys authorised for viewing.';
+$string['reportfinishdate'] = 'Completion date';
+$string['reportstartdate'] = 'Start date';
+$string['reportresult'] = 'Result';
+$string['reportnogradecriterion'] = 'No visible grade or pass criterion';
+$string['reportpassed'] = 'Passed';
+$string['reportnotpassed'] = 'Not passed';
+$string['reportattempt'] = 'Attempt';
+$string['reportattemptlimit'] = 'The latest 25 attempts are shown. Open the native report for the full history.';
+$string['reportcollectivecentre'] = 'Collective / centre';

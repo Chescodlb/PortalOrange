@@ -18,7 +18,7 @@ Las incidencias son avisos operativos creados y asignados por el **Formador Oran
 4. Marcar **Publicado** y guardar. Sin publicar solo lo ven los responsables autorizados.
 5. Usar **Editar** para modificar datos o destinatarios. Los cambios de título, contenido, cliente o producto generan una nueva versión para la lectura individual. Cambiar solo el estado conserva la versión de lectura.
 
-Los avisos de Notificaciones conservan su formulario y confirmación manual. Los campos y el circuito de Incidencias no se aplican a Notificaciones.
+Comunicados conserva su formulario propio y registra lectura automáticamente, sin confirmación manual. Los campos y el circuito de Incidencias no se aplican a Notificaciones.
 
 ## Listado y filtros
 

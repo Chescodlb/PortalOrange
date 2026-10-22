@@ -10,6 +10,8 @@ La cohorte **Usuarios Orange** recibe Biblioteca, Cursos, Incidencias y Notifica
 
 Consulta las [guías de administración por caso](docs/README.md), la [implementación y sus límites](docs/implementacion.md) y el [recorrido de prueba](docs/08-pruebas-y-revision.md). Los perfiles ficticios usan la clave `ORANGE_DEMO_PASSWORD` de `.env`.
 
+La revisión del 22 de octubre está en el [plan de desarrollo y entregas](docs/12-plan-desarrollo-entregas.md). Para instalar sobre una copia del campus existente, usar la [guía de preproducción](docs/13-despliegue-preproduccion.md); incluye la dependencia Moove, carga de categorías/catálogos y creación de cuentas y perfiles desde Moodle.
+
 Para repetir la carga inicial en una instalación local, instalar primero español desde **Administración > Idioma > Paquetes de idioma** y extraer la matriz:
 
 ```bash

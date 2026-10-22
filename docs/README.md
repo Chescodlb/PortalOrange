@@ -13,7 +13,7 @@ El portal local está en http://localhost:8080. Los usuarios ficticios y la revi
 | Cursos, evaluaciones y encuestas | [Formación](05-cursos-y-encuestas.md) | Actividades y libro de calificaciones nativos |
 | Categorías, asignación y estado | [Incidencias](06-incidencias.md) | Portal Orange dentro de administración |
 | Noticias, Registro y Comunicado | [Notificaciones](07-notificaciones.md) | Portal Orange y mensajería nativa |
-| Resultados y lectura confirmada | [Informes](09-informes.md) | Informes nativos y panel de trazabilidad |
+| Lecturas y resultados | [Informes](09-informes.md) | Informes nativos y panel de trazabilidad |
 | Avisos externos de incidencias | [Integración con Teams](10-integracion-teams.md) | Evaluación de plugins y configuración de Microsoft pendiente |
 
 La [decisión de implementación](implementacion.md) explica qué necesita código y por qué. Ningún archivo original de Moodle o Moove se ha modificado.
@@ -21,3 +21,10 @@ La [decisión de implementación](implementacion.md) explica qué necesita códi
 - [Indicadores personales, contadores y fecha de incorporación](10-indicadores-personales.md).
 
 - [Administrador de Orange: cuentas, colectivos, contenidos y exportación](11-administrador-orange.md).
+
+- [Revisión de la reunión y plan de desarrollo y entregas](12-plan-desarrollo-entregas.md).
+- [Despliegue a preproducción, carga de estructura y configuración por la web](13-despliegue-preproduccion.md).
+
+- [Perfiles de consulta de Coordinación y Calidad y configuración desde Moodle](14-perfiles-consulta.md).
+
+- [Replicar perfiles y permisos Orange paso a paso, matriz y XML](15-replicar-perfiles-y-permisos.md).

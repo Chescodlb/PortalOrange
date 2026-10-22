@@ -8,7 +8,6 @@ $query = optional_param('q', '', PARAM_TEXT);
 $document = $section === 'library' ? optional_param('document', 0, PARAM_INT) : 0;
 $status = optional_param('state', '', PARAM_ALPHA);
 $impact = optional_param('impact', '', PARAM_ALPHA);
-$pending = optional_param('pending', 0, PARAM_BOOL);
 $unread = optional_param('unread', 0, PARAM_BOOL);
 $personal = optional_param('personal', 0, PARAM_BOOL);
 $datefrom = in_array($section, ['incidents', 'notifications']) ? optional_param('datefrom', '', PARAM_RAW_TRIMMED) : '';
@@ -17,7 +16,7 @@ $titles = array_combine(['library', 'courses', 'incidents', 'notifications'], ar
     fn($key) => get_string($key, 'local_orangeportal'), ['library', 'courses', 'incidents', 'notifications']));
 if (!isset($titles[$section])) { throw new invalid_parameter_exception('Sección desconocida'); }
 $url = orange_link('index.php', ['section' => $section, 'category' => $category, 'q' => $query,
-    'state' => $status, 'impact' => $impact, 'pending' => $pending, 'datefrom' => $datefrom, 'dateto' => $dateto]);
+    'state' => $status, 'impact' => $impact, 'datefrom' => $datefrom, 'dateto' => $dateto]);
 orange_page($titles[$section], $section, $url);
 if (in_array($section, ['library', 'courses'])) { $PAGE->requires->js('/local/orangeportal/library_browser.js'); }
 if ($document) { $PAGE->url->param('document', $document); }
@@ -89,7 +88,7 @@ if ($section === 'library') {
 }
 if ($section === 'courses') {
     if (has_capability('local/orangeportal:viewreports', context_system::instance())) {
-        echo html_writer::div(html_writer::link(orange_link('reports.php'), get_string('trainingresults', 'local_orangeportal')), 'orange-toolbar');
+        echo html_writer::div(html_writer::link(orange_link('reports.php', ['section' => 'courses']), get_string('trainingresults', 'local_orangeportal')), 'orange-toolbar');
     }
     echo \local_orangeportal\training_browser::render($category, $query, optional_param('course', 0, PARAM_INT), optional_param('order', '', PARAM_ALPHA));
     echo $OUTPUT->footer();
@@ -136,10 +135,7 @@ if (in_array($section, ['incidents', 'notifications'])) {
             html_writer::empty_tag('input', ['type' => 'date', 'name' => $field, 'id' => 'orange-' . $field,
                 'value' => $value, 'class' => 'form-control']));
     }
-    $search .= $filterfield('orange-confirmations', get_string('filterconfirmations', 'local_orangeportal'),
-        html_writer::select([0 => get_string('allconfirmations', 'local_orangeportal'),
-            1 => get_string('pendingconfirmations', 'local_orangeportal')], 'pending', $pending, false,
-            ['id' => 'orange-confirmations', 'class' => 'custom-select']));
+
 }
 if ($section === 'notifications') {
     $search .= $filterfield('orange-unread', get_string('updates_reading', 'local_orangeportal'),
@@ -188,12 +184,12 @@ if (in_array($section, ['library', 'courses'])) {
             ['class' => 'orange-card']);
     }
     if ($section == 'courses' && has_capability('local/orangeportal:viewreports', context_system::instance())) {
-        echo html_writer::div(html_writer::link(orange_link('reports.php'), 'Ver resultados y seguimiento →'), 'orange-toolbar');
+        echo html_writer::div(html_writer::link(orange_link('reports.php', ['section' => 'courses']), 'Ver resultados y seguimiento →'), 'orange-toolbar');
     }
 } else {
     $notices = service::visible($section);
     $tree = orange_notice_tree($section, $notices, $category,
-        ['q' => $query, 'datefrom' => $datefrom, 'dateto' => $dateto, 'pending' => $pending,
+        ['q' => $query, 'datefrom' => $datefrom, 'dateto' => $dateto,
             'state' => $status, 'impact' => $impact]);
     $cats = $DB->get_records('local_orange_category', ['kind' => $section]);
     $selectedids = $category && isset($cats[$category]) ? service::category_descendants($category, $cats) : [];
@@ -208,7 +204,6 @@ if (in_array($section, ['library', 'courses'])) {
         if ($impact && $notice->impact !== $impact) { continue; }
         $receipt = service::get_receipt($notice, (int)$USER->id);
         if ($unread && $receipt && ($receipt->readtime || $receipt->confirmed)) { continue; }
-        if ($pending && $receipt && $receipt->confirmed) { continue; }
         service::receipt($notice, 'received');
         $count++;
         $detailurl = orange_link('view.php', ['id' => $notice->id]);

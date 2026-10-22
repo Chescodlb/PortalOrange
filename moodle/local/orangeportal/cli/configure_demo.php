@@ -174,9 +174,8 @@ function orange_demo_role(string $shortname, string $name, array $caps, array $c
 }
 $publishrole = orange_demo_role('orange_publicador', 'Formador Orange', ['local/orangeportal:manage', 'local/orangeportal:changestate', 'local/orangeportal:viewallincidents', 'local/orangeportal:viewreports']);
 $reportrole = orange_demo_role('orange_seguimiento', 'Coordinación Orange', ['local/orangeportal:viewreports']);
-foreach ([$publishrole, $reportrole] as $roleid) {
-    assign_capability('local/orangeportal:manageoptions', CAP_ALLOW, $roleid, context_system::instance()->id);
-}
+assign_capability('local/orangeportal:manageoptions', CAP_ALLOW, $publishrole, context_system::instance()->id);
+unassign_capability('local/orangeportal:manageoptions', $reportrole, context_system::instance()->id);
 role_assign($publishrole, $publisher->id, context_system::instance()->id);
 role_assign($publishrole, $trainer->id, context_system::instance()->id);
 foreach (['manage', 'changestate', 'viewallincidents', 'viewreports'] as $cap) {
@@ -268,6 +267,7 @@ cohort_update_cohort($orangecohort);
 set_config('audiencecohort', $orangecohort->id, 'local_orangeportal');
 set_config('automaticalerts', 1, 'local_orangeportal');
 set_config('enabled', 1, 'local_orangeportal');
+require(__DIR__ . '/configure_consultation_demo.php');
 theme_reset_all_caches();
 echo "Portal local configurado. Biblioteca raíz: {$library->id}; rama RPV: {$branch->id}.\n";
 echo 'Categorías de biblioteca: ' . $DB->count_records_select('course_categories', 'path LIKE ?', [$library->path . '/%']) . "\n";

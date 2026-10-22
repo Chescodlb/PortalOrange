@@ -25,7 +25,7 @@ function orange_admin_navigation(string $active, string $kind = 'incidents'): st
         $links['users'] = [get_string('orangeusers', 'local_orangeportal'), orange_link('users.php')];
         $links['cohorts'] = [get_string('orangecollectives', 'local_orangeportal'), orange_link('cohorts.php')];
     }
-    if (\local_orangeportal\incident_workflow::all()) {
+    if (\local_orangeportal\incident_workflow::all() && !has_capability('local/orangeportal:viewreports', context_system::instance())) {
         $links['incidenttracking'] = [get_string('incidenttracking', 'local_orangeportal'), orange_link('incident_tracking.php')];
     }
     if (has_capability('local/orangeportal:manage', context_system::instance())) {
@@ -48,6 +48,7 @@ function orange_admin_navigation(string $active, string $kind = 'incidents'): st
     if (has_capability('local/orangeportal:manageoptions', context_system::instance())) {
         $links['options'] = [get_string('manageoptions', 'local_orangeportal'), orange_link('options.php')];
     }
+    if ($active === 'incidenttracking' && isset($links['reports'])) { $active = 'reports'; }
     $html = '';
     foreach ($links as $key => [$label, $url]) {
         $attrs = ['class' => 'orange-admin-link' . ($key === $active ? ' active' : '')];

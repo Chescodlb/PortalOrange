@@ -16,9 +16,10 @@ Abrir **Usuarios > Permisos > Definir roles** para crear o modificar un perfil. 
 
 | Perfil | Asignación inicial | Permisos |
 | --- | --- | --- |
-| Agente | Estudiante en sus cursos y bibliotecas | Consulta y evaluación; incidencias abiertas asignadas sin cambiar estados; confirmación manual solo en Notificaciones |
+| Agente | Estudiante en sus cursos y bibliotecas | Consulta y evaluación; incidencias abiertas asignadas sin cambiar estados; lectura automática en Incidencias y Comunicados |
 | Formador | Rol global Formador Orange; Profesor con edición y Creación de contenidos Orange en sus ámbitos formativos | Funciones del antiguo editor: publicar avisos, categorías y catálogos; CRUD de incidencias, todos los estados y seguimiento; además sus funciones de formación |
-| Coordinación | Profesor sin edición en sus cursos y rol global Coordinación Orange | Consulta todas las incidencias y su seguimiento, resultados autorizados y catálogos; no cambia estados ni publica |
+| Coordinación | Consulta formativa Orange en los cursos autorizados y rol global Coordinación Orange | Consulta incidencias, lecturas y resultados autorizados; sin catálogos, publicación, edición de notas ni exportación por defecto |
+| Calidad | Rol global Calidad Orange y matrícula como participante | Seguimiento de lecturas e incidencias; sin notas ajenas, edición ni exportación |
 | Responsable documental | Profesor con edición en las colecciones documentales que gestiona | Publicación y mantenimiento de recursos; no requiere ser administrador global |
 | Antiguo editor/comunicaciones | Integrado en Formador Orange | Se conserva el ID del rol para no perder asignaciones; `editor.orange` queda como cuenta histórica de pruebas de ese mismo perfil |
 | Administrador de Orange | Rol delegado del portal, sin administración del sitio | Usuarios y colectivos Orange, contenidos y exportación de informes de ese ámbito |
@@ -27,8 +28,8 @@ Abrir **Usuarios > Permisos > Definir roles** para crear o modificar un perfil. 
 Las capacidades del plugin se pueden buscar al definir un rol:
 
 - `local/orangeportal:manage`: publicar, editar, asignar y gestionar categorías de avisos.
-- `local/orangeportal:viewreports`: acceder al panel de resultados y confirmaciones.
-- `local/orangeportal:manageoptions`: gestionar Estados e Impactos desde el portal; asignado a coordinación y comunicaciones. No concede administración general ni publicación de avisos.
+- `local/orangeportal:viewreports`: acceder a Seguimiento, lecturas y resultados autorizados.
+- `local/orangeportal:manageoptions`: gestionar Estados e Impactos desde el portal; reservado a Formación y Administración Orange. No concede administración general ni publicación de avisos.
 - `local/orangeportal:changestate`: cambiar estados de incidencias; reservado al Formador, nunca al agente o coordinador.
 - `local/orangeportal:viewallincidents`: consultar abiertas/cerradas y el panel específico de seguimiento; no concede edición.
 
@@ -61,3 +62,7 @@ Para autorizar a otro responsable a crear contenidos, asignar **Creación de con
 ## Administración delegada de Orange
 
 Formación matricula usuarios existentes; Administración crea las cuentas y mantiene los colectivos. Consultar [configuración, límites y procedimientos del Administrador Orange](11-administrador-orange.md). La cuenta local es `admin.orange`, con la contraseña de pruebas de `.env`.
+
+La configuración estricta de consulta, sustitución de Profesor sin edición y comprobaciones por perfil se detalla en [Perfiles de consulta](14-perfiles-consulta.md).
+
+Para replicar esta configuración con otras cuentas en cada ambiente, utilizar [Replicar perfiles y permisos Orange paso a paso](15-replicar-perfiles-y-permisos.md), con matriz de capacidades, XML nativos y pruebas de aceptación.

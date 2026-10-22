@@ -8,21 +8,28 @@ class service {
     }
     public static function assigned(int $noticeid, int $userid): bool {
         global $DB;
-        return $DB->record_exists_sql("SELECT 1 FROM {local_orange_audience} a
-            WHERE a.noticeid = :notice AND (
-              (a.targettype = 'user' AND a.targetid = :u1) OR
-              (a.targettype = 'cohort' AND EXISTS (SELECT 1 FROM {cohort_members} m
-                  WHERE m.cohortid = a.targetid AND m.userid = :u2)) OR
-              (a.targettype = 'group' AND EXISTS (SELECT 1 FROM {groups_members} g
-                  JOIN {groups} gr ON gr.id = g.groupid
-                  JOIN {enrol} e ON e.courseid = gr.courseid
-                  JOIN {user_enrolments} ue ON ue.enrolid = e.id AND ue.userid = g.userid
-                  WHERE g.groupid = a.targetid AND g.userid = :u3 AND ue.status = 0 AND e.status = 0
-                    AND (ue.timestart = 0 OR ue.timestart <= :t1)
-                    AND (ue.timeend = 0 OR ue.timeend > :t2))))",
-            ['notice' => $noticeid, 'u1' => $userid, 'u2' => $userid, 'u3' => $userid,
-                't1' => time(), 't2' => time()]);
+        [$condition, $params] = self::audience_sql('n.id', 'u.id');
+        return $DB->record_exists_sql("SELECT 1 FROM {local_orange_notice} n JOIN {user} u ON u.id=:audienceuser
+            WHERE n.id=:audiencenotice AND $condition", $params + ['audienceuser' => $userid, 'audiencenotice' => $noticeid]);
     }
+    /** Shared assignment predicate for personal access and paginated reports. Column names are internal only. */
+    public static function audience_sql(string $noticecolumn, string $usercolumn): array {
+        foreach ([$noticecolumn, $usercolumn] as $column) {
+            if (!preg_match('/^[a-z]+\.[a-z]+$/D', $column)) { throw new \coding_exception('Invalid audience column'); }
+        }
+        $condition = "EXISTS (SELECT 1 FROM {local_orange_audience} a WHERE a.noticeid = $noticecolumn AND (
+            (a.targettype = 'user' AND a.targetid = $usercolumn) OR
+            (a.targettype = 'cohort' AND EXISTS (SELECT 1 FROM {cohort_members} m
+                WHERE m.cohortid = a.targetid AND m.userid = $usercolumn)) OR
+            (a.targettype = 'group' AND EXISTS (SELECT 1 FROM {groups_members} g
+                JOIN {groups} gr ON gr.id = g.groupid JOIN {enrol} e ON e.courseid = gr.courseid
+                JOIN {user_enrolments} ue ON ue.enrolid = e.id AND ue.userid = g.userid
+                WHERE g.groupid = a.targetid AND g.userid = $usercolumn AND ue.status = 0 AND e.status = 0
+                AND (ue.timestart = 0 OR ue.timestart <= :audiencestart)
+                AND (ue.timeend = 0 OR ue.timeend > :audienceend)))))";
+        return [$condition, ['audiencestart' => time(), 'audienceend' => time()]];
+    }
+
     public static function can_view(\stdClass $notice, ?int $userid = null, bool $allowmanager = true): bool {
         global $USER;
         $userid = $userid ?? (int)$USER->id;
@@ -51,13 +58,13 @@ class service {
     public static function receipt(\stdClass $notice, string $stage): ?\stdClass {
         global $DB, $USER;
         self::require_view($notice);
-        if ($notice->kind === 'incidents' && $stage === 'confirmed') {
-            throw new \moodle_exception('incidentnoconfirmation', 'local_orangeportal');
+        if ($stage === 'confirmed') {
+            throw new \invalid_parameter_exception(get_string('manualconfirmationdisabled', 'local_orangeportal'));
         }
-        if (!in_array($stage, ['received', 'readtime', 'confirmed'])) {
+        if (!in_array($stage, ['received', 'readtime'])) {
             throw new \coding_exception('Invalid receipt stage');
         }
-        // Managers can record their own view, but delivery and confirmation require assignment.
+        // Managers can record their own view; delivery requires assignment.
         if ($stage !== 'readtime' && !self::can_view($notice, (int)$USER->id, false)) {
             return null;
         }
@@ -70,7 +77,7 @@ class service {
             $current = $DB->get_record('local_orange_notice', ['id' => $notice->id], '*', MUST_EXIST);
             self::require_view($current);
             if ($current->revision != $notice->revision) {
-                throw new \invalid_parameter_exception('El contenido ha cambiado. Vuelve a abrir el aviso antes de confirmar.');
+                throw new \invalid_parameter_exception(get_string('noticerevisionchanged', 'local_orangeportal'));
             }
             $isrecipient = self::can_view($current, (int)$USER->id, false);
             if ($stage !== 'readtime' && !$isrecipient) {
@@ -90,9 +97,6 @@ class service {
             if (!$r->$stage) {
                 $r->$stage = time();
                 $changed = true;
-                if ($stage == 'confirmed' && !$r->readtime) {
-                    $r->readtime = time();
-                }
             }
             if ($changed) {
                 $DB->update_record('local_orange_receipt', $r);
