@@ -438,3 +438,65 @@ $string['reportnotpassed'] = 'No aprobada';
 $string['reportattempt'] = 'Intento';
 $string['reportattemptlimit'] = 'Se muestran los 25 intentos más recientes. Consulta el informe nativo para el histórico completo.';
 $string['reportcollectivecentre'] = 'Colectivo / centro';
+
+// Delegated agent CSV import.
+$string['orangeimportusers'] = 'Importar agentes desde CSV';
+$string['csvintro'] = 'Crea cuentas nuevas de agentes y asígnalas a los colectivos y formaciones de Orange. Revisa la vista previa antes de confirmar. Los roles de gestión se asignan desde la administración de Moodle.';
+$string['orangeimportformat'] = 'Formato del CSV de agentes';
+$string['orangeimportformat_help'] = 'Guarda el archivo como CSV UTF-8, separado por punto y coma o coma, y selecciona el separador correspondiente. Máximo 1.000 usuarios y 2 MB.
+
+Cabeceras obligatorias, en minúsculas: username, firstname, lastname, email, password. Opcionales: idnumber (CE o identificador interno), cohorts y courses. No se admiten otras columnas.
+
+Cada fila crea un agente nuevo: username en minúsculas, nombre, apellidos, correo único y contraseña inicial que cumpla la política de Moodle. El usuario deberá cambiarla al entrar. No se envían correos automáticamente.
+
+En cohorts indica el nombre exacto o identificador de colectivos Orange ya existentes; separa varios con |. Ejemplo: Cristalia-Madrid|OC. Todos entrarán también en la cohorte de acceso a Orange. Deja cohorts vacío si no corresponde ningún colectivo.
+
+En courses escribe los nombres cortos exactos de las formaciones, separados por |. Ejemplo: ORANGE-FORMACION-INICIAL|ORANGE-FORMACION-CONTINUA. Consulta los nombres disponibles debajo de la plantilla. Deben pertenecer a Formaciones Orange y tener Matrícula manual habilitada; se matricula como Estudiante respetando su duración predeterminada. Deja vacío para no realizar matrículas directas. Estas matrículas no dependen de los colectivos.
+
+No se actualizan cuentas existentes ni se asignan roles de Formador, Coordinación o Administración. Revisa los errores, corrige el CSV y vuelve a subirlo. Las contraseñas no aparecen en la vista previa. Conserva el archivo en un lugar privado y retíralo cuando termines.';
+$string['csvdelimiter'] = 'Separador del CSV';
+$string['csvsemicolon'] = 'Punto y coma (;)';
+$string['csvcomma'] = 'Coma (,)';
+$string['csvvalidate'] = 'Validar y ver vista previa';
+$string['csvconfirm'] = 'Confirmar creación de agentes';
+$string['csvcontinue'] = 'Continuar carga';
+$string['csvuploadtitle'] = 'Subir archivo CSV';
+$string['csvdownloadtemplate'] = 'Descargar plantilla CSV';
+$string['csvnewupload'] = 'Subir otro archivo';
+$string['csvinvalidfile'] = 'El archivo debe ser un CSV UTF-8 de hasta 2 MB con el separador seleccionado.';
+$string['csvparseerror'] = 'No se pudo interpretar el CSV. Revisa el separador, las comillas y el número de columnas de cada fila.';
+$string['csvinvalidheaders'] = 'Cabeceras obligatorias: username, firstname, lastname, email, password. Opcionales: idnumber, cohorts, courses. No repitas cabeceras ni añadas otras columnas.';
+$string['csvtoomany'] = 'El máximo es {$a} usuarios por archivo.';
+$string['csvempty'] = 'El CSV no contiene usuarios.';
+$string['csvbadusername'] = 'Usuario inválido: usa minúsculas y hasta 100 caracteres válidos para Moodle.';
+$string['csvusernameunavailable'] = 'Usuario repetido en el archivo o ya existente en Moodle.';
+$string['csvbadname'] = 'Nombre y apellidos son obligatorios, sin etiquetas HTML y hasta 100 caracteres cada uno.';
+$string['csvbademail'] = 'Correo inválido, repetido en el archivo o ya utilizado por una cuenta activa.';
+$string['csvbadpassword'] = 'Falta la contraseña o no cumple la política de contraseñas de Moodle.';
+$string['csvbadidnumber'] = 'El identificador debe tener hasta 255 caracteres y no contener HTML.';
+$string['csvunknowncohort'] = 'Colectivo no disponible o ambiguo: {$a}. Usa el nombre exacto o un identificador único de un colectivo Orange autorizado.';
+$string['csvunsafeenrolment'] = 'Un colectivo seleccionado tiene una matrícula no permitida: debe usar el rol nativo Estudiante y cursos dentro de Orange. Revisa su sincronización de cohortes antes de importar.';
+$string['csvfixerrors'] = 'Corrige los errores del archivo antes de confirmar.';
+$string['csvexpired'] = 'La vista previa ha caducado, ya se procesó ese lote o la sesión cambió. Recarga la página para comprobar el progreso; si no hay carga pendiente, vuelve a subir el CSV con los usuarios restantes.';
+$string['csvcohortchanged'] = 'Los colectivos han cambiado desde la vista previa. Cancela la carga y revisa el archivo.';
+$string['csvrowerror'] = 'Fila {$a->line}: {$a->error}';
+$string['csvimportfailed'] = 'No se pudo completar este lote. Recarga para comprobar el progreso y contacta con administración si persiste. Los lotes completados se conservan.';
+$string['csvnetworkerror'] = 'Se interrumpió la conexión. Recarga la página para comprobar el progreso y continuar; los lotes completados se conservan.';
+$string['csvcancelled'] = 'Carga cancelada. Se conservan {$a} cuentas ya creadas.';
+$string['csvprogress'] = 'Cuentas creadas: {$a->created} de {$a->total}.';
+$string['csvfinished'] = 'Carga completada: {$a->created} de {$a->total} cuentas creadas.';
+$string['csvpreviewcount'] = 'Se crearán {$a} agentes en lotes de 20. Aún puedes cancelar; una vez iniciada la carga, cancelar no elimina las cuentas ya creadas. La vista previa caduca tras 30 minutos de inactividad.';
+$string['csverrorcount'] = 'Hay errores en {$a} filas. No se ha creado ninguna cuenta.';
+$string['csvrow'] = 'Fila';
+$string['csvemployeeid'] = 'CE / Número de ID';
+$string['csvvalidation'] = 'Validación';
+$string['csvvalid'] = 'Correcto';
+$string['csvpreviewlimit'] = 'Se muestran hasta 25 filas; la validación se realiza sobre todo el archivo. Por seguridad, las contraseñas no se muestran.';
+
+$string['csvcourses'] = 'Formaciones';
+$string['csvcourseshortname'] = 'Nombre corto para courses';
+$string['csvcoursecatalogue'] = 'Consultar nombres cortos de formaciones disponibles';
+$string['csvnocourses'] = 'No hay formaciones Orange con Matrícula manual habilitada. Revisa Formación > Participantes > Métodos de matriculación; courses puede dejarse vacío.';
+$string['csvunknowncourse'] = 'Formación no disponible: {$a}. Usa el nombre corto exacto de una formación Orange con Matrícula manual habilitada. Consulta la lista debajo de la plantilla.';
+$string['csvcoursechanged'] = 'Las formaciones han cambiado desde la vista previa. Cancela la carga y revisa el archivo.';
+$string['csvnostudentrole'] = 'No existe un rol con arquetipo Estudiante para realizar las matrículas. Contacta con administración Moodle.';

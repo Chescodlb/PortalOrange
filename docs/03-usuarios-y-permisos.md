@@ -8,7 +8,7 @@ Añadir el usuario a la cohorte de sistema **Usuarios Orange** y seguir [el proc
 
 ## Crear y modificar usuarios
 
-Abrir **Administración > Usuarios > Cuentas > Agregar un usuario**. Para editar, suspender o consultar cuentas existentes, usar **Examinar lista de usuarios**. La carga por CSV también es nativa de Moodle.
+Abrir **Administración > Usuarios > Cuentas > Agregar un usuario**. Para editar, suspender o consultar cuentas existentes, usar **Examinar lista de usuarios**. La carga general por CSV es nativa de Moodle. Administración Orange dispone además de [una carga de agentes limitada al portal](11-administrador-orange.md#importar-agentes-desde-csv), sin permisos globales ni asignación de roles privilegiados.
 
 ## Roles y responsabilidades
 

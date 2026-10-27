@@ -61,6 +61,7 @@ if ($form) {
     $form->display();
 } else {
     echo html_writer::link(orange_link('users.php', ['action' => 'new']), get_string('orangecreateuser', 'local_orangeportal'), ['class' => 'btn btn-primary']);
+    echo ' ' . html_writer::link(orange_link('import_users.php'), get_string('orangeimportusers', 'local_orangeportal'), ['class' => 'btn btn-outline-secondary']);
     if (has_capability('local/orangeportal:exportreports', context_system::instance())) {
         echo ' ' . html_writer::link(orange_link('export.php', ['type' => 'users']), get_string('orangeexport', 'local_orangeportal'), ['class' => 'btn btn-outline-secondary']);
     }

@@ -438,3 +438,65 @@ $string['reportnotpassed'] = 'Not passed';
 $string['reportattempt'] = 'Attempt';
 $string['reportattemptlimit'] = 'The latest 25 attempts are shown. Open the native report for the full history.';
 $string['reportcollectivecentre'] = 'Collective / centre';
+
+// Delegated agent CSV import.
+$string['orangeimportusers'] = 'Import agents from CSV';
+$string['csvintro'] = 'Create new agent accounts and assign Orange collectives and training courses. Review the preview before confirming. Management roles are assigned through Moodle administration.';
+$string['orangeimportformat'] = 'Agent CSV format';
+$string['orangeimportformat_help'] = 'Save as UTF-8 CSV, separated by semicolon or comma, and select the matching delimiter. Maximum 1,000 users and 2 MB.
+
+Required lowercase headers: username, firstname, lastname, email, password. Optional: idnumber (employee/internal ID), cohorts and courses. Other columns are rejected.
+
+Each row creates a new agent: lowercase username, first name, last name, unique email and an initial password complying with Moodle policy. The user must change it on first login. No email is sent automatically.
+
+In cohorts enter the exact name or ID number of existing Orange collectives, separated by |. Example: Cristalia-Madrid|OC. All accounts also join the Orange access cohort. Leave cohorts blank if no collective applies.
+
+In courses enter exact training course short names separated by |. Example: ORANGE-FORMACION-INICIAL|ORANGE-FORMACION-CONTINUA. See the available short names below the template. Courses must belong to Orange Training and have Manual enrolments enabled. Accounts are enrolled as Students, respecting the instance default duration. Leave blank for no direct enrolment. These enrolments are independent of collectives.
+
+Existing accounts are not updated. Trainer, Coordination and Administration roles cannot be assigned here. Correct validation errors and upload again. Passwords are never shown in the preview. Store the file privately and remove it when finished.';
+$string['csvdelimiter'] = 'CSV delimiter';
+$string['csvsemicolon'] = 'Semicolon (;)';
+$string['csvcomma'] = 'Comma (,)';
+$string['csvvalidate'] = 'Validate and preview';
+$string['csvconfirm'] = 'Confirm agent creation';
+$string['csvcontinue'] = 'Continue import';
+$string['csvuploadtitle'] = 'Upload CSV file';
+$string['csvdownloadtemplate'] = 'Download CSV template';
+$string['csvnewupload'] = 'Upload another file';
+$string['csvinvalidfile'] = 'The file must be UTF-8 CSV, up to 2 MB, using the selected delimiter.';
+$string['csvparseerror'] = 'The CSV could not be parsed. Check the delimiter, quoting and column count in each row.';
+$string['csvinvalidheaders'] = 'Required headers: username, firstname, lastname, email, password. Optional: idnumber, cohorts, courses. Do not repeat headers or add other columns.';
+$string['csvtoomany'] = 'The maximum is {$a} users per file.';
+$string['csvempty'] = 'The CSV contains no users.';
+$string['csvbadusername'] = 'Invalid username: use lowercase and up to 100 valid Moodle characters.';
+$string['csvusernameunavailable'] = 'Username repeated in the file or already present in Moodle.';
+$string['csvbadname'] = 'First and last names are required, without HTML tags and up to 100 characters each.';
+$string['csvbademail'] = 'Invalid email, repeated in the file or already used by an active account.';
+$string['csvbadpassword'] = 'The password is missing or does not meet Moodle password policy.';
+$string['csvbadidnumber'] = 'The ID number must have up to 255 characters and contain no HTML.';
+$string['csvunknowncohort'] = 'Unavailable or ambiguous collective: {$a}. Use the exact name or a unique ID number of an authorised Orange collective.';
+$string['csvunsafeenrolment'] = 'A selected collective has an unsupported enrolment: it must use the native Student role and courses within Orange. Review its cohort synchronisation before importing.';
+$string['csvfixerrors'] = 'Correct file errors before confirming.';
+$string['csvexpired'] = 'The preview expired, that batch was already processed or the session changed. Reload to check progress; if no import is pending, upload the remaining users again.';
+$string['csvcohortchanged'] = 'Collectives have changed since the preview. Cancel the import and review the file.';
+$string['csvrowerror'] = 'Row {$a->line}: {$a->error}';
+$string['csvimportfailed'] = 'This batch could not be completed. Reload to check progress and contact administration if it persists. Completed batches are retained.';
+$string['csvnetworkerror'] = 'The connection was interrupted. Reload to check progress and continue; completed batches are retained.';
+$string['csvcancelled'] = 'Import cancelled. {$a} previously created accounts are retained.';
+$string['csvprogress'] = 'Accounts created: {$a->created} of {$a->total}.';
+$string['csvfinished'] = 'Import completed: {$a->created} of {$a->total} accounts created.';
+$string['csvpreviewcount'] = '{$a} agents will be created in batches of 20. You can still cancel; once started, cancelling does not delete accounts already created. The preview expires after 30 minutes of inactivity.';
+$string['csverrorcount'] = '{$a} rows contain errors. No accounts have been created.';
+$string['csvrow'] = 'Row';
+$string['csvemployeeid'] = 'Employee / ID number';
+$string['csvvalidation'] = 'Validation';
+$string['csvvalid'] = 'Valid';
+$string['csvpreviewlimit'] = 'Up to 25 rows are shown; the whole file is validated. Passwords are not displayed for security.';
+
+$string['csvcourses'] = 'Training courses';
+$string['csvcourseshortname'] = 'Short name for courses';
+$string['csvcoursecatalogue'] = 'View available training course short names';
+$string['csvnocourses'] = 'No Orange training courses have Manual enrolments enabled. Check Training > Participants > Enrolment methods; courses may be left blank.';
+$string['csvunknowncourse'] = 'Unavailable training course: {$a}. Use the exact short name of an Orange training course with Manual enrolments enabled. See the list below the template.';
+$string['csvcoursechanged'] = 'Training courses have changed since the preview. Cancel the import and review the file.';
+$string['csvnostudentrole'] = 'No Student archetype role exists for enrolment. Contact Moodle administration.';

@@ -29,6 +29,28 @@ En el listado se pueden buscar usuarios y abrir **Editar** para cambiar colectiv
 
 Los administradores Orange y del sitio están protegidos: su cuenta y su acceso se mantienen desde administración general, evitando cambios sobre otro administrador o dejarse sin acceso desde esta pantalla.
 
+## Importar agentes desde CSV
+
+Disponible en **Administración > Usuarios Orange > Importar agentes desde CSV**, exclusivamente para Administración Orange. Usa las APIs nativas de cuentas, cohortes y matrículas. El importador general de Moodle necesita permisos globales, por lo que este flujo aplica las restricciones del portal en el servidor.
+
+1. Crea primero los colectivos de centro o equipo en **Colectivos Orange**, por ejemplo `Cristalia-Madrid` y `OC`.
+2. Pulsa **Descargar plantilla CSV**. El icono circular **?** junto a Archivo explica los campos y límites. La fila de ejemplo tiene la contraseña vacía: sustituye todos sus datos antes de importar.
+3. Guarda como **CSV UTF-8**. Cabeceras obligatorias: `username;firstname;lastname;email;password`. Opcionales: `idnumber;cohorts;courses`. No se admiten otras columnas.
+4. Usa usuarios en minúsculas y correos únicos. Introduce una contraseña inicial por persona que cumpla la política de Moodle. `idnumber` es el CE o identificador interno, opcional.
+5. En `cohorts`, escribe el nombre exacto o identificador de colectivos Orange existentes; separa varios con `|`, por ejemplo `Cristalia-Madrid|OC`. No escribas aquí roles ni la cohorte general de acceso: **Usuarios Orange se añade automáticamente**. Deja vacío si no requiere colectivos.
+6. En `courses`, indica los **nombres cortos exactos** de las formaciones separados por `|`, por ejemplo `ORANGE-FORMACION-INICIAL|ORANGE-FORMACION-CONTINUA`. Puedes copiarlos del desplegable **Consultar nombres cortos de formaciones disponibles**, debajo de la plantilla. Deben existir en Formaciones Orange y tener **Matrícula manual** habilitada. Se matricula como Estudiante, con la duración predeterminada de esa instancia de matrícula; no utiliza el rol predeterminado si fuera distinto de Estudiante. Deja vacío si no quieres matrícula directa.
+7. Sube el archivo, selecciona coma o punto y coma y pulsa **Validar y ver vista previa**. Límite: **1.000 personas y 2 MB**. Se valida todo el archivo y se muestran hasta 25 filas; si hay errores se muestran hasta 25 filas afectadas. En esta fase no se crea ninguna cuenta.
+8. Corrige los errores en el CSV y vuelve a subirlo. Si está correcto, pulsa **Confirmar creación de agentes**. Se crean en lotes de 20 con un indicador de progreso. No vuelvas a subir el mismo archivo si se interrumpe: recarga para comprobar y continuar.
+9. Comprueba una cuenta y su pertenencia a Orange/colectivos. Cada persona deberá cambiar su contraseña al entrar; no se envía correo automático. Las matrículas pueden provenir de las sincronizaciones de colectivos o de la columna `courses`, siempre como Estudiante dentro de Orange. Las matrículas directas son independientes: quitar un colectivo no elimina la matrícula manual. Para retirarla, usa Participantes de la formación con un usuario autorizado.
+
+Archivo de ejemplo: [agentes-orange-ejemplo.csv](ejemplos/agentes-orange-ejemplo.csv). Incluye una formación, varias formaciones y ninguna matrícula. Los nombres, correos, contraseñas, colectivos y nombres cortos son ejemplos: sustitúyelos por los del ambiente destino. La formación continua del ejemplo debe existir para importarla; no se crean cursos ni colectivos desde este archivo.
+
+Solo crea cuentas nuevas de agentes: no modifica usuarios existentes ni asigna roles de Formador, Coordinación, Calidad o Administración. Si un usuario/correo ya existe, lo rechaza. Los roles de gestión siguen asignándose desde Moodle general, y los permisos formativos en sus categorías/cursos. Los colectivos no conceden roles de gestión.
+
+**Cancelación y privacidad:** la vista previa caduca a los 30 minutos de inactividad. Cancelar antes de iniciar no crea nada; después conserva los lotes completados. Cada lote se confirma o revierte completo. Si caduca después de una carga parcial, prepara otro archivo solo con las cuentas restantes. Las contraseñas no se muestran ni se incluyen en resultados o registros propios del importador: el CSV temporal se retira del área de borradores después de validarlo y los datos pendientes quedan cifrados en la sesión nativa hasta finalizar/cancelar/caducar. Protege el archivo original y los accesos al servidor. El cifrado utiliza las claves nativas de Moodle en `moodledata/secret`, compartidas entre nodos cuando corresponda; no se añaden tablas ni configuración de roles.
+
+Para llevar esta funcionalidad a otro ambiente, actualiza **todo `local/orangeportal`** y purga las cachés nativas. No requiere cambios de esquema, importación de roles ni modificación del tema/core. Este procedimiento no instala el resto del portal desde cero: para eso sigue la guía de despliegue.
+
 ## Colectivos y matrículas
 
 **Administración > Colectivos Orange > Crear colectivo** crea una cohorte nativa identificada con `component=local_orangeportal`. Los miembros se mantienen desde Usuarios Orange. También permite renombrar colectivos, consultar sus miembros y borrar los vacíos. No se permite eliminar si tiene miembros, publicaciones asignadas o sincronizaciones de matrícula.
@@ -60,3 +82,6 @@ Los informes reutilizan las tablas de notas/finalización y los registros de lec
 - `docker compose exec -T web php local/orangeportal/cli/check_orange_admin.php`: prueba reversible de alta nativa, protección de cuentas, aislamiento de IDs, colectivos, matrícula y permisos de Formador/externos.
 - `node scripts/test-orange-browser.mjs --orange-admin-only`: navegación, formularios, acceso denegado a administración general, CSV, idioma y móvil.
 - Copia local previa: `backups/before-orange-admin-20261020.sql`, excluida de Git.
+
+- `cli/check_agent_import.php`: prueba reversible local de CSV, límites, duplicados, permisos, colectivos, cifrado, lotes y caducidad.
+- `node scripts/test-orange-browser.mjs --agent-import-only`: formulario, ayuda, idiomas, subida, vista previa y cancelación.

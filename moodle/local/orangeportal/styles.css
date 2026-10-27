@@ -213,3 +213,9 @@ body.orange-agent-menu .usermenu a[href*="/user/files.php"]{display:none!importa
 .orange-report-filters .orange-filter-field{flex:1 1 180px;min-width:0}
 .orange-report-filters select{max-width:100%}
 @media(max-width:575px){.orange-report-count{float:none;display:block;margin:.25rem 0 0}.orange-report-filters .orange-filter-field{flex-basis:100%}.orange-report-content{padding:0 .5rem .5rem}}
+/* Agent import: readable progress and controls, including narrow screens. */
+#orange-import-progress{display:block;width:min(100%,42rem);height:1.25rem;margin:1rem 0;accent-color:#ff7900}
+#orange-import-runner{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;margin:1rem 0}
+#orange-import-runner>p{flex-basis:100%;margin:0}
+#orange-import-runner form{margin:0}
+.orange-agent-import-preview td{overflow-wrap:anywhere}

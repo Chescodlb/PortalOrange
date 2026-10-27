@@ -63,7 +63,55 @@ try {
   };
   const nav = () => evaluate(`Array.from(document.querySelectorAll('.primary-navigation .nav-link')).filter(x=>x.textContent.trim()!=='').map(x=>x.textContent.trim()).filter(x=>!['Más','More'].includes(x))`);
   await send('Page.enable'); await send('Runtime.enable');
-  if (process.argv.includes('--user-reports-only')) {
+  if (process.argv.includes('--agent-import-only')) {
+    await login('admin.orange',env.ORANGE_DEMO_PASSWORD);
+    await navigate('/local/orangeportal/users.php');
+    check(await evaluate(`!!document.querySelector('a[href*="import_users.php"]')`),'Administración Orange ofrece importación CSV');
+    for(const lang of ['en','es']) {
+      await navigate('/local/orangeportal/import_users.php?lang='+lang);
+      check(await evaluate(`!!document.querySelector('#id_csvfile')&&!document.body.textContent.includes('[[')`),lang+': formulario traducido');
+      check(await evaluate(`!!document.querySelector('a[href*="template=1"]')&&!!document.querySelector('a[data-content*="username"] .fa-circle-question')`),lang+': plantilla e icono circular de ayuda');
+      await evaluate(`document.querySelector('a[data-content*="username"]').click()`);
+      await wait(`!!document.querySelector('.popover-body')`);
+      check(await evaluate(`document.querySelector('.popover-body').textContent.includes('cohorts')&&document.querySelector('.popover-body').textContent.includes('courses')`),lang+': ayuda explica formato, colectivos y formaciones');
+    }
+    await navigate('/local/orangeportal/import_users.php?lang=es');
+    const shortname=await evaluate(`document.querySelector('.orange-import-courses tbody tr td')?.textContent`);
+    check(!!shortname,'Catálogo muestra nombres cortos reales de formaciones Orange');
+    check(await evaluate(`fetch(document.querySelector('a[href*="template=1"]').href).then(r=>r.text()).then(csv=>csv.split('\\n')[0].includes(';courses'))`),'Plantilla descargable incluye la columna courses');
+    const fixture=join(profile,'agentes.csv');
+    const user='csvbrowser_'+Date.now();
+    const password='Csv!9aB_'+Date.now();
+    await writeFile(fixture,'username;firstname;lastname;email;password;idnumber;cohorts;courses\n'+user+';Prueba;CSV;'+user+'@example.invalid;'+password+';CE-CSV;;'+shortname+'\n');
+    await evaluate(`document.querySelector('.fp-btn-choose').click()`);
+    await wait(`!!document.querySelector('.fp-repo-area')`);
+    await evaluate(`Array.from(document.querySelectorAll('.fp-repo-area a')).find(x=>x.textContent.includes('Subir')).click()`);
+    await wait(`!!document.querySelector('input[name="repo_upload_file"]')`);
+    const doc=await send('DOM.getDocument');
+    const file=await send('DOM.querySelector',{nodeId:doc.root.nodeId,selector:'input[name="repo_upload_file"]'});
+    await send('DOM.setFileInputFiles',{nodeId:file.nodeId,files:[fixture]});
+    await evaluate(`document.querySelector('.fp-upload-btn').click()`);
+    await wait(`document.querySelector('.filepicker-filename')?.textContent.includes('agentes.csv')`);
+    await evaluate(`document.querySelector('#id_submitbutton').click()`);
+    await wait(`!!document.querySelector('.orange-agent-import-preview')`);
+    check(await evaluate(`document.querySelector('.orange-agent-import-preview').textContent.includes(${JSON.stringify(user)})&&!document.documentElement.outerHTML.includes(${JSON.stringify(password)})&&!document.body.textContent.includes('[[')`),'Archivo subido: vista previa sin contraseña');
+    check(await evaluate(`document.querySelector('.orange-agent-import-preview').textContent.includes(${JSON.stringify(shortname)})`),'Vista previa identifica la formación a matricular');
+    check(await evaluate(`!!document.querySelector('#orange-import-progress')&&document.querySelector('#orange-import-runner').parentElement!==document.querySelector('#orange-import-progress')`),'Progreso y botones correctamente renderizados');
+    await screenshot('agentes-csv-vista-previa');
+    await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+    await screenshot('agentes-csv-movil');
+    check(await evaluate(`document.documentElement.scrollWidth<=innerWidth+2`),'CSV usable en móvil sin desbordamiento global');
+    await send('Emulation.clearDeviceMetricsOverride');
+    await evaluate(`Array.from(document.querySelectorAll('#orange-import-runner form')).find(f=>f.querySelector('input[name="action"]').value==='cancel').querySelector('button').click()`);
+    await wait(`location.pathname.endsWith('/users.php')&&document.readyState!=='loading'`);
+    await navigate('/local/orangeportal/import_users.php');
+    check(await evaluate(`!!document.querySelector('#id_csvfile')&&!document.querySelector('#orange-import-runner')`),'Cancelar elimina la vista previa y permite otra carga');
+    await logout();
+    await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
+    await navigate('/local/orangeportal/import_users.php');
+    check(await evaluate(`!document.querySelector('#id_csvfile')&&!document.querySelector('#orange-import-runner')`),'Formador no accede al importador');
+    console.log('Verificaciones CSV completas: '+results.length);
+  } else if (process.argv.includes('--user-reports-only')) {
     for(const username of ['formador.orange','coordinador.orange','calidad.orange','admin.orange']) {
       await login(username,env.ORANGE_DEMO_PASSWORD);
       for(const language of ['es','en']) {

@@ -121,6 +121,10 @@ class orange_administration {
         $u = (object)['username' => $username, 'password' => $data->password, 'auth' => 'manual',
             'firstname' => clean_param($data->firstname, PARAM_NOTAGS), 'lastname' => clean_param($data->lastname, PARAM_NOTAGS),
             'email' => clean_param($data->email, PARAM_EMAIL), 'confirmed' => 1, 'mnethostid' => $CFG->mnet_localhost_id];
+        if (isset($data->idnumber)) {
+            $u->idnumber = clean_param(trim($data->idnumber), PARAM_NOTAGS);
+            if (\core_text::strlen($u->idnumber) > 255) { throw new \moodle_exception('csvbadidnumber', 'local_orangeportal'); }
+        }
         $id = user_create_user($u);
         set_user_preference('auth_forcepasswordchange', 1, $id);
         $marker = $DB->get_field('role', 'id', ['shortname' => 'orange_cuenta'], MUST_EXIST);

@@ -1,0 +1,4 @@
+﻿username;firstname;lastname;email;password;idnumber;cohorts;courses
+agente.ejemplo01;Ana;García;ana.garcia@example.invalid;CambiarOrange!2026_A1;CE001;;ORANGE-FORMACION-INICIAL
+agente.ejemplo02;Luis;Pérez;luis.perez@example.invalid;CambiarOrange!2026_B2;CE002;Cristalia-Madrid|OC;ORANGE-FORMACION-INICIAL|ORANGE-FORMACION-CONTINUA
+agente.ejemplo03;Marta;López;marta.lopez@example.invalid;CambiarOrange!2026_C3;CE003;;
