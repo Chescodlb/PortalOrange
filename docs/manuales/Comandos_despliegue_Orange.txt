@@ -1,0 +1,53 @@
+COMANDOS DEL DESPLIEGUE ORANGE · 26/10/2026
+
+PLANTILLA DE REFERENCIA. NO EJECUTAR ESTE ARCHIVO ENTERO COMO SCRIPT.
+Copiar un comando por vez desde el bloque correspondiente de la guía.
+Antes: sustituir /RUTA_REAL/MOODLE, /RUTA_PRIVADA y los IDs de producción.
+Los IDs 2 y 3 solo fueron los de PRE; NO utilizarlos automáticamente en PRO.
+Ejecutar con el usuario de servicio y los permisos habituales de Sistemas.
+No copiar prompts root@..., símbolos > de la terminal ni texto de una captura.
+
+C01 · Ir a la raíz real de Moodle
+cd /RUTA_REAL/MOODLE
+
+C02 · Solo en la ventana de instalación acordada, con respaldo disponible
+php admin/cli/maintenance.php --enable
+
+C03 · Copiar componentes revisados y completar actualización por CLI o por web, sin simultanear ambas vías
+php admin/cli/upgrade.php --non-interactive
+
+C04 · Purgar cachés
+php admin/cli/purge_caches.php
+
+C05 · Solo tras instalación correcta, retirar mantenimiento según la ventana de Sistemas
+php admin/cli/maintenance.php --disable
+
+C06 · VALIDAR EL JSON: primero crear las dos raíces vacías y sustituir TODOS los marcadores
+php local/orangeportal/cli/import_preproduction.php --file=/RUTA_PRIVADA/catalogos-orange.json --library-root-id=ID_BIBLIOTECA --training-root-id=ID_FORMACIONES
+
+C07 · APLICAR EL JSON: SOLO después de Validación correcta y revisar inventario y respaldo
+php local/orangeportal/cli/import_preproduction.php --file=/RUTA_PRIVADA/catalogos-orange.json --library-root-id=ID_BIBLIOTECA --training-root-id=ID_FORMACIONES --apply
+
+C08 · Tras cargar la estructura
+php admin/cli/purge_caches.php
+
+D01 · OPCIONAL: desbloquear encabezado Orange vacío SOLO EN PRIMERA INSTALACIÓN, sin colectivos delegados
+No vaciar managedcohorts en un portal que ya tenga delegaciones.
+php admin/cli/cfg.php --component=local_orangeportal --name=managedcohorts --set=''
+php admin/cli/purge_caches.php
+
+D02a · DIAGNÓSTICO: consulta de un ajuste, no escribe
+php admin/cli/cfg.php --component=theme_boost_union --name=scsspre
+
+D02b · RECUPERACIÓN EXCEPCIONAL: revisar antes los ajustes pendientes DE TODO EL CAMPUS.
+Guarda predeterminados solo donde no hay valor; conservar el parámetro false.
+No es necesario si la instalación ya finalizó. No repetir indiscriminadamente.
+php -r 'define("CLI_SCRIPT",true);require "config.php";require_once($CFG->libdir."/adminlib.php");\core\session\manager::set_user(get_admin());$saved=admin_apply_default_settings(null,false);echo "Ajustes inicializados: ".count($saved).PHP_EOL;'
+php admin/cli/purge_caches.php
+
+D03 · SOLO si quedan estos nueve ajustes concretos de Boost Union/LearnR sin inicializar.
+Una sola línea; solo escribe cada ajuste si todavía no existe.
+php -r 'define("CLI_SCRIPT",true);require "config.php";if(get_config("theme_boost_union","loginbackgroundimagetext")===false){set_config("loginbackgroundimagetext","","theme_boost_union");}for($i=1;$i<=8;$i++){if(get_config("theme_learnr","nav".$i."target")===false){set_config("nav".$i."target","_self","theme_learnr");}}echo "Proceso terminado".PHP_EOL;'
+php admin/cli/purge_caches.php
+
+FIN. Guardar la salida completa y el resultado en el acta del despliegue.

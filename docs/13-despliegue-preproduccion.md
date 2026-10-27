@@ -209,3 +209,16 @@ La versión revisada separa **Seguimiento** mediante un selector de Incidencias,
 Los paquetes ZIP generados antes de esta ampliación de Seguimiento no la incluyen. Antes de entregar código a Sistemas, regenerar el paquete desde el estado revisado del repositorio y actualizar su manifiesto de integridad. No mezclar archivos de versiones de la página de informes.
 
 Para replicar esta configuración con otras cuentas en cada ambiente, utilizar [Replicar perfiles y permisos Orange paso a paso](15-replicar-perfiles-y-permisos.md), con matriz de capacidades, XML nativos y pruebas de aceptación.
+
+## Si Guardar cambios deja un encabezado Orange vacío
+
+En una instalación sin cohortes disponibles, el selector opcional de colectivos delegados puede quedar invisible mientras Moodle lo considera sin inicializar. Se reconoce por el encabezado «Nuevos ajustes - Configuración Orange» sin campos. El plugin corrige este caso con `classes/admin_setting_optional_multiselect.php` y su uso en `settings.php`: una selección opcional no configurada equivale a una lista vacía, conservando las selecciones existentes.
+
+Para aplicar la corrección, copiar ambos archivos de la misma revisión y purgar cachés. Como desbloqueo de la instalación inicial, sin cambiar código, el administrador del servidor puede inicializar **solo la lista vacía de colectivos delegados**, desde la raíz Moodle:
+
+```bash
+php admin/cli/cfg.php --component=local_orangeportal --name=managedcohorts --set=''
+php admin/cli/purge_caches.php
+```
+
+Este comando es para la primera instalación, sin colectivos delegados configurados: en un portal en uso, vaciar esa lista retiraría las delegaciones existentes. No crea categorías, usuarios, permisos ni contenidos, ni activa Orange. Volver a Nuevos ajustes y guardar los demás ajustes pendientes conservando sus valores. Los ajustes de Boost Union o LearnR pertenecen a otros temas y pueden requerir revisión independiente. Si siguen apareciendo tras guardar, registrar el campo/error concreto; no dar por hecho que todos dependen de Orange.
