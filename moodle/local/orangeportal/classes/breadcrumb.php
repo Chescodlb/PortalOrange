@@ -57,6 +57,14 @@ class breadcrumb {
     public static function apply(): void {
         global $PAGE, $CFG, $DB;
         if (course_creation::section()) { return; } // The creation form already sets its breadcrumb.
+        if ($PAGE->course->id != SITEID && ($map = native_content::mapping((int)$PAGE->course->id)) && $map->kind === 'notice') {
+            $notice = $DB->get_record('local_orange_notice', ['id' => $map->noticeid], '*', MUST_EXIST);
+            self::root($notice->kind);
+            $PAGE->navbar->ignore_active(); $PAGE->navbar->children = [];
+            $PAGE->navbar->add($notice->title, new \moodle_url('/local/orangeportal/view.php', ['id' => $notice->id]));
+            if ($PAGE->cm) { $PAGE->navbar->add($PAGE->cm->name); }
+            return;
+        }
         $categoryid = $PAGE->course->id != SITEID ? (int)$PAGE->course->category :
             ($PAGE->context->contextlevel === CONTEXT_COURSECAT ? (int)$PAGE->context->instanceid : 0);
         if ($categoryid) {
@@ -78,6 +86,21 @@ class breadcrumb {
         $section = $PAGE->url->get_param('section') ?? $PAGE->url->get_param('kind');
         if ($file === 'view.php') {
             $section = $DB->get_field('local_orange_notice', 'kind', ['id' => (int)$PAGE->url->get_param('id')]);
+        } else if (in_array($file, ['add_activity.php', 'activity.php'], true)) {
+            $courseid = $file === 'add_activity.php' ? (int)$PAGE->url->get_param('course') :
+                (int)$DB->get_field('course_modules', 'course', ['id' => (int)$PAGE->url->get_param('id')]);
+            $map = native_content::mapping($courseid);
+            if ($map && $map->kind === 'notice') {
+                $section = $DB->get_field('local_orange_notice', 'kind', ['id' => $map->noticeid]);
+            } else {
+                $category = $DB->get_record('course_categories', ['id' => get_course($courseid)->category]);
+                $section = $category && in_array((int)get_config('local_orangeportal', 'librarycategory'),
+                    array_map('intval', explode('/', $category->path)), true) ? 'library' : 'courses';
+            }
+        } else if ($file === 'collections.php') {
+            $section = 'courses';
+        } else if ($file === 'resources.php') {
+            $section = $DB->get_field('local_orange_notice', 'kind', ['id' => (int)$PAGE->url->get_param('notice')]);
         } else if ($file === 'add_document.php') {
             $section = 'library';
         } else if ($file === 'manage.php') {

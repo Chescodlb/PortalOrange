@@ -12,7 +12,7 @@ class document_reads {
         $record = $DB->get_record_sql('SELECT cm.id, m.name, c.category
             FROM {course_modules} cm JOIN {modules} m ON m.id = cm.module
             JOIN {course} c ON c.id = cm.course WHERE cm.id = ?', [$cmid]);
-        if (!$record || !in_array($record->name, ['resource', 'page', 'book', 'folder', 'url'], true)) { return; }
+        if (!$record) { return; }
         $root = (int)get_config('local_orangeportal', 'librarycategory');
         $path = $DB->get_field('course_categories', 'path', ['id' => $record->category]);
         if (!$root || !in_array($root, array_map('intval', explode('/', $path ?: '')), true)) { return; }

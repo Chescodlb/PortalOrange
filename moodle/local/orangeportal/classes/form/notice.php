@@ -23,6 +23,7 @@ class notice extends \moodleform {
         $m->addElement('editor', 'body', get_string('noticecontent', 'local_orangeportal'), null,
             ['maxfiles' => 0, 'context' => \context_system::instance(), 'subdirs' => 0]);
         $m->setType('body', PARAM_RAW);
+        $m->addElement('static', 'resourcenote', '', get_string('nativenoticeinstructions', 'local_orangeportal'));
         $current = $this->_customdata['current'] ?? null;
         $impact = $current->impact ?? \local_orangeportal\notice_options::default_code('impacts');
         $state = $current->state ?? \local_orangeportal\notice_options::default_code('states');
@@ -58,10 +59,10 @@ class notice extends \moodleform {
         $m->addElement('advcheckbox', 'published', get_string('publishlabel', 'local_orangeportal'), get_string('visibleforrecipients', 'local_orangeportal'));
         $m->addElement('static', 'revisionnote', '', get_string('revisionnote', 'local_orangeportal'));
         $this->add_action_buttons(true, get_string('savepublication', 'local_orangeportal'));
+        $m->addElement('submit', 'saveandresources', get_string('nativesaveandresources', 'local_orangeportal'));
     }
     public function validation($data, $files): array {
         $errors = parent::validation($data, $files);
-        if (empty(trim(strip_tags($data['body']['text'] ?? '')))) { $errors['body'] = get_string('entercontent', 'local_orangeportal'); }
         if (!empty($data['published']) && empty($data['users']) && empty($data['cohorts']) && empty($data['groups'])) {
             $errors['users'] = get_string('recipientsrequired', 'local_orangeportal');
         }

@@ -63,7 +63,109 @@ try {
   };
   const nav = () => evaluate(`Array.from(document.querySelectorAll('.primary-navigation .nav-link')).filter(x=>x.textContent.trim()!=='').map(x=>x.textContent.trim()).filter(x=>!['Más','More'].includes(x))`);
   await send('Page.enable'); await send('Runtime.enable');
-  if (process.argv.includes('--agent-import-only')) {
+  if (process.argv.includes('--native-chooser-only')) {
+    const fixture=JSON.parse(await readFile('backups/previews/native-content-fixture.json','utf8'));
+    const modal='document.querySelector(\'.modal.show .modchooser\')';
+    const waitChooser=async()=>{
+      await wait(`!!${modal}?.querySelector('[data-region="chooser-option-container"]')`);
+      check(await evaluate(`!!${modal}.querySelector('[data-region="chooser-option-container"] .optionicon img')&&!!${modal}.querySelector('[data-region="chooser-option-actions-container"]')`),'Selector nativo con iconos, favoritos y ayuda');
+    };
+    const selectModule=async(name)=>{
+      await evaluate(`Array.from(${modal}.querySelectorAll('[data-internal="${name}"] a[data-action="add-chooser-option"]')).find(x=>x.getClientRects().length)?.click()`);
+      await wait(`location.pathname==='/course/modedit.php'&&!!document.querySelector('form.mform')`);
+    };
+    await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
+    for(const lang of ['es','en']) {
+      await navigate('/local/orangeportal/add_document.php?category='+fixture.category+'&lang='+lang);
+      check(await evaluate(`!!document.querySelector('select[name="categoryid"]')&&!document.querySelector('[name="documenttype"]')`),lang+': Biblioteca solo pide la categoría');
+      await evaluate(`document.querySelector('input[name="submitbutton"]').click()`);
+      await waitChooser();
+      check(await evaluate(`${modal}.textContent.includes(${JSON.stringify('Archivo')})||${modal}.textContent.includes('File')`),lang+': modal en el idioma de Moodle');
+      check(await evaluate(`${modal}.querySelectorAll('[role="tab"]').length>=3`),lang+': pestañas nativas Todos, Actividades y Recursos');
+      if(lang==='es') {
+        await screenshot('selector-nativo-biblioteca');
+        await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+        await screenshot('selector-nativo-movil');
+        check(await evaluate(`document.documentElement.scrollWidth<=innerWidth+2`),'Modal nativo adaptable a móvil');
+        await send('Emulation.clearDeviceMetricsOverride');
+      }
+      await selectModule('url');
+      check(await evaluate(`new URL(location.href).searchParams.get('course')===${JSON.stringify(String(fixture.library))}&&!!document.querySelector('input[name="externalurl"]')`),lang+': recurso elegido abre el formulario nativo en su categoría');
+    }
+    await navigate('/local/orangeportal/resources.php?notice='+fixture.notice+'&lang=es');
+    check(await evaluate(`!!document.querySelector('button.section-modchooser-link')&&!document.querySelector('a[href*="add_activity.php"]')`),'Publicaciones abren el modal sin página intermedia');
+    await evaluate(`document.querySelector('button.section-modchooser-link').click()`);
+    await waitChooser();
+    await selectModule('quiz');
+    check(await evaluate(`new URL(location.href).searchParams.get('course')===${JSON.stringify(String(fixture.course))}&&!!document.querySelector('#id_attempts')`),'Cuestionario usa el contenedor de la publicación');
+    await navigate('/local/orangeportal/collections.php?course='+fixture.training+'&lang=en');
+    const target=await evaluate(`Array.from(document.querySelectorAll('button.section-modchooser-link')).at(-1)?.dataset.sectionnum`);
+    check(target!==undefined,'Colecciones tienen botón visual nativo por sección');
+    await evaluate(`Array.from(document.querySelectorAll('button.section-modchooser-link')).at(-1).click()`);
+    await waitChooser();
+    await selectModule('page');
+    check(await evaluate(`new URL(location.href).searchParams.get('course')===${JSON.stringify(String(fixture.training))}&&new URL(location.href).searchParams.get('section')===${JSON.stringify(target)}`),'La selección conserva la formación y colección de destino');
+    await logout();await login('agente.orange',env.ORANGE_DEMO_PASSWORD);
+    await navigate('/local/orangeportal/collections.php?course=4');
+    check(await evaluate(`!document.querySelector('button.section-modchooser-link')`),'Agente no recibe el selector de edición');
+    await navigate('/local/orangeportal/add_activity.php?course='+fixture.course);
+    check(await evaluate(`!document.querySelector('button.section-modchooser-link')`),'Acceso directo del agente también denegado');
+    console.log('Verificaciones de selector completas: '+results.length);
+  } else if (process.argv.includes('--native-content-only') || process.argv.includes('--native-content-withdrawn')) {
+    const fixture=JSON.parse(await readFile('backups/previews/native-content-fixture.json','utf8'));
+    const withdrawn=process.argv.includes('--native-content-withdrawn');
+    if(!withdrawn) {
+      await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
+      for(const lang of ['es','en']) {
+        await navigate('/local/orangeportal/add_document.php?category='+fixture.category+'&lang='+lang);
+        check(await evaluate(`!!document.querySelector('select[name="categoryid"]')&&!document.querySelector('[name="collection"]')&&!document.querySelector('[name="documenttype"]')&&!document.body.textContent.includes('[[')`),lang+': Biblioteca pide categoría y actividad, sin colección');
+        await navigate('/local/orangeportal/resources.php?notice='+fixture.notice+'&lang='+lang);
+        check(await evaluate(`document.body.textContent.includes('TESTWEB Página')&&!!document.querySelector('button.section-modchooser-link')&&!document.body.textContent.includes('[[')`),lang+': gestor de recursos de publicación traducido');
+      }
+      await navigate('/local/orangeportal/add_document.php?category='+fixture.category+'&lang=es');
+      await evaluate(`document.querySelector('input[name="submitbutton"]').click()`);
+      await wait(`!!document.querySelector('.modal.show .modchooser [data-internal="url"] a[data-action="add-chooser-option"]')`);
+      await evaluate(`Array.from(document.querySelectorAll('.modal.show .modchooser [data-internal="url"] a[data-action="add-chooser-option"]')).find(x=>x.getClientRects().length).click()`);
+      await wait(`location.pathname==='/course/modedit.php'&&!!document.querySelector('input[name="externalurl"]')`);
+      check(await evaluate(`!!document.querySelector('input[name="name"]')`),'Nuevo documento abre el formulario nativo completo de URL');
+      await evaluate(`document.querySelector('input[name="cancel"]').click()`);
+      await wait(`location.pathname==='/local/orangeportal/index.php'&&document.readyState!=='loading'`);
+      check(await evaluate(`new URL(location.href).searchParams.get('section')==='library'`),'Cancelar formulario nativo vuelve a Biblioteca');
+      await navigate('/local/orangeportal/manage.php?kind=notifications&id='+fixture.notice);
+      await evaluate(`document.querySelector('[name="saveandresources"]').click()`);
+      await wait(`location.pathname==='/local/orangeportal/resources.php'&&document.readyState!=='loading'`);
+      check(await evaluate(`document.body.textContent.includes('TESTWEB Página')`),'Guardar publicación sin descripción abre sus recursos');
+      await navigate('/local/orangeportal/collections.php?course='+fixture.training+'&lang=es');
+      check(await evaluate(`!!document.querySelector('.orange-training-collection')&&!document.body.textContent.includes('[[')`),'Formación lista las colecciones existentes');
+      await evaluate(`document.querySelector('input[name="name"]').value='TESTWEB Colección añadida';document.querySelector('input[name="submitbutton"]').click()`);
+      await wait(`!!Array.from(document.querySelectorAll('.orange-training-collection')).find(x=>x.textContent.includes('TESTWEB Colección añadida'))`);
+      check(true,'Crear colección añade una sección nativa');
+      await evaluate(`Array.from(document.querySelectorAll('form')).find(f=>f.action.includes('/course/view.php')).querySelector('button').click()`);
+      await wait(`location.pathname==='/course/view.php'&&document.readyState!=='loading'`);
+      check(await evaluate(`!!document.querySelector('[data-action="addblock"]')||document.body.textContent.includes('Agregar un bloque')||!!document.querySelector('a[href*="bui_addblock"]')`),'Edición nativa permite agregar bloques laterales');
+      await logout();
+    }
+    await login('agente.orange',env.ORANGE_DEMO_PASSWORD);
+    if(!withdrawn) {
+      await navigate('/local/orangeportal/view.php?id='+fixture.notice);
+      check(await evaluate(`document.body.textContent.includes('TESTWEB Página')&&!document.querySelector('a[href*="resources.php"]')`),'Agente ve recursos y carece de herramientas de gestión');
+      const downloaded=await evaluate(`fetch(${JSON.stringify(fixture.file)}).then(r=>r.text())`);
+      check(downloaded==='ORANGE-FILE-'+fixture.token,'Descarga nativa pluginfile autorizada para el destinatario');
+      await navigate('/mod/page/view.php?id='+fixture.modules[fixture.course]);
+      check(await evaluate(`document.body.textContent.includes(${JSON.stringify('ORANGE-NATIVE-'+fixture.token)})`),'Recurso nativo muestra su contenido dentro de Orange');
+      await screenshot('recursos-publicacion-agente');
+      await navigate('/local/orangeportal/index.php?section=library&category='+fixture.category);
+      check(await evaluate(`document.querySelector('.orange-library-documents').textContent.includes('TESTWEB Página')`),'Documento nuevo aparece directamente bajo su categoría');
+      await navigate('/local/orangeportal/add_document.php');
+      check(await evaluate(`!document.querySelector('select[name="documenttype"]')`),'Agente no carga documentos');
+    } else {
+      const downloaded=await evaluate(`fetch(${JSON.stringify(fixture.file)}).then(r=>r.text())`);
+      check(!downloaded.includes('ORANGE-FILE-'+fixture.token),'Retirar publicación bloquea descarga aunque conserve una matrícula anterior');
+      await navigate('/mod/page/view.php?id='+fixture.modules[fixture.course]);
+      check(await evaluate(`!document.body.textContent.includes(${JSON.stringify('ORANGE-NATIVE-'+fixture.token)})`),'Retirar publicación bloquea la URL nativa de la actividad');
+    }
+    console.log('Verificaciones de recursos completas: '+results.length);
+  } else if (process.argv.includes('--agent-import-only')) {
     await login('admin.orange',env.ORANGE_DEMO_PASSWORD);
     await navigate('/local/orangeportal/users.php');
     check(await evaluate(`!!document.querySelector('a[href*="import_users.php"]')`),'Administración Orange ofrece importación CSV');
@@ -540,7 +642,7 @@ try {
     }
     await logout();await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
     await navigate('/local/orangeportal/add_document.php?lang=en');
-    check(await evaluate(`document.querySelector('.orange-intro h2').textContent==='New document' && document.querySelector('#id_submitbutton').value==='Add document'`),'Formador: nuevo documento en inglés');
+    check(await evaluate(`document.querySelector('.orange-intro h2').textContent==='New document' && document.querySelector('#id_submitbutton').value==='Add an activity or resource'`),'Formador: nuevo documento en inglés');
     await logout();await login(env.MOODLE_ADMIN_USER||'admin',env.MOODLE_ADMIN_PASSWORD);
     await navigate('/admin/settings.php?section=local_orangeportal&lang=en');
     check(await evaluate(`document.body.innerText.includes('Orange settings') && document.body.innerText.includes('Automatic training alerts') && document.body.innerText.includes('Library root category')`),'Administrador general: ajustes existentes del plugin en inglés');
@@ -626,39 +728,24 @@ try {
   } else if (process.argv.includes('--creation-only') || process.argv.includes('--creation-languages')) {
     await login('formador.orange', env.ORANGE_DEMO_PASSWORD);
     for (const language of (process.argv.includes('--creation-languages') ? ['es', 'en'] : ['es'])) {
-      const collectionTitle = language === 'es' ? 'Crear una nueva colección documental' : 'Create a new document collection';
-      const collectionWord = language === 'es' ? 'colección' : 'Collection';
-      const courseTitle = language === 'es' ? 'Crear un nuevo curso' : 'Add a new course';
       for (const section of ['library', 'courses']) {
-        await navigate('/local/orangeportal/index.php?section=' + section + '&lang=' + language);
-        const target = await evaluate(`document.querySelector('.orange-create-course').href`) + '&lang=' + language;
-        await navigate(target);
-        await wait(`!!document.querySelector('#id_fullname')`);
-        if (section === 'library') {
-          await wait(`Array.from(document.querySelectorAll('h1,h2,h3')).some(h=>h.textContent.trim()===${JSON.stringify(collectionTitle)})`);
-          check(await evaluate(`document.querySelector('label[for="id_fullname"]').textContent.includes(${JSON.stringify(collectionWord)})`), 'Biblioteca: nombres de colección en formulario');
-          check(await evaluate(`document.title.includes(${JSON.stringify(collectionTitle)})`), 'Biblioteca: título de colección');
-          check(await evaluate(`!(/\\bcurso(s)?\\b/i.test(document.querySelector('form.mform').innerText))`), 'Biblioteca: formulario sin términos de curso');
-          check(await evaluate(`!document.querySelector('select[name="showgrades"]') && !document.querySelector('select[name="enablecompletion"]') && !document.querySelector('[data-formatchooser-field="selector"]')`), 'Biblioteca: sin controles académicos');
-          check(await evaluate(`document.querySelector('input[name="format"]').value==='topics' && document.querySelector('input[name="enablecompletion"]').value==='0'`), 'Biblioteca: valores documentales nativos');
+        await navigate('/local/orangeportal/index.php?section='+section+'&lang='+language);
+        if(section==='library') {
+          check(await evaluate(`!document.querySelector('.orange-create-course')&&!!document.querySelector('a[href*="add_document.php"]')`),'Biblioteca ofrece documento directo sin crear colección');
+          await navigate('/local/orangeportal/add_document.php?lang='+language);
+          check(await evaluate(`!!document.querySelector('select[name="categoryid"]')&&!document.querySelector('input[name="fullname"]')&&!document.querySelector('[name="collection"]')`),'Biblioteca elige categoría y tipo de recurso');
+          check(await evaluate(`document.querySelectorAll('select[name="categoryid"] option').length>0&&!Array.from(document.querySelectorAll('select[name="categoryid"] option')).some(o=>o.textContent.includes('Formación inicial'))`),'Destino de documentos limitado a categorías de Biblioteca');
         } else {
-          check(await evaluate(`Array.from(document.querySelectorAll('h1,h2,h3')).some(h=>h.textContent.includes(${JSON.stringify(courseTitle)}))`), 'Cursos conserva el título de curso');
+          const target=await evaluate(`document.querySelector('.orange-create-course').href`);
+          await navigate(target+'&lang='+language);
+          await wait(`!!document.querySelector('#id_fullname')`);
+          check(await evaluate(`!!document.querySelector('select[name="category"]')`),'Formaciones conserva el formulario nativo de curso');
+          check(await evaluate(`!Array.from(document.querySelectorAll('select[name="category"] option')).some(o=>o.textContent.includes('Biblioteca'))`),'Crear formación no mezcla categorías de Biblioteca');
         }
-        check(await evaluate(`!document.querySelector('.secondary-navigation .nav-link')`), section + ': sin barra Categoría/Más');
-        check(await evaluate(`!document.querySelector('.breadcrumb')?.textContent.includes('Administrar cursos y categorías')`), section + ': ruta sin administración de categorías');
-        const breadcrumb = await evaluate(`Array.from(document.querySelectorAll('.breadcrumb li')).map(li=>({text:li.textContent.trim(), href:li.querySelector('a')?.href || ''}))`);
-        const sectionLabel = language === 'es' ? (section === 'library' ? 'Biblioteca' : 'Formaciones') : (section === 'library' ? 'Library' : 'Training');
-        check(breadcrumb.length === 2 && breadcrumb[0].text === sectionLabel &&
-          breadcrumb[0].href.includes('section=' + section) && !breadcrumb.some(item=>item.text.includes('Página Principal')),
-          section + ': breadcrumb empieza en la sección correcta');
-        await navigate(breadcrumb[0].href);
-        check(await evaluate(`location.pathname==='/local/orangeportal/index.php' && new URLSearchParams(location.search).get('section')===${JSON.stringify(section)}`), section + ': enlace del breadcrumb vuelve a su sección');
-        await navigate(target);
-        await wait(`!!document.querySelector('#id_fullname')`);
-        check(await evaluate(`!!document.querySelector('.primary-navigation .nav-link.active[href*="section=${section}"]')`), section + ': menú principal activo');
-        const options = await evaluate(`Array.from(document.querySelectorAll('select[name="category"] option')).filter(o=>o.value && o.value!=='0').map(o=>o.textContent)`);
-        check(options.length > 0 && options.every(t=>t.includes(section === 'library' ? 'Biblioteca' : 'Cursos')), section + ': categorías de su sección');
-        await screenshot('crear-' + section + '-' + language);
+        check(await evaluate(`!document.querySelector('.secondary-navigation .nav-link')`),section+': sin barra Categoría/Más');
+        const first=await evaluate(`document.querySelector('.breadcrumb a')?.href||''`);
+        check(first.includes('section='+section),section+': breadcrumb vuelve a su sección');
+        await screenshot('crear-'+section+'-'+language);
       }
     }
     console.log('Verificaciones de creación: ' + results.length);

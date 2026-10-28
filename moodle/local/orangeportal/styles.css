@@ -108,8 +108,10 @@ body .orange-library-category.is-selected,body .orange-library-document.is-selec
 .orange-library-detail{margin-top:20px;padding-top:16px;border-top:1px solid #dedde0;font-size:.9rem;line-height:1.5;overflow-wrap:anywhere}
 .orange-library-detail h4{font-size:1.15rem;font-weight:700;margin:8px 0}
 .orange-library-resource-type{font-size:.8rem;color:#595959;display:block;margin-bottom:12px}
-.orange-library-open{display:inline-block;max-width:100%;white-space:normal}
-.orange-library-manage{display:block;margin-top:12px;font-size:.85rem}
+.orange-library-open,.orange-library-manage,.orange-library-delete{display:inline-block;max-width:100%;white-space:normal;margin:0 8px 8px 0}
+.orange-training-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.orange-training-actions .btn{max-width:100%;white-space:normal}
+.orange-training-actions form{margin:0}
 @media(max-width:575px){.orange-library-column{flex:0 0 85%;max-width:none}.orange-library-results{flex:0 0 100%}.orange-library-browser{scroll-snap-type:x proximity}.orange-library-column{scroll-snap-align:start}.orange-library-search-controls{gap:8px}}
 
 /* Personal reading state and explicit ordering, independent of course completion. */
@@ -219,3 +221,8 @@ body.orange-agent-menu .usermenu a[href*="/user/files.php"]{display:none!importa
 #orange-import-runner>p{flex-basis:100%;margin:0}
 #orange-import-runner form{margin:0}
 .orange-agent-import-preview td{overflow-wrap:anywhere}
+.orange-native-activities{list-style:none;padding:0;margin:1.25rem 0}
+.orange-native-activity{display:flex;flex-wrap:wrap;align-items:center;gap:.75rem;padding:1rem 0;border-bottom:1px solid #ddd}
+.orange-native-activity form{margin:0}.orange-native-module-type{color:#555;font-size:.85rem;margin-right:auto}
+.orange-notice-resources,.orange-training-collection{margin:1.5rem 0;padding:1.25rem;border:1px solid #ddd;border-radius:.5rem}
+@media(max-width:600px){.orange-native-activity{align-items:flex-start}.orange-native-activity>form{max-width:100%}.orange-native-activity button{white-space:normal;text-align:left}.orange-training-collection{padding:.75rem}}

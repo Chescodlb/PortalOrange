@@ -88,15 +88,18 @@ class orange_administration {
             $id = (int)get_config('local_orangeportal', $setting);
             if ($id) { $roots[] = \context_coursecat::instance($id)->id; }
         }
+        $internalcourses = $DB->get_records_menu('local_orange_container', [], '', 'courseid, courseid');
         $owncontext = \context_user::instance($userid)->id;
         $portalroles = $DB->get_records_list('role', 'shortname', ['orange_publicador', 'orange_seguimiento']);
         foreach ($DB->get_records('role_assignments', ['userid' => $userid]) as $ra) {
             if ($ra->contextid == $owncontext) { continue; }
             $context = \context::instance_by_id($ra->contextid);
             if ($context->contextlevel === CONTEXT_SYSTEM && isset($portalroles[$ra->roleid])) { continue; }
+            $coursecontext = $context->get_course_context(false);
+            if ($coursecontext && isset($internalcourses[$coursecontext->instanceid])) { continue; }
             if (!array_intersect($roots, array_map('intval', explode('/', $context->path)))) { return false; }
         }
-        $courses = orange_scope::course_ids();
+        $courses = orange_scope::course_ids() + $internalcourses;
         foreach ($DB->get_records_sql('SELECT e.courseid FROM {enrol} e JOIN {user_enrolments} ue ON ue.enrolid=e.id
                 WHERE ue.userid=?', [$userid]) as $e) {
             if (!isset($courses[$e->courseid])) { return false; }

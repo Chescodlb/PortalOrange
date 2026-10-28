@@ -68,8 +68,10 @@ class native_categories {
                 'moodle/category:manage', 'nopermissions', '');
         }
         if ($DB->record_exists('course_categories', ['parent' => $id])) { return 'categoryhassubcategories'; }
-        if ($DB->record_exists('course', ['category' => $id])) {
-            return $kind === 'library' ? 'categoryhascollections' : 'categoryhascourses';
+        foreach ($DB->get_records('course', ['category' => $id]) as $course) {
+            if ($kind !== 'library' || !native_content::empty_library_container((int)$course->id)) {
+                return $kind === 'library' ? 'categoryhascollections' : 'categoryhascourses';
+            }
         }
         if (!$category->can_move_content_to((int)$category->parent)) {
             return 'categorydeletefailed';
@@ -79,7 +81,16 @@ class native_categories {
     public static function delete_category(string $kind, int $id): void {
         $blocker = self::category_delete_blocker($kind, $id);
         if ($blocker) { throw new \moodle_exception($blocker, 'local_orangeportal'); }
+        global $DB, $CFG;
         $category = self::editable($kind, $id);
+        require_once($CFG->dirroot . '/course/lib.php');
+        foreach ($DB->get_records('course', ['category' => $id]) as $course) {
+            if ($kind !== 'library' || !native_content::empty_library_container((int)$course->id)) {
+                throw new \moodle_exception('categoryhascollections', 'local_orangeportal');
+            }
+            delete_course($course, false);
+            $DB->delete_records('local_orange_container', ['courseid' => $course->id]);
+        }
         // Native deletion preserves category context content by moving it to its parent.
         if (!$category->delete_move((int)$category->parent, false)) {
             throw new \moodle_exception('categorydeletefailed', 'local_orangeportal');

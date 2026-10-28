@@ -1,14 +1,14 @@
 # Gestionar la biblioteca RPV y CENTREX
 
-La biblioteca usa categorías nativas de Moodle y cursos como colecciones documentales. El usuario navega por columnas y selecciona directamente los recursos Archivo, Carpeta, Página, Libro o URL de las colecciones, sin entrar antes en el curso documental. El cliente puede crear, mover y renombrar categorías, colecciones y recursos desde Moodle.
+La biblioteca usa categorías nativas de Moodle. **Nuevo documento** crea una actividad o recurso asociado directamente a la categoría seleccionada; no pide crear o seleccionar una colección. Las colecciones anteriores se conservan con sus recursos y permisos. El usuario navega por columnas y abre los elementos accesibles. [Guía de carga, permisos y actualización](16-actividades-recursos-y-colecciones.md).
 
 ## Navegación por columnas · 20/10/2026
 
 **Biblioteca** en el menú superior abre una página; ya no despliega un árbol flotante. La primera columna permite elegir RPV o CENTREX. Cada elección abre a su derecha la lista de categorías hijas, con el nombre de la categoría seleccionada como título. No se utilizan los títulos fijos Proceso, Subproceso, Detalle o Sistemas. La columna final se llama **Documentos**. Los pasos seleccionados de la ruta y el documento elegido se resaltan con fondo naranja suave y texto/borde naranja, siguiendo la referencia visual.
 
-Ejemplo de recorrido: `RPV → ALTA → Alta con terminal → SIM Física → Documentos`. Las categorías pueden tener más o menos niveles; no se fija una profundidad. La lista final recoge los recursos accesibles de las colecciones de la rama seleccionada, incluidas sus subcategorías. Las colecciones se mantienen en Moodle para organizar y gestionar los documentos, pero no añaden un paso obligatorio al lector.
+Ejemplo de recorrido: `RPV → ALTA → Alta con terminal → SIM Física → Documentos`. Las categorías pueden tener más o menos niveles; no se fija una profundidad. La lista final recoge las actividades y recursos accesibles de la rama seleccionada y sus subcategorías, incluidos los que ya existían en colecciones anteriores.
 
-Al seleccionar un documento se muestra su ruta, título, descripción y tipo, con **Abrir documento**. El botón abre el recurso nativo de Moodle y respeta su configuración de visualización. Los perfiles con permiso para gestionar actividades ven además **Gestionar colección**, para editar sus recursos y accesos con las herramientas nativas. Antes de seleccionar no hay botón de apertura. En móvil, las columnas se desplazan horizontalmente dentro de la biblioteca; los enlaces y la búsqueda funcionan sin JavaScript. Una mejora opcional de foco muestra la siguiente columna tras navegar.
+Al seleccionar un documento se muestra su ruta, título, descripción y tipo, con **Abrir documento**. El botón abre el recurso nativo de Moodle y respeta su configuración de visualización. Los perfiles con permiso para gestionar actividades ven además **Editar actividad o recurso**, que abre su formulario nativo. Antes de seleccionar no hay botón de apertura. En móvil, las columnas se desplazan horizontalmente dentro de la biblioteca; los enlaces y la búsqueda funcionan sin JavaScript. Una mejora opcional de foco muestra la siguiente columna tras navegar.
 
 ## Estructura inicial
 
@@ -18,7 +18,7 @@ Biblioteca
 │   └── ALTA
 │       └── Alta con terminal
 │           └── SIM Física
-│               └── Colección documental → recursos
+│               └── Actividades y recursos
 └── CENTREX (vacía por ahora)
 ```
 
@@ -44,17 +44,16 @@ El formulario es el mismo estilo que Incidencias y Notificaciones, pero crea y a
 
 La gestión general de Moodle sigue disponible para un administrador en **Administración del sitio > Cursos > Administrar cursos y categorías**; no es la entrada habitual del portal.
 
-## Crear una colección y cargar recursos
+## Cargar documentos directamente en una categoría
 
-Con `formador.orange`, Biblioteca muestra **Nuevo documento** y **Nueva colección documental**.
+1. Con Formación o Administración Orange, pulsar **Nuevo documento**.
+2. Elegir categoría y tipo de actividad o recurso. Se incluyen los módulos nativos habilitados, como Archivo, Página, URL y Cuestionario.
+3. Continuar al formulario de Moodle, completar sus campos y guardar. El documento aparece directamente en la categoría.
+4. Seleccionar el elemento y usar **Editar actividad o recurso** para actualizarlo.
 
-1. Para un archivo nuevo, pulsar **Nuevo documento**, elegir una colección editable, seleccionar **Archivo adjunto** y pulsar **Añadir documento**. Se abre el formulario nativo Archivo: indicar el nombre, subir el PDF o documento y guardar.
-2. Para una nueva colección, pulsar **Nueva colección documental**. El formulario nativo de Moodle crea un curso documental en Biblioteca. Si se ha seleccionado una categoría del árbol, se propone esa categoría. Elegir **Guardar y mostrar** para entrar en la colección nueva y activar edición.
-3. Añadir recursos Archivo, Carpeta, Página, Libro o URL desde la colección. Las evaluaciones se reservan normalmente a Cursos.
-4. En Participantes, matricular los usuarios o colectivos destinatarios y asignar los responsables. Una colección nueva no hereda automáticamente los destinatarios de otra.
-5. Probar con un agente matriculado.
+Moodle necesita un curso contenedor: el portal lo prepara en segundo plano para esa categoría, con acceso Estudiante por la cohorte Orange. Las restricciones específicas por grupos se configuran en la actividad con las herramientas nativas. No se cambia la matrícula de las colecciones antiguas ni se mueve contenido manual.
 
-El selector Nuevo documento solo contiene colecciones de Biblioteca donde se pueden gestionar actividades y añadir archivos o páginas. Cada combinación de colección y tipo se valida con sus permisos nativos. La subida, almacenamiento y permisos de archivos son los del módulo nativo de Moodle. La nueva colección queda bajo la responsabilidad de su creador con el rol nativo Profesor con permiso de edición, según el ajuste de Moodle para creadores de cursos.
+Ya no se ofrece el botón Nueva colección documental en Biblioteca. Las colecciones de **Formaciones** son secciones dentro de sus cursos; se consultan desde **Colecciones de formación**.
 
 ## Restringir documentos y secciones
 
@@ -76,9 +75,9 @@ Tener acceso a la colección permite consultar y descargar sus documentos. Crear
 
 Una colección se almacena como curso nativo de Moodle. Su menú contextual se adapta dentro de Biblioteca a **Documentos**, **Configuración** y **Accesos**, mostrando las opciones que Moodle permite al usuario. Documentos abre sus recursos; Configuración permite modificar la colección y Accesos abre Participantes para gestionar destinatarios, matrículas y grupos. Se retiran de esta barra las herramientas académicas como calificaciones e informes; los cursos de formación conservan su navegación normal. El plugin adapta los nodos mediante el hook `secondary_extend`, sin alterar roles, permisos ni archivos del core.
 
-## Formulario de nueva colección
+## Formulario anterior de colección
 
-«Nueva colección documental» reutiliza el formulario nativo de Moodle con nombres de colección para el título, los campos y la ruta de navegación. El selector se limita a Biblioteca y sus subcategorías. En los accesos de creación del portal se oculta la navegación secundaria «Categoría / Más» mediante la API de página de Moodle, sin modificar el tema ni el core.
+El formulario anterior de colección queda para la administración de contenido existente; no es el acceso Nuevo documento del portal. Reutiliza el formulario nativo de Moodle con nombres de colección para el título, los campos y la ruta de navegación. El selector se limita a Biblioteca y sus subcategorías. En los accesos de creación del portal se oculta la navegación secundaria «Categoría / Más» mediante la API de página de Moodle, sin modificar el tema ni el core.
 
 El formulario de nueva colección muestra nombre, código corto, categoría, visibilidad, identificador opcional, descripción e imagen de portada, además de idioma, archivos, grupos y etiquetas. Las ayudas también usan terminología de Biblioteca. La imagen de portada admite imágenes; no es el lugar para cargar documentos.
 
@@ -96,11 +95,11 @@ En **Administración > Gestionar categorías > Biblioteca**, pulsar **Eliminar**
 
 La categoría debe estar vacía: no puede contener subcategorías ni colecciones documentales, incluidos los ocultos. Moverlos primero mediante las herramientas nativas de Moodle. La raíz **Biblioteca** está protegida y no ofrece eliminación; tampoco se pueden eliminar categorías de otra sección manipulando la URL.
 
-El portal utiliza `core_course_category::delete_move()` hacia la categoría superior después de comprobar que no existen cursos ni subcategorías. Moodle gestiona contextos, cachés y eventos, y conserva otros contenidos del contexto mediante su traslado nativo. Se exige confirmación mediante POST con `sesskey` y se comprueba de nuevo que la categoría esté vacía. No se modifica el core ni se borran cursos o documentos.
+El portal utiliza `core_course_category::delete_move()` hacia la categoría superior después de comprobar que no existen cursos ni subcategorías. Moodle gestiona contextos, cachés y eventos, y conserva otros contenidos del contexto mediante su traslado nativo. Se exige confirmación mediante POST con `sesskey` y se comprueba de nuevo que la categoría esté vacía. No se borran documentos ni cursos de contenido: únicamente se limpian contenedores técnicos vacíos del nuevo flujo. No se modifica el core.
 
 ## Implementación y comprobación
 
-La generación de columnas, la consulta de recursos permitidos y la búsqueda se reúnen en `classes/library_browser.php`, reutilizando `orange_native_courses()` y `get_fast_modinfo()`. Las categorías siguen gestionadas con las APIs nativas; no se crean tablas ni se modifica el core o Moove. La presentación por columnas requiere código porque no existe un ajuste nativo para ese recorrido dentro del portal. Los textos nuevos están en español e inglés y el diseño sigue limitado a la cohorte Orange.
+La generación de columnas, la consulta de recursos permitidos y la búsqueda se reúnen en `classes/library_browser.php`, reutilizando `orange_native_courses()` y `get_fast_modinfo()`. Las categorías siguen gestionadas con las APIs nativas; la relación con los contenedores nativos se guarda en `local_orange_container`. No se modifica el core ni Moove. La presentación por columnas requiere código porque no existe un ajuste nativo para ese recorrido dentro del portal. Los textos nuevos están en español e inglés y el diseño sigue limitado a la cohorte Orange.
 
 `node scripts/test-orange-browser.mjs --library-columns-only` comprueba el recorrido, selección, apertura, búsqueda, móvil, traducciones y que Formaciones abra directamente su página. `php local/orangeportal/cli/check_library_browser.php` dentro del contenedor comprueba búsquedas globales y permisos, incluidos recursos ocultos, restricciones por grupo y capacidades de módulo; revierte todas las actividades y roles temporales.
 

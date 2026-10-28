@@ -42,7 +42,11 @@ if ($id || $new || $_SERVER['REQUEST_METHOD'] === 'POST') {
                 ['context' => context_system::instance(), 'filter' => false]),
             'impact' => $data->impact, 'state' => $data->state, 'published' => (int)$data->published];
         if ($kind === 'incidents') { $record->client = $data->client; $record->product = $data->product; }
-        service::save_notice($record, ['user' => $data->users ?? [], 'cohort' => $data->cohorts ?? [], 'group' => $data->groups ?? []]);
+        $savedid = service::save_notice($record, ['user' => $data->users ?? [], 'cohort' => $data->cohorts ?? [], 'group' => $data->groups ?? []]);
+        if (!empty($data->saveandresources)) {
+            \local_orangeportal\native_content::notice_container($savedid);
+            redirect(orange_link('resources.php', ['notice' => $savedid]));
+        }
         redirect($url, get_string('publicationsaved', 'local_orangeportal'), null, \core\output\notification::NOTIFY_SUCCESS);
     }
     if ($id) {
@@ -70,7 +74,7 @@ if ($form) { $form->display(); } else {
             ['kind' => $kind, 'delete' => $n->id]), get_string('delete')) : '';
         $table->data[] = [s($n->title), orange_category_label((int)$n->categoryid, $categories), $n->published ? get_string('published', 'local_orangeportal') : get_string('draft', 'local_orangeportal'),
             s(service::states()[$n->state]), html_writer::link(orange_link('manage.php', ['kind' => $kind, 'id' => $n->id]), get_string('edit')) .
-            ' · ' . html_writer::link(orange_link('view.php', ['id' => $n->id]), get_string('viewnotice', 'local_orangeportal')) . $deleteaction];
+            ' · ' . html_writer::link(orange_link('view.php', ['id' => $n->id]), get_string('viewnotice', 'local_orangeportal')) . ' · ' . html_writer::link(orange_link('resources.php', ['notice' => $n->id]), get_string('nativeactivities', 'local_orangeportal')) . $deleteaction];
     }
     echo html_writer::table($table);
 }

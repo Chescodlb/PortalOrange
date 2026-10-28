@@ -230,3 +230,10 @@ Para actualizar permisos en el futuro: editar el rol Orange desde Definir roles,
 - [Perfiles de consulta](14-perfiles-consulta.md), [Administración Orange](11-administrador-orange.md) y [Seguimiento](09-informes.md) amplían los procedimientos concretos.
 
 Los permisos y asignaciones viven en la base de datos de cada Moodle; subir carpetas de código no replica las asignaciones de personas. El código define las capacidades y las comprobaciones, mientras Moodle conserva roles, contextos, cohortes y matrículas. Instalar el plugin crea sus tres roles auxiliares/delegados; los inicializadores `configure_demo.php` y `configure_consultation_demo.php` son solo para localhost y pueden reaplicar permisos de demo. No utilizarlos para mantener perfiles reales.
+
+
+## Rol técnico para recursos desde 2026102700
+
+La actualización crea **Autor de recursos Orange** (`orange_autorrecursos`). Es un rol nativo de curso para los contenedores de Biblioteca y publicaciones, con las capacidades de edición de actividades del arquetipo Profesor con edición, sin gestión de matrículas ni roles. El portal añade `moodle/course:view` en ese contexto para permitir el acceso del autor al contenedor. No se asigna al sistema ni se importa manualmente para los agentes.
+
+El portal lo asigna automáticamente cuando la persona conserva el permiso para crear contenido en la categoría de Biblioteca o gestionar la publicación. El acceso nativo comprueba ese ámbito y retira las asignaciones automáticas de quien pierde el permiso. Los roles de Formación, Coordinación, Calidad y Administración no se sustituyen. [Guía de funcionamiento y despliegue](16-actividades-recursos-y-colecciones.md).

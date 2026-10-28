@@ -56,19 +56,16 @@ if (in_array($section, ['library', 'courses']) ?
     $manageurl = in_array($section, ['library', 'courses']) ? orange_link('categories.php', ['kind' => $section]) :
         orange_link('manage.php', ['kind' => $section]);
     echo html_writer::div(html_writer::link($manageurl, 'Gestionar ' . strtolower($titles[$section]),
-        ['class' => 'btn btn-outline-secondary']), 'orange-toolbar');
+        ['class' => $section === 'courses' ? 'btn btn-primary' : 'btn btn-outline-secondary']), 'orange-toolbar');
 }
 if (in_array($section, ['library', 'courses'])) {
     $rootid = (int)get_config('local_orangeportal', $section === 'library' ? 'librarycategory' : 'coursescategory');
     $root = core_course_category::get($rootid, MUST_EXIST, true);
     $actions = '';
-    if ($section === 'library' && array_filter(orange_native_courses($rootid), fn($c) =>
-            (has_capability('mod/resource:addinstance', context_course::instance($c->id)) ||
-                has_capability('mod/page:addinstance', context_course::instance($c->id))) &&
-            has_capability('moodle/course:manageactivities', context_course::instance($c->id)))) {
-        $actions .= html_writer::link(orange_link('add_document.php'), 'Nuevo documento', ['class' => 'btn btn-primary']);
+    if ($section === 'library' && \local_orangeportal\native_content::library_options()) {
+        $actions .= html_writer::link(orange_link('add_document.php', ['category' => $category]), get_string('newdocument', 'local_orangeportal'), ['class' => 'btn btn-primary']);
     }
-    if (has_capability('moodle/course:create', context_coursecat::instance($rootid))) {
+    if ($section === 'courses' && has_capability('moodle/course:create', context_coursecat::instance($rootid))) {
         $destination = $category && $DB->record_exists_select('course_categories',
             'id = ? AND (id = ? OR path LIKE ?)', [$category, $rootid, $root->path . '/%']) ? $category : $rootid;
         if (has_capability('moodle/course:create', context_coursecat::instance($destination))) {
@@ -79,6 +76,7 @@ if (in_array($section, ['library', 'courses'])) {
                 ['class' => 'btn btn-primary orange-create-course']);
         }
     }
+    if ($section === 'courses') { $actions .= html_writer::link(orange_link('collections.php'), get_string('nativecollections', 'local_orangeportal'), ['class' => 'btn btn-primary']); }
     if ($actions) { echo html_writer::div($actions, 'orange-toolbar orange-content-actions'); }
 }
 if ($section === 'library') {

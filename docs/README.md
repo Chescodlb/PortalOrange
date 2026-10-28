@@ -32,3 +32,5 @@ La [decisión de implementación](implementacion.md) explica qué necesita códi
 - Manual para operadores: [Usuarios, permisos y colectivos en PDF](manuales/Guia_usuarios_permisos_y_colectivos_Orange.pdf) y [Word editable](manuales/Guia_usuarios_permisos_y_colectivos_Orange.docx).
 
 - Primera instalación en producción e incidencias: [PDF](manuales/Guia_despliegue_produccion_Orange.pdf), [Word editable](manuales/Guia_despliegue_produccion_Orange.docx) y [comandos en una línea](manuales/Comandos_despliegue_Orange.txt).
+
+- [Actividades y recursos por categoría/publicación, colecciones formativas y actualización](16-actividades-recursos-y-colecciones.md).

@@ -5,6 +5,7 @@ require(__DIR__ . '/../../../config.php');
 require_once(__DIR__ . '/../locallib.php');
 use local_orangeportal\form\notice;
 use local_orangeportal\service;
+use local_orangeportal\notice_options;
 if (!str_starts_with($CFG->wwwroot, 'http://localhost:')) { cli_error('Prueba limitada a local.'); }
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/orangeportal/manage.php');
@@ -33,6 +34,11 @@ function save_notice_form(stdClass $data): int {
 }
 try {
     \core\session\manager::set_user($editor);
+    $defaultstate = notice_options::default_code('states');
+    $defaultimpact = notice_options::default_code('impacts');
+    $teststate = isset(service::states(true)['progress']) ? 'progress' : $defaultstate;
+    $testimpact = isset(service::impacts(true)['high']) ? 'high' : $defaultimpact;
+    $criticalimpact = isset(service::impacts(true)['critical']) ? 'critical' : $defaultimpact;
     foreach (['notifications', 'incidents'] as $kind) {
         $categories = $DB->get_records('local_orange_category', ['kind' => $kind], 'id', '*', 0, 1);
         $category = reset($categories);
@@ -40,11 +46,11 @@ try {
             'categoryid' => $category->id, 'body' => ['text' => '<p>Contenido inicial</p>', 'format' => FORMAT_HTML, 'itemid' => 0],
             'users' => [$agent->id], 'published' => 1, 'submitbutton' => 'Guardar publicación'];
         // Frozen notification fields are deliberately omitted, as in the browser POST.
-        if ($kind === 'incidents') { $values += ['state' => 'progress', 'impact' => 'high']; }
+        if ($kind === 'incidents') { $values += ['state' => $teststate, 'impact' => $testimpact]; }
         $data = submit_notice_form($kind, $values);
         form_check($data !== null, 'Formulario valida: ' . $kind);
-        form_check($data->state === ($kind === 'notifications' ? 'open' : 'progress') &&
-            $data->impact === ($kind === 'notifications' ? 'normal' : 'high'), 'Estado e impacto válidos: ' . $kind);
+        form_check($data->state === ($kind === 'notifications' ? $defaultstate : $teststate) &&
+            $data->impact === ($kind === 'notifications' ? $defaultimpact : $testimpact), 'Estado e impacto válidos: ' . $kind);
         $id = save_notice_form($data);
         $saved = $DB->get_record('local_orange_notice', ['id' => $id], '*', MUST_EXIST);
         form_check($saved->kind === $kind && $saved->published && service::can_view($saved, (int)$agent->id, false),
@@ -58,15 +64,17 @@ try {
         $draftid = save_notice_form(submit_notice_form($kind, $values));
         form_check((int)$DB->get_field('local_orange_notice', 'published', ['id' => $draftid]) === 0,
             'Borrador guardado con cohorte: ' . $kind);
+        $values['id'] = 0; $values['body']['text'] = '';
+        form_check(submit_notice_form($kind, $values) !== null, 'Descripción opcional para publicación con actividades: ' . $kind);
     }
     foreach (['' => 'formulario antiguo', 'closed' => 'valor alterado'] as $postedstate => $label) {
         foreach ($DB->get_records('local_orange_category', ['kind' => 'notifications'], 'id') as $category) {
             $values = ['id' => 0, 'revision' => 1, 'kind' => 'notifications', 'title' => 'Pruebas nueva Notificación',
                 'categoryid' => $category->id, 'body' => ['text' => '<p>Prueba del título indicado</p>', 'format' => FORMAT_HTML, 'itemid' => 0],
-                'users' => [$agent->id], 'published' => 1, 'state' => $postedstate, 'impact' => $postedstate === '' ? '' : 'critical'];
+                'users' => [$agent->id], 'published' => 1, 'state' => $postedstate, 'impact' => $postedstate === '' ? $defaultimpact : $criticalimpact];
             $data = submit_notice_form('notifications', $values);
-            form_check($data && $data->state === 'open' && $data->impact === 'normal',
-                'Campos constantes prevalecen: ' . $label . ' / ' . $category->name);
+            form_check($data && $data->state === $defaultstate && $data->impact === ($postedstate === '' ? $defaultimpact : $criticalimpact),
+                'Estado protegido e impacto editable: ' . $label . ' / ' . $category->name);
             $id = save_notice_form($data);
             form_check($DB->get_field('local_orange_notice', 'title', ['id' => $id]) === 'Pruebas nueva Notificación',
                 'Título con tilde guardado: ' . $label . ' / ' . $category->name);

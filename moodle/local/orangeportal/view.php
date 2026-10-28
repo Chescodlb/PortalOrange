@@ -23,6 +23,7 @@ echo $OUTPUT->header();
 if ($notice->kind === 'incidents') {
     echo html_writer::link(orange_link('index.php', ['section' => 'incidents']), get_string('backtolist', 'local_orangeportal'));
     echo \local_orangeportal\incident_detail::render($notice);
+    echo \local_orangeportal\native_content::notice_html($notice);
     echo $OUTPUT->footer();
     exit;
 }
@@ -33,6 +34,7 @@ echo orange_intro($category->name, $notice->title, get_string('noticeversiondate
 echo html_writer::div(s(get_string('incidentcolumnimpact', 'local_orangeportal') . ': ' .
     service::impacts()[$notice->impact]), 'orange-notice-impact');
 echo html_writer::div(format_text($notice->content, FORMAT_HTML, ['context' => context_system::instance()]), 'orange-notice-content');
+echo \local_orangeportal\native_content::notice_html($notice);
 if ($receipt && service::can_view($notice, (int)$USER->id, false)) {
     echo html_writer::div(get_string('receiptdates', 'local_orangeportal', (object)['received' => userdate($receipt->received), 'read' => userdate($receipt->readtime)]), 'orange-receipt');
 } else { echo $OUTPUT->notification(get_string($notice->kind === 'incidents' ? 'incidentmanagementpreview' : 'managementpreview', 'local_orangeportal'), 'info'); }

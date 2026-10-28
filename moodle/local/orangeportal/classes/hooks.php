@@ -36,6 +36,8 @@ class hooks {
             $category = $DB->get_record('course_categories', ['id' => $PAGE->course->category]);
             $rootid = (int)get_config('local_orangeportal', 'librarycategory');
             $key = $category && in_array($rootid, array_map('intval', explode('/', $category->path))) ? 'library' : 'courses';
+            $map = native_content::mapping((int)$PAGE->course->id);
+            if ($map && $map->kind === 'notice') { $key = $DB->get_field('local_orange_notice', 'kind', ['id' => $map->noticeid]); }
             $PAGE->set_primary_active_tab('orange_' . $key);
         }
         if (is_siteadmin() || has_capability('local/orangeportal:administer', \context_system::instance()) || has_capability('local/orangeportal:manage', \context_system::instance()) ||
@@ -65,6 +67,13 @@ class hooks {
             $staff = $staff || has_capability('local/orangeportal:' . $cap, \context_system::instance());
         }
         if (!$staff) { $PAGE->add_body_class('orange-agent-menu'); }
+        if ($PAGE->course->id != SITEID && ($map = native_content::mapping((int)$PAGE->course->id))) {
+            $path = parse_url($CFG->wwwroot . '/course/view.php', PHP_URL_PATH);
+            if ($PAGE->url->get_path() === $path) {
+                redirect($map->kind === 'notice' ? new \moodle_url('/local/orangeportal/view.php', ['id' => $map->noticeid]) :
+                    new \moodle_url('/local/orangeportal/index.php', ['section' => 'library', 'category' => $map->categoryid]));
+            }
+        }
         course_creation::presentation();
         breadcrumb::apply();
         // Error pages may default PAGE->url to the site root; use the actual request.

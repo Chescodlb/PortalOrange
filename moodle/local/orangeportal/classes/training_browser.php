@@ -79,16 +79,20 @@ class training_browser {
             $detail = \html_writer::tag('p', s($path), ['class' => 'orange-library-document-path']) .
                 \html_writer::tag('h4', s($course->fullname)) .
                 format_text($course->summary, $course->summaryformat, ['context' => $context]) .
+                \html_writer::start_div('orange-training-actions') .
                 \html_writer::link(new \moodle_url('/course/view.php', ['id' => $course->id]), get_string('trainingopen', 'local_orangeportal'),
                     ['class' => 'btn btn-primary orange-training-open']);
+
+            $detail .= \html_writer::link(\orange_link('collections.php', ['course' => $course->id]), get_string('nativecollections', 'local_orangeportal'), ['class' => 'btn btn-primary']);
             if (has_capability('moodle/course:manageactivities', $context)) {
                 $detail .= \html_writer::div(\orange_post_button(new \moodle_url('/course/view.php', ['id' => $course->id]),
                     get_string('trainingedit', 'local_orangeportal'), ['edit' => 1]), 'orange-card-edit');
                 if (has_capability('mod/quiz:addinstance', $context)) {
                     $detail .= \html_writer::link(new \moodle_url('/course/modedit.php', ['add' => 'quiz', 'course' => $course->id, 'section' => 0, 'return' => 0]),
-                        get_string('trainingnewquiz', 'local_orangeportal'), ['class' => 'btn btn-outline-secondary orange-create-quiz']);
+                        get_string('trainingnewquiz', 'local_orangeportal'), ['class' => 'btn btn-primary orange-create-quiz']);
                 }
             }
+            $detail .= \html_writer::end_div();
         } else { $detail = \html_writer::tag('p', get_string($selectedcourse ? 'trainingunavailable' : 'trainingselect', 'local_orangeportal')); }
         $panel = \html_writer::tag('section', $heading . $listing . \html_writer::div($detail, 'orange-library-detail'),
             ['class' => 'orange-library-column orange-library-results', 'aria-label' => get_string('trainingcourses', 'local_orangeportal')]);

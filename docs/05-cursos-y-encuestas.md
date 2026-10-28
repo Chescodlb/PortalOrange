@@ -36,7 +36,7 @@ La instalación local mantiene el correo desactivado. Para procesar tareas local
 
 ## Categorías al crear desde el portal
 
-Al pulsar «Nuevo curso» desde Formaciones, el selector del formulario nativo muestra la raíz Cursos y sus subcategorías, respetando el permiso `moodle/course:create`. «Nueva colección documental» desde Biblioteca limita el selector a Biblioteca. No es necesario retirar al formador sus permisos de la otra sección.
+Al pulsar «Nuevo curso» desde Formaciones, el selector del formulario nativo muestra la raíz Cursos y sus subcategorías, respetando el permiso `moodle/course:create`. Biblioteca utiliza Nuevo documento para añadir actividades directamente a sus categorías. No es necesario retirar al formador sus permisos de la otra sección.
 
 La ruta de navegación al crear un curso es **Formaciones > Crear un nuevo curso**; el primer enlace vuelve a la raíz de Cursos. No muestra «Página Principal» ni lleva a Biblioteca.
 
@@ -77,3 +77,10 @@ En la demo local, `cli/configure_training_branches.php` crea las dos categorías
 
 - `docker compose exec -T web php local/orangeportal/cli/check_training_browser.php`: ramas, búsquedas globales, IDs manipulados, separación documental y visibilidad por rol; revierte cambios temporales.
 - `node scripts/test-orange-browser.mjs --training-columns-only`: recorrido, fichas, orden, idioma, móvil y herramientas del Formador.
+
+
+## Colecciones y bloques laterales
+
+Desde **Formaciones > Colecciones de formación**, seleccionar un curso para ver sus secciones existentes. Cada colección equivale a una sección nativa: Formación puede crearla por nombre, editarla y añadir actividades o recursos desde su bloque. El agente solo consulta las secciones y recursos disponibles según su matrícula y restricciones.
+
+**Editar formación y bloques laterales** abre la edición nativa del curso, incluido **Agregar un bloque**. Se conservan las capacidades y los bloques instalados de Moodle; no se crea otro sistema de contenidos. [Pasos y actualización](16-actividades-recursos-y-colecciones.md).

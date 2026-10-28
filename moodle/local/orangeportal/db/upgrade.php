@@ -90,5 +90,18 @@ function xmldb_local_orangeportal_upgrade($oldversion): bool {
         \local_orangeportal\orange_administration::install_roles();
         upgrade_plugin_savepoint(true, 2026102003, 'local', 'orangeportal');
     }
+    if ($oldversion < 2026102700) {
+        $table = new xmldb_table('local_orange_container');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table->add_field('kind', XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL);
+        foreach (['categoryid', 'noticeid'] as $field) { $table->add_field($field, XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0'); }
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('course', XMLDB_KEY_FOREIGN_UNIQUE, ['courseid'], 'course', ['id']);
+        $table->add_index('containerowner', XMLDB_INDEX_UNIQUE, ['kind', 'categoryid', 'noticeid']);
+        if (!$DB->get_manager()->table_exists($table)) { $DB->get_manager()->create_table($table); }
+        \local_orangeportal\native_content::install_roles();
+        upgrade_plugin_savepoint(true, 2026102700, 'local', 'orangeportal');
+    }
     return true;
 }

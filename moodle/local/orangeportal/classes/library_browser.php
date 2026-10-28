@@ -4,7 +4,6 @@ defined('MOODLE_INTERNAL') || die();
 
 /** Column navigation over native categories and permission-filtered Moodle resources. */
 class library_browser {
-    private const MODULES = ['resource', 'page', 'book', 'folder', 'url'];
 
     public static function categories(int $rootid): array {
         global $DB;
@@ -19,24 +18,28 @@ class library_browser {
         $documents = [];
         $readtimes = document_reads::times((int)$USER->id);
         $instances = [];
+        foreach ($DB->get_records('local_orange_container', ['kind' => 'library']) as $map) {
+            if (native_content::can_author($map)) { native_content::author((int)$map->courseid); }
+        }
         foreach (\orange_native_courses($rootid) as $course) {
             foreach (get_fast_modinfo($course)->get_cms() as $cm) {
-                if (!in_array($cm->modname, self::MODULES, true) || !$cm->uservisible ||
+                if (!$cm->uservisible ||
                         !$cm->is_visible_on_course_page()) { continue; }
                 $viewcap = 'mod/' . $cm->modname . ($cm->modname === 'book' ? ':read' : ':view');
-                if (!has_capability($viewcap, \context_module::instance($cm->id))) { continue; }
+                if (get_capability_info($viewcap) && !has_capability($viewcap, \context_module::instance($cm->id))) { continue; }
                 $documents[$cm->id] = (object)['id' => (int)$cm->id, 'name' => $cm->name,
                     'published' => (bool)($course->visible && $cm->visible && get_fast_modinfo($course)->get_section_info($cm->sectionnum)->visible),
                     'added' => 0, 'category' => (int)$course->category, 'collection' => $course->fullname,
                     'courseid' => (int)$course->id, 'module' => $cm->modname, 'instance' => (int)$cm->instance,
-                    'description' => '', 'modified' => 0, 'readtime' => (int)($readtimes[$cm->id] ?? 0), 'url' => new \moodle_url('/mod/' . $cm->modname . '/view.php', ['id' => $cm->id])];
+                    'description' => '', 'modified' => 0, 'readtime' => (int)($readtimes[$cm->id] ?? 0), 'url' => $cm->url ?: new \moodle_url('/local/orangeportal/activity.php', ['id' => $cm->id])];
                 $instances[$cm->modname][$cm->instance] = $cm->instance;
             }
         }
         $added = $documents ? $DB->get_records_list('course_modules', 'id', array_keys($documents), '', 'id, added') : [];
         $intros = [];
         foreach ($instances as $module => $ids) {
-            $intros[$module] = $DB->get_records_list($module, 'id', array_values($ids), '', 'id, intro, timemodified');
+            $fields = array_intersect(['id', 'intro', 'timemodified'], array_keys($DB->get_columns($module)));
+            $intros[$module] = $DB->get_records_list($module, 'id', array_values($ids), '', implode(',', $fields));
         }
         foreach ($documents as $doc) {
             $doc->added = (int)($added[$doc->id]->added ?? 0);
@@ -176,9 +179,15 @@ class library_browser {
                 \html_writer::link($doc->url, get_string('libraryopendocument', 'local_orangeportal'),
                     ['class' => 'btn btn-primary orange-library-open']);
             if (has_capability('moodle/course:manageactivities', \context_course::instance($doc->courseid))) {
-                $details .= \html_writer::link(new \moodle_url('/course/view.php', ['id' => $doc->courseid]),
-                    get_string('librarymanagecollection', 'local_orangeportal'),
-                    ['class' => 'orange-library-manage']);
+                $details .= \html_writer::link(new \moodle_url('/course/modedit.php', ['update' => $doc->id, 'return' => 0]),
+                    get_string('nativeeditactivity', 'local_orangeportal'),
+                    ['class' => 'btn btn-primary orange-library-manage']);
+            }
+            if (has_capability('moodle/course:manageactivities', \context_module::instance($doc->id))) {
+                // Moodle handles the confirmation, session validation and module deletion.
+                $details .= \html_writer::link(new \moodle_url('/course/mod.php',
+                    ['delete' => $doc->id, 'sesskey' => sesskey()]), get_string('delete'),
+                    ['class' => 'btn btn-primary orange-library-delete']);
             }
         } else {
             $details = \html_writer::tag('p', get_string($selecteddocument ? 'librarydocumentunavailable' : 'libraryselectdocument',

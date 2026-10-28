@@ -74,3 +74,10 @@ Se reutiliza el campo `local_orange_notice.impact` y el catálogo compartido de 
 ## Informes separados
 
 **Administración > Seguimiento** separa Comunicados e Incidencias en un selector por tipo, resúmenes de leídos/sin leer por publicación y detalle por destinatario, con paginación de 25 filas. Se retiró la confirmación manual del detalle, de los filtros y del CSV; se conservan las evidencias históricas. Ver [informes](09-informes.md).
+
+
+## Actividades y recursos dentro de la publicación
+
+La descripción es opcional. **Guardar y gestionar actividades y recursos** abre un espacio propio donde Formación añade uno o varios módulos con sus formularios nativos. El listado administrativo y la ficha también ofrecen acceso a este gestor. Los datos, destinatarios, impacto, estado y lecturas de la publicación se conservan.
+
+Los recursos respetan el acceso de la publicación incluso al abrir una URL nativa o descargar un archivo. Añadir, editar o borrar una actividad crea una revisión pendiente de lectura y conserva el historial anterior. Leer la publicación no equivale a finalizar todas sus actividades. [Guía paso a paso y despliegue](16-actividades-recursos-y-colecciones.md).

@@ -66,3 +66,10 @@ Al abrir una incidencia, la ficha muestra su identificador y título, una tabla 
 Formador y Administración conservan los enlaces de edición/seguimiento junto al título; el cambio de estado y su histórico están en el bloque desplegable **Gestión e histórico de estados**, antes de la descripción. Coordinación dispone de consulta/seguimiento sin controles de modificación. Los agentes solo consultan los datos y la descripción. Abrir la ficha sigue registrando la lectura individual antes de dibujar la cabecera, sin confirmación manual ni cambio de estado.
 
 `classes/incident_detail.php` genera la ficha y `view.php` conserva la autorización y las operaciones. No se altera el detalle de Comunicados, la base de datos, Moodle ni Moove. Los encabezados y controles están en español e inglés.
+
+
+## Actividades y recursos dentro de la publicación
+
+La descripción es opcional. **Guardar y gestionar actividades y recursos** abre un espacio propio donde Formación añade uno o varios módulos con sus formularios nativos. El listado administrativo y la ficha también ofrecen acceso a este gestor. Los datos, destinatarios, impacto, estado y lecturas de la publicación se conservan.
+
+Los recursos respetan el acceso de la publicación incluso al abrir una URL nativa o descargar un archivo. Añadir, editar o borrar una actividad crea una revisión pendiente de lectura y conserva el historial anterior. Leer la publicación no equivale a finalizar todas sus actividades. [Guía paso a paso y despliegue](16-actividades-recursos-y-colecciones.md).
