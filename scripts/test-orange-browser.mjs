@@ -63,7 +63,70 @@ try {
   };
   const nav = () => evaluate(`Array.from(document.querySelectorAll('.primary-navigation .nav-link')).filter(x=>x.textContent.trim()!=='').map(x=>x.textContent.trim()).filter(x=>!['Más','More'].includes(x))`);
   await send('Page.enable'); await send('Runtime.enable');
-  if (process.argv.includes('--native-chooser-only')) {
+  if (process.argv.includes('--notice-opening-only')) {
+    const fixture=JSON.parse(await readFile('backups/previews/native-content-fixture.json','utf8'));
+    const moduleid=fixture.modules[fixture.course];
+    const edit='/local/orangeportal/manage.php?kind=notifications&id='+fixture.notice;
+    const resources='/local/orangeportal/resources.php?notice='+fixture.notice;
+    const view='/local/orangeportal/view.php?id='+fixture.notice;
+    const configure=async id=>{
+      await navigate(resources+'&lang=es');
+      await wait(`!!document.querySelector('select[name="openactivity"]')`);
+      await evaluate(`document.querySelector('select[name="openactivity"]').value=${JSON.stringify(String(id))};document.querySelector('[name="submitbutton"]').click()`);
+      await wait(`!!document.querySelector('.alert-success')&&document.readyState!=='loading'`);
+    };
+    await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
+    for(const lang of ['es','en']) {
+      await navigate(resources+'&lang='+lang);
+      check(await evaluate(`!!document.querySelector('select[name="openactivity"] option[value="${moduleid}"]')&&!document.body.textContent.includes('[[')`),lang+': apertura por publicación traducida con sus recursos');
+    }
+    await navigate(edit);
+    check(await evaluate(`!document.querySelector('select[name="openactivity"]')`),'El formulario inicial no pide recursos todavía inexistentes');
+    await configure(moduleid);
+    await navigate(view);
+    check(await evaluate(`location.pathname==='/local/orangeportal/view.php'&&!!document.querySelector('.orange-notice-resources')`),'Formador siempre abre la ficha aunque el agente abra un recurso');
+    await navigate(resources);
+    await evaluate(`document.querySelector('button.section-modchooser-link').click()`);
+    await wait(`!!document.querySelector('.modal.show .modchooser [data-internal="url"] a[data-action="add-chooser-option"]')`);
+    await evaluate(`Array.from(document.querySelectorAll('.modal.show .modchooser [data-internal="url"] a[data-action="add-chooser-option"]')).find(x=>x.getClientRects().length).click()`);
+    await wait(`location.pathname==='/course/modedit.php'&&!!document.querySelector('input[name="externalurl"]')`);
+    check(await evaluate(`!!document.querySelector('[name="submitbutton2"]')&&!document.querySelector('[name="submitbutton"]')`),'Formulario nativo ofrece guardar y volver a los recursos');
+    await evaluate(`document.querySelector('[name="name"]').value='TESTWEB URL añadida';document.querySelector('[name="externalurl"]').value='https://example.org/';document.querySelector('[name="submitbutton2"]').click()`);
+    await wait(`location.pathname==='/local/orangeportal/resources.php'&&document.body.textContent.includes('TESTWEB URL añadida')`);
+    check(await evaluate(`document.querySelectorAll('.orange-native-activity').length>=3`),'Guardar vuelve a recursos y permite añadir múltiples actividades');
+    const update=await evaluate(`Array.from(document.querySelectorAll('.orange-native-activity')).find(x=>x.textContent.includes('TESTWEB URL añadida')).querySelector('a[href*="modedit.php"]').href`);
+    await navigate(update);
+    await evaluate(`document.querySelector('[name="name"]').value='TESTWEB URL editada';document.querySelector('[name="submitbutton2"]').click()`);
+    await wait(`location.pathname==='/local/orangeportal/resources.php'&&document.body.textContent.includes('TESTWEB URL editada')`);
+    check(true,'Editar un recurso también vuelve a la misma gestión');
+    await navigate(update);
+    await evaluate(`document.querySelector('[name="cancel"]').click()`);
+    await wait(`location.pathname==='/local/orangeportal/resources.php'&&!!document.querySelector('select[name="openactivity"]')`);
+    check(true,'Cancelar vuelve a recursos sin perder la publicación');
+    await navigate(resources);
+    check(await evaluate(`document.querySelector('select[name="openactivity"]').value==='${moduleid}'`),'Se conserva la apertura al añadir, editar y cancelar recursos');
+    await screenshot('publicacion-configurar-apertura');
+    await logout();await login('agente.orange',env.ORANGE_DEMO_PASSWORD);
+    await navigate(view);
+    await wait(`location.pathname==='/mod/page/view.php'&&document.body.textContent.includes('ORANGE-NATIVE-')`);
+    check(await evaluate(`new URL(location.href).searchParams.get('id')==='${moduleid}'`),'Comunicado abre directamente su Página sin pantalla intermedia');
+    check(await evaluate(`Array.from(document.querySelectorAll('a')).some(a=>a.href.includes('view.php?id=${fixture.notice}')&&a.href.includes('detail=1'))`),'La actividad conserva un acceso a la ficha');
+    await navigate(view+'&detail=1');
+    check(await evaluate(`!!document.querySelector('.orange-notice-resources')`),'La ficha sigue disponible aunque haya apertura directa');
+    await logout();await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
+    await configure(fixture.label);
+    await logout();await login('agente.orange',env.ORANGE_DEMO_PASSWORD);
+    await navigate(view);
+    await wait(`location.pathname==='/local/orangeportal/activity.php'&&document.body.textContent.includes('ORANGE-INLINE-')`);
+    check(await evaluate(`!document.querySelector('form button[type="submit"]')&&document.querySelector('#region-main').textContent.includes('ORANGE-INLINE-')`),'Área de texto y medios abre directamente sin pedir otro clic');
+    await screenshot('publicacion-apertura-directa-area-texto');
+    await logout();await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
+    await configure(0);
+    await logout();await login('agente.orange',env.ORANGE_DEMO_PASSWORD);
+    await navigate(view);
+    check(await evaluate(`location.pathname==='/local/orangeportal/view.php'&&!!document.querySelector('.orange-notice-resources')`),'Puede restaurarse la apertura de ficha');
+    console.log('Verificaciones de apertura completas: '+results.length);
+  } else if (process.argv.includes('--native-chooser-only')) {
     const fixture=JSON.parse(await readFile('backups/previews/native-content-fixture.json','utf8'));
     const modal='document.querySelector(\'.modal.show .modchooser\')';
     const waitChooser=async()=>{

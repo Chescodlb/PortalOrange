@@ -1,4 +1,10 @@
 <?php
+$string['noticeopening'] = 'Al abrir la publicación';
+$string['noticeopenrecord'] = 'Mostrar la ficha de la publicación';
+$string['noticeopeninghelp'] = 'Elige qué abrirán los usuarios sin permiso de gestión al seleccionar esta publicación. Puedes mostrar la ficha o abrir directamente uno de los recursos de arriba. Si el recurso no está disponible para el usuario, se mostrará la ficha. Los gestores siempre entran en la ficha.';
+$string['noticeopeningsave'] = 'Guardar apertura';
+$string['noticesaveandreturnresources'] = 'Guardar y volver a los recursos';
+$string['noticeopeninginvalid'] = 'Elige la ficha o una actividad o recurso de esta publicación.';
 $string['pluginname'] = 'Portal Orange';
 $string['collection_fullname'] = 'Nombre completo de la colección';
 $string['collection_fullname_help'] = 'Nombre que verán los usuarios al consultar la Biblioteca.';

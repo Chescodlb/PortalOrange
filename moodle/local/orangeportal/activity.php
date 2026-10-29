@@ -10,7 +10,9 @@ $map = native_content::mapping((int)$record->course);
 if ($map && $map->kind === 'notice') {
     $notice = $DB->get_record('local_orange_notice', ['id' => $map->noticeid], '*', MUST_EXIST);
     \local_orangeportal\service::require_view($notice);
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    $direct = optional_param('direct', 0, PARAM_BOOL) && confirm_sesskey() &&
+        (int)($notice->openactivity ?? 0) === $id;
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST' && !$direct) {
         orange_page(get_string('nativeopenactivity', 'local_orangeportal'), $notice->kind, orange_link('activity.php', ['id' => $id]));
         echo $OUTPUT->header(); echo orange_post_button($PAGE->url, get_string('nativeopenactivity', 'local_orangeportal'), ['open' => 1]);
         echo $OUTPUT->footer(); exit;
@@ -35,6 +37,10 @@ $PAGE->set_secondary_navigation(false);
 $PAGE->activityheader->disable();
 $PAGE->set_title($cm->name); $PAGE->set_heading($cm->name);
 echo $OUTPUT->header();
+if ($map && $map->kind === 'notice') {
+    echo html_writer::link(orange_link('view.php', ['id' => $notice->id, 'detail' => 1]),
+        get_string('viewnotice', 'local_orangeportal'), ['class' => 'btn btn-primary']);
+}
 echo $OUTPUT->heading(format_string($cm->name));
 echo $cm->content;
 if ($map && $map->kind === 'notice') { \local_orangeportal\service::receipt($notice, 'readtime'); }

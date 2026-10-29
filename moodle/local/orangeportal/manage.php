@@ -74,7 +74,7 @@ if ($form) { $form->display(); } else {
             ['kind' => $kind, 'delete' => $n->id]), get_string('delete')) : '';
         $table->data[] = [s($n->title), orange_category_label((int)$n->categoryid, $categories), $n->published ? get_string('published', 'local_orangeportal') : get_string('draft', 'local_orangeportal'),
             s(service::states()[$n->state]), html_writer::link(orange_link('manage.php', ['kind' => $kind, 'id' => $n->id]), get_string('edit')) .
-            ' · ' . html_writer::link(orange_link('view.php', ['id' => $n->id]), get_string('viewnotice', 'local_orangeportal')) . ' · ' . html_writer::link(orange_link('resources.php', ['notice' => $n->id]), get_string('nativeactivities', 'local_orangeportal')) . $deleteaction];
+            ' · ' . html_writer::link(orange_link('view.php', ['id' => $n->id, 'detail' => 1]), get_string('viewnotice', 'local_orangeportal')) . ' · ' . html_writer::link(orange_link('resources.php', ['notice' => $n->id]), get_string('nativeactivities', 'local_orangeportal')) . $deleteaction];
     }
     echo html_writer::table($table);
 }

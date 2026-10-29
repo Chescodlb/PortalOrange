@@ -220,6 +220,10 @@ class service {
         $existing = !empty($data->id) ? $DB->get_record('local_orange_notice',
             ['id' => $data->id, 'kind' => $data->kind], '*', MUST_EXIST) : null;
         if ($existing && !empty($existing->deleted)) { throw new \invalid_parameter_exception('Deleted publication'); }
+        if (isset($data->openactivity) && !array_key_exists((int)$data->openactivity, native_content::opening_options($existing))) {
+            throw new \invalid_parameter_exception(get_string('noticeopeninginvalid', 'local_orangeportal'));
+        }
+        $data->openactivity = (int)($data->openactivity ?? $existing->openactivity ?? 0);
         incident_workflow::change_metadata($data, $existing);
         notice_options::validate_selection('states', $data->state, $existing->state ?? null);
         notice_options::validate_selection('impacts', $data->impact, $existing->impact ?? null);

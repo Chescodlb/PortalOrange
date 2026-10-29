@@ -71,8 +71,31 @@ try {
         native_page($nativeid, 'TEST segundo recurso ' . $kind);
         native_check(count(content::activities($nativeid)) === 2, "$kind admite varios recursos sin descripción obligatoria");
         native_check(!isset(local_orangeportal\orange_scope::course_ids()[$nativeid]), "$kind no aparece como formación ni colección de Biblioteca");
+        $notice = $DB->get_record('local_orange_notice', ['id' => $id]);
+        native_check(content::opening_activity($notice) === null, "$kind existente abre la ficha por defecto");
+        native_check(isset(content::opening_options($notice)[$resource->coursemodule]) &&
+            !isset(content::opening_options($notice)[$page->coursemodule]), "$kind solo permite elegir sus propias actividades");
+        $notice->openactivity = $page->coursemodule;
+        native_denied(fn() => service::save_notice(clone $notice, ['user' => [$agent->id]]), "$kind rechaza un recurso de otra publicación o Biblioteca");
+        $notice->openactivity = $resource->coursemodule;
+        content::save_opening($id, (int)$resource->coursemodule, (int)$notice->revision, 0);
+        native_check($DB->get_field('local_orange_notice', 'revision', ['id' => $id]) == $notice->revision,
+            "$kind configurar apertura no cambia contenido ni reinicia lecturas");
+        native_denied(fn() => content::save_opening($id, 0, (int)$notice->revision, 0),
+            "$kind una pantalla antigua no sobrescribe una elección posterior");
         \core\session\manager::set_user($agent);
         $notice = $DB->get_record('local_orange_notice', ['id' => $id]);
+        native_denied(fn() => content::save_opening($id, 0, (int)$notice->revision, (int)$notice->openactivity),
+            "$kind agente no puede cambiar la apertura");
+        native_check(content::opening_activity($notice)?->id == $resource->coursemodule &&
+            !service::get_receipt($notice, $agent->id), "$kind resuelve la apertura directa sin completar ni leer durante la comprobación");
+        $DB->set_field('course_modules', 'visible', 0, ['id' => $resource->coursemodule]);
+        rebuild_course_cache($nativeid, true);
+        native_check(content::opening_activity($notice) === null, "$kind recurso oculto vuelve a la ficha");
+        $DB->set_field('course_modules', 'visible', 1, ['id' => $resource->coursemodule]);
+        rebuild_course_cache($nativeid, true);
+        $missing = clone $notice; $missing->openactivity = 2147483647;
+        native_check(content::opening_activity($missing) === null, "$kind recurso eliminado vuelve a la ficha");
         content::enter_notice($nativeid); content::guard($nativeid);
         native_check(is_enrolled(context_course::instance($nativeid), $agent->id, '', true) &&
             !has_capability('moodle/course:manageactivities', context_course::instance($nativeid)), "$kind destinatario abre con rol Estudiante sin edición");
@@ -87,6 +110,7 @@ try {
         $DB->delete_records('local_orange_audience', ['noticeid' => $id]);
         \core\session\manager::set_user($agent);
         native_denied(fn() => local_orangeportal_after_require_login($nativeid, false, null, true, true), "$kind retirar destinatario bloquea URL nativa y pluginfile");
+        native_denied(fn() => content::opening_activity($updated), "$kind apertura directa respeta destinatarios actuales");
         \core\session\manager::set_user($trainer);
         $DB->insert_record('local_orange_audience', (object)['noticeid' => $id, 'targettype' => 'user', 'targetid' => $agent->id]);
         $DB->set_field('local_orange_notice', 'published', 0, ['id' => $id]);

@@ -4,6 +4,43 @@ defined('MOODLE_INTERNAL') || die();
 
 /** Native modules behind category documents, notice resources and training collections. */
 class native_content {
+    /** Navigation preferences do not change publication content, state or reading revision. */
+    public static function save_opening(int $id, int $activity, int $revision, int $previous): void {
+        global $DB;
+        experience::require_access();
+        require_capability('local/orangeportal:manage', \context_system::instance());
+        $lock = \core\lock\lock_config::get_lock_factory('local_orangeportal')->get_lock('notice_' . $id, 10);
+        if (!$lock) { throw new \moodle_exception('locktimeout'); }
+        try {
+            $notice = $DB->get_record('local_orange_notice', ['id' => $id], '*', MUST_EXIST);
+            service::require_view($notice);
+            if ((int)$notice->revision !== $revision || (int)$notice->openactivity !== $previous) {
+                throw new \invalid_parameter_exception(get_string('noticerevisionchanged', 'local_orangeportal'));
+            }
+            if (!array_key_exists($activity, self::opening_options($notice))) {
+                throw new \invalid_parameter_exception(get_string('noticeopeninginvalid', 'local_orangeportal'));
+            }
+            $DB->set_field('local_orange_notice', 'openactivity', $activity, ['id' => $id]);
+        } finally { $lock->release(); }
+    }
+    /** Only native modules belonging to this publication may be configured as its entry point. */
+    public static function opening_options(?\stdClass $notice): array {
+        global $DB;
+        $options = [0 => get_string('noticeopenrecord', 'local_orangeportal')];
+        if (!$notice || !($map = self::notice_mapping((int)$notice->id))) { return $options; }
+        foreach ($DB->get_records('course_modules', ['course' => $map->courseid, 'deletioninprogress' => 0], 'id') as $record) {
+            $cm = get_fast_modinfo($map->courseid)->get_cm($record->id);
+            $options[$cm->id] = $cm->name . ' (' . get_string('modulename', $cm->modname) . ')';
+        }
+        return $options;
+    }
+    /** Resolve against this reader's native visibility, availability and module capabilities. */
+    public static function opening_activity(\stdClass $notice): ?\cm_info {
+        service::require_view($notice);
+        if (empty($notice->openactivity) || !($map = self::notice_mapping((int)$notice->id))) { return null; }
+        self::enter_notice((int)$map->courseid);
+        return self::activities((int)$map->courseid)[$notice->openactivity] ?? null;
+    }
     public static function install_roles(): void {
         global $DB;
         $id = $DB->get_field('role', 'id', ['shortname' => 'orange_autorrecursos']);

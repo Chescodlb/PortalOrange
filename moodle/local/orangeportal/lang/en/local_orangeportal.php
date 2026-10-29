@@ -1,4 +1,10 @@
 <?php
+$string['noticeopening'] = 'When opening the publication';
+$string['noticeopenrecord'] = 'Show the publication details';
+$string['noticeopeninghelp'] = 'Choose what users without management permission open when selecting this publication: its details or one of the resources above. If the resource is unavailable to the user, the details will be shown. Managers always open the details.';
+$string['noticeopeningsave'] = 'Save opening preference';
+$string['noticesaveandreturnresources'] = 'Save and return to resources';
+$string['noticeopeninginvalid'] = 'Choose the details page or an activity or resource belonging to this publication.';
 $string['pluginname'] = 'Orange Portal';
 $string['collection_fullname'] = 'Collection full name';
 $string['collection_fullname_help'] = 'Name displayed to users browsing the Library.';

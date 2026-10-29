@@ -103,5 +103,11 @@ function xmldb_local_orangeportal_upgrade($oldversion): bool {
         \local_orangeportal\native_content::install_roles();
         upgrade_plugin_savepoint(true, 2026102700, 'local', 'orangeportal');
     }
+    if ($oldversion < 2026102900) {
+        $table = new xmldb_table('local_orange_notice');
+        $field = new xmldb_field('openactivity', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        if (!$DB->get_manager()->field_exists($table, $field)) { $DB->get_manager()->add_field($table, $field); }
+        upgrade_plugin_savepoint(true, 2026102900, 'local', 'orangeportal');
+    }
     return true;
 }

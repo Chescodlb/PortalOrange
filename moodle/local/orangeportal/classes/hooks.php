@@ -70,8 +70,12 @@ class hooks {
         if ($PAGE->course->id != SITEID && ($map = native_content::mapping((int)$PAGE->course->id))) {
             $path = parse_url($CFG->wwwroot . '/course/view.php', PHP_URL_PATH);
             if ($PAGE->url->get_path() === $path) {
-                redirect($map->kind === 'notice' ? new \moodle_url('/local/orangeportal/view.php', ['id' => $map->noticeid]) :
-                    new \moodle_url('/local/orangeportal/index.php', ['section' => 'library', 'category' => $map->categoryid]));
+                if ($map->kind === 'notice') {
+                    redirect(native_content::can_author($map) ?
+                        new \moodle_url('/local/orangeportal/resources.php', ['notice' => $map->noticeid]) :
+                        new \moodle_url('/local/orangeportal/view.php', ['id' => $map->noticeid, 'detail' => 1]));
+                }
+                redirect(new \moodle_url('/local/orangeportal/index.php', ['section' => 'library', 'category' => $map->categoryid]));
             }
         }
         course_creation::presentation();

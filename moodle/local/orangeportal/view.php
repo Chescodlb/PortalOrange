@@ -7,7 +7,7 @@ require_login();
 $id = required_param('id', PARAM_INT);
 $notice = $DB->get_record('local_orange_notice', ['id' => $id], '*', MUST_EXIST);
 service::require_view($notice);
-$url = orange_link('view.php', ['id' => $id]);
+$url = orange_link('view.php', ['id' => $id, 'detail' => 1]);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_sesskey();
     $action = required_param('action', PARAM_ALPHA);
@@ -15,6 +15,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         service::change_state($notice, required_param('state', PARAM_ALPHA));
     } else { throw new invalid_parameter_exception(get_string('unknownaction', 'local_orangeportal')); }
     redirect($url, get_string('changessaved', 'local_orangeportal'), null, \core\output\notification::NOTIFY_SUCCESS);
+}
+if (!service::manager() && !is_siteadmin() && !optional_param('detail', 0, PARAM_BOOL) &&
+        ($activity = \local_orangeportal\native_content::opening_activity($notice))) {
+    service::receipt($notice, 'readtime');
+    redirect(orange_link('activity.php', ['id' => $activity->id, 'direct' => 1, 'sesskey' => sesskey()]));
 }
 orange_page($notice->title, $notice->kind, $url);
 $receipt = service::receipt($notice, 'readtime');

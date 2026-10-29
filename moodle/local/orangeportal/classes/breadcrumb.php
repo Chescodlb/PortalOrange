@@ -61,7 +61,7 @@ class breadcrumb {
             $notice = $DB->get_record('local_orange_notice', ['id' => $map->noticeid], '*', MUST_EXIST);
             self::root($notice->kind);
             $PAGE->navbar->ignore_active(); $PAGE->navbar->children = [];
-            $PAGE->navbar->add($notice->title, new \moodle_url('/local/orangeportal/view.php', ['id' => $notice->id]));
+            $PAGE->navbar->add($notice->title, new \moodle_url('/local/orangeportal/view.php', ['id' => $notice->id, 'detail' => 1]));
             if ($PAGE->cm) { $PAGE->navbar->add($PAGE->cm->name); }
             return;
         }

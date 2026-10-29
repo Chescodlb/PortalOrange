@@ -86,6 +86,8 @@ body a:hover, body a:focus-visible {
 
 // 2. Pie: ocultar bloques sin enlaces y el crédito visual; conservar soporte y sesión.
 #page-footer { background-color: var(--orange-ink); color: var(--orange-surface); }
+// Fill Moove's viewport-height flex wrapper; longer pages keep their natural height.
+body:not(.pagelayout-login) #page.drawers { flex: 1 0 auto; }
 #page-footer .contact:not(:has(a)), #page-footer .socialnetworks:not(:has(a)),
 #page-footer .column-left:not(:has(a)), #page-footer .column-right:not(:has(a)),
 #page-footer .copyright { display: none; }

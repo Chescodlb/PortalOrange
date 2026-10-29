@@ -31,6 +31,9 @@ if ($action === 'create') {
         $modules[$target] = $module->coursemodule;
     }
     $context = context_module::instance($modules[$courseid]);
+    $label = add_moduleinfo((object)['module' => $DB->get_field('modules', 'id', ['name' => 'label']),
+        'modulename' => 'label', 'section' => 0, 'visible' => 1, 'name' => 'TESTWEB Área ' . $token,
+        'intro' => '<p>ORANGE-INLINE-' . $token . '</p>', 'introformat' => FORMAT_HTML], get_course($courseid));
     get_file_storage()->create_file_from_string((object)['contextid' => $context->id, 'component' => 'mod_page',
         'filearea' => 'content', 'itemid' => 0, 'filepath' => '/', 'filename' => 'prueba.txt'], 'ORANGE-FILE-' . $token);
     $training = create_course((object)['category' => (int)get_config('local_orangeportal', 'coursescategory'),
@@ -42,7 +45,7 @@ if ($action === 'create') {
     if (!$instance) { $instance = $DB->get_record('enrol', ['id' => $manual->add_instance($training)]); }
     $manual->enrol_user($instance, $USER->id, reset($roles)->id);
     echo json_encode(['token' => $token, 'category' => (int)$category->id, 'library' => $library, 'notice' => $notice,
-        'course' => $courseid, 'training' => (int)$training->id, 'modules' => $modules,
+        'course' => $courseid, 'training' => (int)$training->id, 'modules' => $modules, 'label' => (int)$label->coursemodule,
         'file' => moodle_url::make_pluginfile_url($context->id, 'mod_page', 'content', 0, '/', 'prueba.txt')->out(false)], JSON_THROW_ON_ERROR);
 } else {
     $token = $argv[2] ?? '';
