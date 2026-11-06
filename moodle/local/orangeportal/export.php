@@ -23,6 +23,22 @@ if ($type === 'users') {
         $rows[] = ['publication' => $row->title, 'user' => fullname($row), 'collectives' => \local_orangeportal\report_scope::user_cohorts($row->userid),
             'received' => $date($row->received), 'read' => $date($row->readtime)];
     }
+} else if ($type === 'library') {
+    $documentid = optional_param('library_document', 0, PARAM_INT);
+    $documents = $documentid ? [$documentid => \local_orangeportal\library_report::document($documentid)] :
+        \local_orangeportal\library_report::documents(optional_param('library_search', '', PARAM_TEXT));
+    $columns = ['document' => get_string('libraryreportdocument', 'local_orangeportal'), 'user' => get_string('fullnameuser'),
+        'ce' => get_string('idnumber'), 'collectives' => get_string('orangecollectives', 'local_orangeportal'),
+        'reading' => get_string('updates_reading', 'local_orangeportal'), 'readtime' => get_string('libraryreportfirstread', 'local_orangeportal')];
+    foreach ($documents as $document) {
+        foreach (\local_orangeportal\library_report::readers($document, optional_param('library_reading', '', PARAM_ALPHA),
+                optional_param('library_usersearch', '', PARAM_TEXT)) as $row) {
+            $rows[] = ['document' => $document->name, 'user' => fullname($row->user), 'ce' => $row->user->idnumber,
+                'collectives' => \local_orangeportal\report_scope::user_cohorts($row->user->id),
+                'reading' => get_string($row->readtime ? 'libraryread' : 'libraryunread', 'local_orangeportal'),
+                'readtime' => $row->readtime ? userdate($row->readtime, '%Y-%m-%d %H:%M:%S') : ''];
+        }
+    }
 } else if ($type === 'training') {
     $columns = ['course' => get_string('course'), 'user' => get_string('fullnameuser'), 'ce' => get_string('idnumber'),
         'collectives' => get_string('orangecollectives', 'local_orangeportal'),

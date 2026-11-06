@@ -587,3 +587,10 @@ $string['edition_objective'] = 'Objective';
 $string['edition_source'] = 'Source of need';
 $string['edition_subject'] = 'Subject';
 $string['edition_kpi'] = 'Related KPI (label)';
+
+// Library reading tracking.
+$string['libraryreportdocument'] = 'Document';
+$string['libraryreportsearch'] = 'Search document or collection';
+$string['libraryreportadded'] = 'Resource creation date';
+$string['libraryreportfirstread'] = 'First recorded opening';
+$string['libraryreporthelp'] = 'The period filters by resource creation date. Recipients are users within your scope who can currently access the document. Read means a recorded opening, not proof of full reading. The first available recorded date is shown; earlier openings without evidence cannot be reconstructed.';

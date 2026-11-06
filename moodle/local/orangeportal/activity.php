@@ -45,6 +45,7 @@ echo $OUTPUT->heading(format_string($cm->name));
 echo $cm->content;
 if ($map && $map->kind === 'notice') { \local_orangeportal\service::receipt($notice, 'readtime'); }
 else {
+    \local_orangeportal\document_reads::record((int)$USER->id, (int)$cm->id);
     $completion = new completion_info(get_course($cm->course)); $completion->set_module_viewed($cm);
 }
 echo $OUTPUT->footer();

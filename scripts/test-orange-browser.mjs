@@ -432,7 +432,7 @@ try {
     for(const language of ['es','en']) {
       for(const section of ['incidents','notifications']) {
         await navigate('/local/orangeportal/reports.php?section='+section+'&lang='+language);
-        check(await evaluate(`document.querySelectorAll('.orange-category-tabs a').length===5&&document.querySelector('.orange-category-tabs [aria-current="page"]').href.includes('section=${section}')`),language+' / '+section+': selector de Seguimiento activo');
+        check(await evaluate(`document.querySelectorAll('.orange-category-tabs a').length===6&&document.querySelector('.orange-category-tabs [aria-current="page"]').href.includes('section=${section}')`),language+' / '+section+': selector de Seguimiento activo');
         check(await evaluate(`!!document.querySelector('.orange-reading-summary')&&!document.querySelector('.orange-reading-detail')&&!document.body.textContent.includes('[[')`),language+' / '+section+': resumen por publicación separado del detalle');
         check(await evaluate(`Array.from(document.querySelectorAll('.orange-reading-summary tbody tr')).every(r=>Number(r.cells[2].textContent)===Number(r.cells[3].textContent.match(/— (\\d+)\\//)?.[1]||0)+Number(r.cells[4].textContent.match(/— (\\d+)\\//)?.[1]||0))`),language+' / '+section+': total igual a leídos más sin leer');
         check(await evaluate(`document.querySelectorAll('.orange-reading-summary tbody tr').length<=25`),language+' / '+section+': resumen paginado');

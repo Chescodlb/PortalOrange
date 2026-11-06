@@ -587,3 +587,10 @@ $string['edition_objective'] = 'Objetivo';
 $string['edition_source'] = 'Origen de la necesidad';
 $string['edition_subject'] = 'Materia impartida';
 $string['edition_kpi'] = 'KPI asociado (etiqueta)';
+
+// Library reading tracking.
+$string['libraryreportdocument'] = 'Documento';
+$string['libraryreportsearch'] = 'Buscar documento o colección';
+$string['libraryreportadded'] = 'Fecha de alta del recurso';
+$string['libraryreportfirstread'] = 'Primera lectura registrada';
+$string['libraryreporthelp'] = 'El periodo filtra por fecha de alta del recurso. Los destinatarios son los usuarios de tu ámbito que pueden acceder actualmente al documento. Leído indica una apertura registrada, no acredita lectura completa. Se muestra la primera fecha registrada disponible; no se reconstruyen aperturas anteriores sin evidencia.';

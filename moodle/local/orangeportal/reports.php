@@ -27,8 +27,10 @@ if ($legacyid = optional_param('noticeid', 0, PARAM_INT)) {
 }
 $section = optional_param('section', $courseid ? 'courses' : 'overview', PARAM_ALPHA);
 if (!empty($legacy)) { $section = $legacy->kind; }
-if (!in_array($section, ['overview', 'incidents', 'notifications', 'courses', 'users'], true)) { throw new invalid_parameter_exception('Unknown report section'); }
+if (!in_array($section, ['overview', 'library', 'incidents', 'notifications', 'courses', 'users'], true)) { throw new invalid_parameter_exception('Unknown report section'); }
 $reportparams['section'] = $section;
+foreach (['library_document', 'library_page'] as $key) { $reportparams[$key] = optional_param($key, 0, PARAM_INT); }
+foreach (['library_search', 'library_usersearch', 'library_reading'] as $key) { $reportparams[$key] = optional_param($key, '', PARAM_TEXT); }
 foreach (['training_tab' => 'summary', 'training_search' => '', 'training_modality' => ''] as $key => $default) {
     $reportparams[$key] = optional_param($key, $default, PARAM_TEXT);
 }
@@ -78,7 +80,7 @@ echo $OUTPUT->header();
 echo orange_admin_intro(get_string('reportstitle', 'local_orangeportal'));
 echo orange_admin_navigation('reports');
 $tabs = '';
-foreach (['overview', 'incidents', 'notifications', 'courses', 'users'] as $tab) {
+foreach (['overview', 'library', 'incidents', 'notifications', 'courses', 'users'] as $tab) {
     $attrs = ['class' => 'orange-admin-link' . ($section === $tab ? ' active' : '')];
     if ($section === $tab) { $attrs['aria-current'] = 'page'; }
     $tabs .= html_writer::link($reporturl(['section' => $tab]),
@@ -104,14 +106,15 @@ echo html_writer::tag('nav', $tabs, ['class' => 'orange-category-tabs',
     $periodhidden = '';
     foreach ($reportparams as $key => $value) {
         if (!in_array($key, ['period', 'report_from', 'report_to', 'report_cohort', 'user_cohort', 'report_userid',
-                'incidents_notice', 'notifications_notice', 'incidents_user', 'notifications_user']) && !str_ends_with($key, '_page')) {
+                'library_document', 'incidents_notice', 'notifications_notice', 'incidents_user', 'notifications_user']) && !str_ends_with($key, '_page')) {
             $periodhidden .= html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $key, 'value' => $value]);
         }
     }
     echo html_writer::tag('form', $periodhidden . $periodfields . html_writer::tag('button', get_string('filter'),
         ['class' => 'btn btn-primary']), ['method' => 'get', 'class' => 'orange-report-filters']);
-    echo html_writer::tag('p', get_string('reportperiodexplanation', 'local_orangeportal'), ['class' => 'text-muted']);
+    echo html_writer::tag('p', get_string($section === 'library' ? 'libraryreporthelp' : 'reportperiodexplanation', 'local_orangeportal'), ['class' => 'text-muted']);
 }
+if ($section === 'library') { require(__DIR__ . '/report_library.php'); echo $OUTPUT->footer(); exit; }
 if ($section === 'overview') { require(__DIR__ . '/report_overview.php'); echo $OUTPUT->footer(); exit; }
 if ($section === 'users') {
     require(__DIR__ . '/report_users.php');

@@ -4,7 +4,7 @@ El acceso está en **Administración > Seguimiento**. Se requiere pertenecer a O
 
 ## Selector de seguimiento
 
-La pestaña **Seguimiento** muestra debajo un segundo nivel de navegación, igual que Gestionar categorías: **Resumen**, **Incidencias**, **Comunicados**, **Formación** y **Usuarios**. Solo se muestra la sección seleccionada y se marca en naranja. La entrada inicial es Resumen; los enlaces existentes a un curso o publicación abren automáticamente su sección correspondiente.
+La pestaña **Seguimiento** muestra debajo un segundo nivel de navegación, igual que Gestionar categorías: **Resumen**, **Biblioteca**, **Incidencias**, **Comunicados**, **Formación** y **Usuarios**. Solo se muestra la sección seleccionada y se marca en naranja. La entrada inicial es Resumen; los enlaces existentes a un curso o publicación abren automáticamente su sección correspondiente.
 
 Incidencias y Comunicados muestran una fila por publicación con **Publicación, Fecha de publicación/revisión, Destinatarios, Sin leer y Leídos**. Los totales corresponden a la versión actual y a los destinatarios actuales del portal Orange. Un usuario asignado por individuo, cohorte y grupo cuenta una sola vez. Las publicaciones sin destinatarios actuales solo aparecen con ceros en la consulta global sin filtro de colectivo; un responsable de equipo solo ve publicaciones asignadas a personas de su ámbito. Se incluyen publicaciones publicadas y no retiradas, también incidencias cerradas para los perfiles autorizados de seguimiento.
 
@@ -108,3 +108,16 @@ Pruebas locales: `cli/check_user_reports.php` valida periodos, coherencia de por
 7. Revisar Evaluaciones y Satisfacción. Una matrícula no acredita asistencia; asistencia no acredita finalización ni aprobado. La nota final del cuestionario sigue el método nativo y puede incluir intentos fuera del rango; su columna lo indica. La duración del intento incluye posibles pausas y no acredita horas activas de estudio.
 
 Pruebas de esta ampliación: `cli/check_report_scope.php` (datos temporales con reversión, dos ediciones, colectivos, rangos, asistencia, evaluaciones y anonimato) y `node scripts/test-orange-browser.mjs --edition-reports-only` (ES/EN, móvil y accesos por perfil). Los Excel se han usado como referencia de campos; no se han importado sus registros reales.
+
+
+## Seguimiento de Biblioteca
+
+En **Administración > Seguimiento > Biblioteca**, cada recurso publicado muestra fecha de alta, categoría, usuarios con acceso, Sin leer y Leídos (porcentaje y cantidad). Seleccionar el título abre el detalle por usuario, CE, colectivos, estado de lectura y primera fecha registrada disponible. Se puede buscar por nombre o CE y filtrar Leído/Sin leer. Los listados tienen 25 filas por página.
+
+Se mantienen los filtros de colectivo y periodo: en Biblioteca, el periodo se aplica a la fecha de alta de la actividad/recurso, no a su fecha de apertura. El denominador incluye a las personas del ámbito del consultante que pueden acceder actualmente al recurso, teniendo en cuenta matrícula o permisos de acceso, visibilidad y restricciones nativas. No se cuentan como pendientes los documentos ocultos o inaccesibles. El informe muestra los recursos actuales, no reconstruye accesos ni destinatarios históricos.
+
+Las fechas proceden de `local_orange_doc_read` y, cuando existe, `course_modules_viewed`; se conserva la primera evidencia disponible. Abrir acredita una vista, no lectura completa. Reabrir no sobrescribe la primera fecha; modificar el contenido de un mismo recurso no genera versiones de lectura. No se inventan fechas para aperturas anteriores sin registros. Las áreas de texto y medios abiertas desde Biblioteca también registran su vista, aunque no tengan finalización configurada.
+
+Se requiere `local/orangeportal:viewreports`; Coordinación y Calidad conservan su ámbito de colectivos. El CSV requiere además `local/orangeportal:exportreports` y exporta todas las filas que coinciden con los filtros, con fecha de lectura y sin columnas de notas. No se crean tablas nuevas para este informe ni se modifican permisos de cursos.
+
+Comprobaciones: `cli/check_library_reports.php` cubre visibilidad, restricciones, lecturas, fechas, filtros y permisos con datos temporales revertidos; `cli/check_document_reads.php` cubre las lecturas personales y privacidad.
