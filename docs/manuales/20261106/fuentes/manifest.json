@@ -1,0 +1,27 @@
+[
+  {
+    "id": "01_Agentes_Orange",
+    "title": "Agentes Orange",
+    "chapters": 7
+  },
+  {
+    "id": "02_Coordinadores_Orange",
+    "title": "Coordinadores Orange",
+    "chapters": 9
+  },
+  {
+    "id": "03_Formadores_Orange",
+    "title": "Formadores Orange",
+    "chapters": 12
+  },
+  {
+    "id": "04_Administradores_Orange",
+    "title": "Administradores Orange",
+    "chapters": 16
+  },
+  {
+    "id": "05_Administradores_Generales_Moodle",
+    "title": "Administradores generales de Moodle",
+    "chapters": 15
+  }
+]

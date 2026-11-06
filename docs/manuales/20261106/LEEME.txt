@@ -1,0 +1,41 @@
+MANUALES DEL PORTAL ORANGE — 6 DE NOVIEMBRE DE 2026
+Versión documental 1.0. Código de referencia: 48461c2.
+Portal Orange 2026110601 · Tema Orange 2026102900 · Moodle 4.5.1.
+
+Cinco manuales independientes:
+01 Agentes Orange: consulta, lecturas y formaciones.
+02 Coordinadores Orange: seguimiento del equipo, sin edición.
+03 Formadores Orange: documentos, publicaciones, recursos y ediciones.
+04 Administradores Orange: altas, CSV, colectivos y gestión delegada.
+05 Administradores generales de Moodle: instalación/configuración completa,
+   roles por contexto, puesta en marcha, actualización y aceptación.
+
+FORMATOS
+.doc  : Word 97–2003, solicitado para compatibilidad.
+.docx : Word editable moderno, con estructura de títulos y tablas.
+.pdf  : lectura, impresión y distribución con paginación fija.
+
+Los nombres de cursos, colectivos y cuentas usados como ejemplos son ficticios.
+Sustituir los datos de ejemplo por los del ambiente destino. No hay contraseñas
+reales ni datos de empleados en estos manuales.
+
+MATERIAL DE APOYO
+roles/: definiciones XML y matriz de permisos del repositorio; las asignaciones
+        a personas y categorías deben configurarse en cada ambiente.
+Plantilla_agentes_Orange.csv: ejemplo; sustituir TODOS sus datos antes de validar.
+MANIFEST.sha256: integridad de los archivos de la entrega.
+
+El manual general distingue instalación nueva y actualización. No repetir el
+importador del catálogo inicial en un portal en uso. No copiar la base de datos
+local al servidor. No utilizar los scripts de demo en preproducción/producción.
+
+Los permisos visibles dependen de las asignaciones reales de cada cuenta.
+La lectura acredita una apertura registrada, no una lectura íntegra.
+
+MANTENIMIENTO DOCUMENTAL
+fuentes/contenido_manuales.py contiene el texto revisado por perfil.
+Los generadores están en scripts/generar-manuales-orange.py y
+scripts/generar-manuales-pdf-orange.mjs. La validación se realiza con
+scripts/validar-manuales-orange.py. Requieren las herramientas locales
+Python con python-docx/pypdf, textutil y Chrome; no se ejecutan en Moodle.
+Los HTML de fuentes son documentos locales, sin recursos remotos.

@@ -1,0 +1,41 @@
+{
+  "review_date": "2026-11-06",
+  "code_revision": "48461c2",
+  "checks": [
+    {
+      "manual": "Agentes Orange",
+      "file": "01_Agentes_Orange",
+      "pages_pdf": 9,
+      "content_fragments_verified": 92,
+      "docx_tables": 9
+    },
+    {
+      "manual": "Coordinadores Orange",
+      "file": "02_Coordinadores_Orange",
+      "pages_pdf": 11,
+      "content_fragments_verified": 132,
+      "docx_tables": 12
+    },
+    {
+      "manual": "Formadores Orange",
+      "file": "03_Formadores_Orange",
+      "pages_pdf": 14,
+      "content_fragments_verified": 137,
+      "docx_tables": 10
+    },
+    {
+      "manual": "Administradores Orange",
+      "file": "04_Administradores_Orange",
+      "pages_pdf": 19,
+      "content_fragments_verified": 198,
+      "docx_tables": 17
+    },
+    {
+      "manual": "Administradores generales de Moodle",
+      "file": "05_Administradores_Generales_Moodle",
+      "pages_pdf": 19,
+      "content_fragments_verified": 240,
+      "docx_tables": 17
+    }
+  ]
+}

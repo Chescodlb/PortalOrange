@@ -34,3 +34,17 @@ La [decisión de implementación](implementacion.md) explica qué necesita códi
 - Primera instalación en producción e incidencias: [PDF](manuales/Guia_despliegue_produccion_Orange.pdf), [Word editable](manuales/Guia_despliegue_produccion_Orange.docx) y [comandos en una línea](manuales/Comandos_despliegue_Orange.txt).
 
 - [Actividades y recursos por categoría/publicación, colecciones formativas y actualización](16-actividades-recursos-y-colecciones.md).
+
+
+## Manuales por perfil — 6 de noviembre de 2026
+
+Entrega basada en Portal Orange `2026110601`, revisión `48461c2`. Cada manual está disponible en DOC, DOCX y PDF; incluye procedimientos diarios, permisos y resolución de dudas. El manual general cubre la configuración completa en un ambiente nuevo y la actualización de uno existente.
+
+- [Descargar los cinco manuales y material de apoyo](manuales/20261106/Manuales_Orange_20261106.zip).
+- Agentes Orange: [DOC](manuales/20261106/01_Agentes_Orange.doc), [DOCX](manuales/20261106/01_Agentes_Orange.docx), [PDF](manuales/20261106/01_Agentes_Orange.pdf).
+- Coordinadores Orange: [DOC](manuales/20261106/02_Coordinadores_Orange.doc), [DOCX](manuales/20261106/02_Coordinadores_Orange.docx), [PDF](manuales/20261106/02_Coordinadores_Orange.pdf).
+- Formadores Orange: [DOC](manuales/20261106/03_Formadores_Orange.doc), [DOCX](manuales/20261106/03_Formadores_Orange.docx), [PDF](manuales/20261106/03_Formadores_Orange.pdf).
+- Administradores Orange: [DOC](manuales/20261106/04_Administradores_Orange.doc), [DOCX](manuales/20261106/04_Administradores_Orange.docx), [PDF](manuales/20261106/04_Administradores_Orange.pdf).
+- Administradores generales de Moodle: [DOC](manuales/20261106/05_Administradores_Generales_Moodle.doc), [DOCX](manuales/20261106/05_Administradores_Generales_Moodle.docx), [PDF](manuales/20261106/05_Administradores_Generales_Moodle.pdf).
+
+El contenido fuente está en `manuales/20261106/fuentes/contenido_manuales.py`. Los generadores y el validador están en `scripts/generar-manuales-orange.py`, `scripts/generar-manuales-pdf-orange.mjs` y `scripts/validar-manuales-orange.py`. Son herramientas documentales locales, no scripts de Moodle ni de despliegue.
