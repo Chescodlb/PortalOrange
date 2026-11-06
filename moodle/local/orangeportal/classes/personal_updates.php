@@ -58,16 +58,11 @@ class personal_updates {
         return $counts;
     }
 
-    public static function navbar(): string {
-        $paths = [
-            'notifications' => '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z"/><path d="M10 21h4"/>',
-            'incidents' => '<path d="m12 3 10 18H2Z"/><path d="M12 9v5"/><circle cx="12" cy="17" r=".5"/>',
-            'courses' => '<path d="M12 5v16M12 5C8 2 4 3 2 4v15c3-1 6-1 10 2 4-3 7-3 10-2V4c-2-1-6-2-10 1Z"/>',
-            'library' => '<path d="M3 3h4v18H3ZM9 3h4v18H9ZM15 4l4-1 4 17-4 1Z"/>',
-        ];
-        $links = '';
+    /** Shared presentation data for both the initial HTML and authenticated live updates. */
+    public static function indicators(): array {
+        $indicators = [];
         $counts = self::counts();
-        foreach ($paths as $key => $path) {
+        foreach (['notifications', 'incidents', 'courses', 'library'] as $key) {
             $total = $counts[$key];
             $critical = $counts[$key . 'critical'] ?? 0;
             $count = $critical ?: $total;
@@ -85,14 +80,38 @@ class personal_updates {
                 $description .= '. ' . get_string('updates_criticalsummary', 'local_orangeportal',
                     (object)['critical' => $critical, 'total' => $total]);
             }
-            $icon = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $path . '</svg>';
-            $links .= \html_writer::link(\orange_link('index.php', $params), $icon .
+            $indicators[] = ['key' => $key, 'count' => $count, 'total' => $total, 'critical' => $critical,
+                'description' => $description, 'href' => \orange_link('index.php', $params)->out(false)];
+        }
+        return $indicators;
+    }
+
+    public static function navbar(): string {
+        global $PAGE;
+        $paths = [
+            'notifications' => '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z"/><path d="M10 21h4"/>',
+            'incidents' => '<path d="m12 3 10 18H2Z"/><path d="M12 9v5"/><circle cx="12" cy="17" r=".5"/>',
+            'courses' => '<path d="M12 5v16M12 5C8 2 4 3 2 4v15c3-1 6-1 10 2 4-3 7-3 10-2V4c-2-1-6-2-10 1Z"/>',
+            'library' => '<path d="M3 3h4v18H3ZM9 3h4v18H9ZM15 4l4-1 4 17-4 1Z"/>',
+        ];
+        $PAGE->requires->js(new \moodle_url('/local/orangeportal/personal_updates.js',
+            ['v' => filemtime(__DIR__ . '/../personal_updates.js')]));
+        $links = '';
+        foreach (self::indicators() as $indicator) {
+            $key = $indicator['key'];
+            $count = $indicator['count'];
+            $critical = $indicator['critical'];
+            $total = $indicator['total'];
+            $description = $indicator['description'];
+            $icon = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $paths[$key] . '</svg>';
+            $links .= \html_writer::link($indicator['href'], $icon .
                 \html_writer::span((string)$count, 'orange-update-count', ['aria-hidden' => 'true']),
                 ['class' => 'orange-update orange-update-' . $key . ($count ? ' has-updates' : '') . ($critical ? ' is-critical' : ''),
                     'aria-label' => $description, 'title' => $description, 'data-update' => $key, 'data-count' => $count,
                     'data-total' => $total, 'data-critical' => $critical]);
         }
         return \html_writer::tag('nav', $links, ['class' => 'orange-personal-updates',
+            'data-updates-url' => \orange_link('updates.php')->out(false),
             'aria-label' => get_string('personalupdates', 'local_orangeportal')]);
     }
 }

@@ -1,5 +1,5 @@
 // Local browser smoke test using Chrome DevTools; no npm dependencies.
-import {spawn} from 'node:child_process';
+import {spawn, execFileSync} from 'node:child_process';
 import {readFile, writeFile, mkdtemp, mkdir} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
@@ -63,7 +63,75 @@ try {
   };
   const nav = () => evaluate(`Array.from(document.querySelectorAll('.primary-navigation .nav-link')).filter(x=>x.textContent.trim()!=='').map(x=>x.textContent.trim()).filter(x=>!['Más','More'].includes(x))`);
   await send('Page.enable'); await send('Runtime.enable');
-  if (process.argv.includes('--notice-opening-only')) {
+  if (process.argv.includes('--live-updates-only')) {
+    const token=crypto.randomUUID().replaceAll('-','').slice(0,12);
+    const fixtureCommand=(action,key)=>execFileSync('docker',['compose','exec','-T','web','php',
+      'local/orangeportal/cli/live_updates_browser_fixture.php',action,token,...(key?[key]:[])],{encoding:'utf8'});
+    const state=key=>evaluate(`(()=>{const e=document.querySelector('[data-update="${key}"]');return e?{count:Number(e.dataset.count),total:Number(e.dataset.total),critical:Number(e.dataset.critical),red:e.classList.contains('is-critical'),href:e.href,title:e.title}:null})()`);
+    let requests=0;
+    await send('Network.enable');
+    ws.addEventListener('message',({data})=>{const event=JSON.parse(data);if(event.method==='Network.requestWillBeSent'&&event.params.request.url.includes('/local/orangeportal/updates.php')){requests++;}});
+    try {
+      await navigate('/login/index.php');
+      check(await evaluate(`fetch('/local/orangeportal/updates.php',{method:'POST'}).then(r=>r.status)`)===401,'Endpoint rechaza sesiones anónimas');
+      const fixture=JSON.parse(fixtureCommand('create'));
+      await login(fixture.username,env.ORANGE_DEMO_PASSWORD);
+      await navigate('/local/orangeportal/index.php?section=library');
+      await wait(`document.querySelector('.orange-personal-updates')?.dataset.liveUpdates==='1'`);
+      const before=await state('incidents');
+      check(before.total===0&&!before.red,'Borradores y publicaciones ajenas no entran en el contador');
+      check(await evaluate(`fetch('/local/orangeportal/updates.php',{method:'POST',body:new URLSearchParams({sesskey:'invalid'})}).then(r=>r.status)`)===403,'Endpoint comprueba el token de sesión');
+      await evaluate(`document.querySelector('#orange-library-search').value='Texto que debe conservarse';document.querySelector('#orange-library-search').focus();window.liveOriginalSearch=document.querySelector('#orange-library-search');`);
+      const originalUrl=await evaluate('location.href');
+      fixtureCommand('publish','normal');
+      console.log('Esperando el intervalo real de 30 segundos...');
+      await delay(31000);
+      await wait(`document.querySelector('[data-update="incidents"]').dataset.total==='1'`);
+      check((await state('incidents')).count===1&&!(await state('incidents')).red,'Nueva incidencia aparece sin recargar tras el intervalo real');
+      check(await evaluate(`location.href===${JSON.stringify(originalUrl)}&&window.liveOriginalSearch===document.querySelector('#orange-library-search')&&document.activeElement===window.liveOriginalSearch&&window.liveOriginalSearch.value==='Texto que debe conservarse'`),'Actualización conserva página, formulario y foco');
+      await navigate('/user/preferences.php');
+      await wait(`document.querySelector('.orange-personal-updates')?.dataset.liveUpdates==='1'`);
+      fixtureCommand('publish','communication');
+      const priorRequests=requests;
+      await evaluate(`window.dispatchEvent(new Event('focus'));window.dispatchEvent(new Event('focus'));window.dispatchEvent(new Event('focus'));`);
+      await wait(`document.querySelector('[data-update="notifications"]').dataset.critical==='1'`);
+      const notification=await state('notifications');
+      check(notification.red&&notification.count===1&&notification.href.includes('impact=critical'),'Comunicado crítico actualiza color, cantidad y filtro en una página nativa');
+      check(requests===priorRequests+1,'Eventos simultáneos comparten una única consulta');
+      const hiddenRequests=requests;
+      await evaluate(`Object.defineProperty(document,'hidden',{value:true,configurable:true});document.dispatchEvent(new Event('visibilitychange'));window.dispatchEvent(new Event('focus'));`);
+      fixtureCommand('publish','critical');
+      await delay(1000);
+      check(requests===hiddenRequests&&(await state('incidents')).critical===0,'Pestaña oculta pausa las consultas');
+      await evaluate(`delete document.hidden;document.dispatchEvent(new Event('visibilitychange'));`);
+      await wait(`document.querySelector('[data-update="incidents"]').dataset.critical==='1'`);
+      const critical=await state('incidents');
+      check(critical.red&&critical.count===1&&critical.total===2&&critical.href.includes('priority=critical')&&critical.title.includes('2'),'Volver a la pestaña muestra críticas sin leer y mantiene el total en la ayuda');
+      await screenshot('indicadores-actualizacion-automatica');
+      await evaluate(`fetch('/local/orangeportal/view.php?id=${fixture.notices.critical}&detail=1').then(r=>r.text())`);
+      await evaluate(`window.dispatchEvent(new Event('focus'))`);
+      await wait(`document.querySelector('[data-update="incidents"]').dataset.critical==='0'`);
+      const read=await state('incidents');
+      check(!read.red&&read.total===1&&read.count===1&&!read.href.includes('priority=critical'),'Lectura en otra pestaña devuelve el icono a naranja y resta solo la leída');
+      check(await evaluate(`fetch('/local/orangeportal/updates.php',{method:'POST',body:new URLSearchParams({sesskey:M.cfg.sesskey})}).then(async r=>({cache:r.headers.get('cache-control'),data:await r.json()})).then(x=>x.cache.includes('no-store')&&x.data.indicators.length===4&&x.data.indicators.every(i=>!('userid' in i)&&!('title' in i)))`),'Respuesta privada sin caché contiene solo los cuatro indicadores');
+      await send('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0});
+      await evaluate(`window.dispatchEvent(new Event('focus'))`);await delay(1000);
+      check((await state('incidents')).total===1,'Sin conexión se conservan los indicadores y la página');
+      await send('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});
+      const exitUrl=await evaluate(`document.querySelector('a[href*="/login/logout.php"]').href`);
+      await evaluate(`fetch(${JSON.stringify(exitUrl)}).then(r=>r.text())`);
+      check(await evaluate(`fetch('/local/orangeportal/updates.php',{method:'POST'}).then(r=>r.status)`)===401,'Sesión cerrada deja de devolver contadores');
+      await evaluate(`window.dispatchEvent(new Event('focus'))`);await delay(1000);
+      const stoppedRequests=requests;
+      await evaluate(`window.dispatchEvent(new Event('focus'))`);await delay(500);
+      check(requests===stoppedRequests,'El refresco se detiene al expirar la sesión');
+      await navigate('/login/index.php');
+      await evaluate(`document.querySelector('#username').value='usuario.externo';document.querySelector('#password').value=${JSON.stringify(env.ORANGE_DEMO_PASSWORD)};document.querySelector('#loginbtn').click()`);
+      await wait(`location.pathname!=='/login/index.php'&&document.readyState!=='loading'`);
+      check(await evaluate(`!document.querySelector('.orange-personal-updates')&&fetch('/local/orangeportal/updates.php',{method:'POST',body:new URLSearchParams({sesskey:M.cfg.sesskey})}).then(r=>r.status===403)`),'Usuario externo conserva su portal y no accede a los contadores Orange');
+      console.log('Verificaciones de actualización automática completas: '+results.length);
+    } finally { console.log(fixtureCommand('cleanup').trim()); }
+  } else if (process.argv.includes('--notice-opening-only')) {
     const fixture=JSON.parse(await readFile('backups/previews/native-content-fixture.json','utf8'));
     const moduleid=fixture.modules[fixture.course];
     const edit='/local/orangeportal/manage.php?kind=notifications&id='+fixture.notice;
