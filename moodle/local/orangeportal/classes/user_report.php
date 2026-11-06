@@ -8,6 +8,7 @@ class user_report {
         global $DB;
         experience::require_access();
         require_capability('local/orangeportal:viewreports', \context_system::instance());
+        if ($userid) { report_scope::require_user($userid); }
         if ($userid && (!experience::member($userid) || !$DB->record_exists('user', ['id' => $userid, 'deleted' => 0]))) {
             throw new \moodle_exception('outsideorange', 'local_orangeportal');
         }
@@ -26,11 +27,11 @@ class user_report {
     public static function training(int $userid, bool $details = false): array {
         global $DB;
         self::require_access($userid);
-        $courses = self::courses();
+        $courses = array_filter(self::courses(), fn($c) => report_period::contains((int)$c->startdate));
         $rows = []; $completed = 0; $started = 0;
         foreach ($courses as $course) {
             $ctx = \context_course::instance($course->id);
-            if (!is_enrolled($ctx, $userid, '', true)) { continue; }
+            if (!is_enrolled($ctx, $userid, 'moodle/course:isincompletionreports', true)) { continue; }
             $completion = $DB->get_record('course_completions', ['course' => $course->id, 'userid' => $userid]);
             $activity = $DB->record_exists_sql('SELECT 1 FROM {course_modules_completion} cc
                 JOIN {course_modules} cm ON cm.id=cc.coursemoduleid WHERE cm.course=? AND cc.userid=? AND cc.completionstate>0',

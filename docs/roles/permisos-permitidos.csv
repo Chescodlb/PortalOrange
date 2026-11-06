@@ -466,3 +466,4 @@ orange_publicador;Formador Orange;system;local/orangeportal:viewallincidents;Per
 orange_publicador;Formador Orange;system;local/orangeportal:viewreports;Permitir
 orange_seguimiento;Coordinación Orange;system;local/orangeportal:viewallincidents;Permitir
 orange_seguimiento;Coordinación Orange;system;local/orangeportal:viewreports;Permitir
+orange_administrador;Administrador de Orange;system;local/orangeportal:viewallreports;Permitir

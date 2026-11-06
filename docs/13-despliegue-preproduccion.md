@@ -222,3 +222,17 @@ php admin/cli/purge_caches.php
 ```
 
 Este comando es para la primera instalación, sin colectivos delegados configurados: en un portal en uso, vaciar esa lista retiraría las delegaciones existentes. No crea categorías, usuarios, permisos ni contenidos, ni activa Orange. Volver a Nuevos ajustes y guardar los demás ajustes pendientes conservando sus valores. Los ajustes de Boost Union o LearnR pertenecen a otros temas y pueden requerir revisión independiente. Si siguen apareciendo tras guardar, registrar el campo/error concreto; no dar por hecho que todos dependen de Orange.
+
+
+## Actualización de Seguimiento por colectivos y ediciones — 2026110601
+
+No copiar la base de desarrollo. Subir el directorio completo actualizado `local/orangeportal` y ejecutar desde la raíz de Moodle, con el usuario habitual del servicio:
+
+```bash
+php admin/cli/upgrade.php --non-interactive
+php admin/cli/purge_caches.php
+```
+
+La actualización crea la tabla `local_orange_attendance`, los campos de curso `orange_*` y la capacidad `local/orangeportal:viewallreports`. La concede al rol técnico Administrador Orange; los demás responsables quedan limitados a sus colectivos actuales. No importa registros de Excel, usuarios ni cursos de desarrollo. No reinstalar ni ejecutar inicializadores de demo.
+
+Desde la web: revisar colectivos de cada responsable, sus permisos nativos de los cursos y exportación; completar los datos de cada edición en Configuración del curso > Orange. Validar que cada coordinador solo ve su equipo en lista, ficha y CSV. Calidad no debe recibir notas por esta actualización. Confirmar cron para copiar cursos y consolidar finalizaciones. Consultar [Seguimiento](09-informes.md) y [permisos](15-replicar-perfiles-y-permisos.md).

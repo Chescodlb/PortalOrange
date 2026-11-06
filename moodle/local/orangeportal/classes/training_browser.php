@@ -86,6 +86,10 @@ class training_browser {
             if (has_capability('moodle/course:manageactivities', $context)) {
                 $detail .= \html_writer::link(\orange_link('collections.php', ['course' => $course->id]),
                     get_string('trainingmanagecontent', 'local_orangeportal'), ['class' => 'btn btn-primary orange-training-manage']);
+                if (\core_course\management\helper::can_copy_course((int)$course->id)) {
+                    $detail .= \html_writer::link(new \moodle_url('/backup/copy.php', ['id' => $course->id]),
+                        get_string('trackingcopyedition', 'local_orangeportal'), ['class' => 'btn btn-primary orange-training-copy']);
+                }
                 $detail .= \html_writer::div(\orange_post_button(new \moodle_url('/course/view.php', ['id' => $course->id]),
                     get_string('trainingedit', 'local_orangeportal'), ['edit' => 1]), 'orange-card-edit');
                 if (has_capability('mod/quiz:addinstance', $context)) {

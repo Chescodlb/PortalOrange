@@ -14,7 +14,7 @@ $perpage = 25;
 $courseid = optional_param('courseid', 0, PARAM_INT);
 $period = optional_param('period', 'month', PARAM_ALPHA);
 $since = reading_report::since($period);
-$reportparams = ['period' => $period, 'courseid' => $courseid, 'training_page' => optional_param('training_page', 0, PARAM_INT)];
+$reportparams = \local_orangeportal\report_period::params() + ['period' => $period, 'courseid' => $courseid, 'training_page' => optional_param('training_page', 0, PARAM_INT)];
 foreach (['incidents', 'notifications'] as $kind) {
     foreach (['notice', 'user', 'page', 'summary_page', 'history_page', 'revision'] as $key) {
         $reportparams[$kind . '_' . $key] = optional_param($kind . '_' . $key, 0, PARAM_INT);
@@ -26,10 +26,22 @@ if ($legacyid = optional_param('noticeid', 0, PARAM_INT)) {
     $legacy = $DB->get_record('local_orange_notice', ['id' => $legacyid], '*', MUST_EXIST);
     $reportparams[$legacy->kind . '_notice'] = $legacyid;
 }
-$section = optional_param('section', $courseid ? 'courses' : 'incidents', PARAM_ALPHA);
+$section = optional_param('section', $courseid ? 'courses' : 'overview', PARAM_ALPHA);
 if (!empty($legacy)) { $section = $legacy->kind; }
-if (!in_array($section, ['incidents', 'notifications', 'courses', 'users'], true)) { throw new invalid_parameter_exception('Unknown report section'); }
+if (!in_array($section, ['overview', 'incidents', 'notifications', 'courses', 'users'], true)) { throw new invalid_parameter_exception('Unknown report section'); }
 $reportparams['section'] = $section;
+foreach (['training_tab' => 'summary', 'training_search' => '', 'training_modality' => ''] as $key => $default) {
+    $reportparams[$key] = optional_param($key, $default, PARAM_TEXT);
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_sesskey();
+    if ($section !== 'courses' || required_param('action', PARAM_ALPHA) !== 'attendance') { throw new invalid_parameter_exception('Invalid report action'); }
+    $minutes = optional_param('minutes', '', PARAM_RAW_TRIMMED);
+    if ($minutes !== '' && !ctype_digit($minutes)) { throw new invalid_parameter_exception('Invalid minutes'); }
+    \local_orangeportal\training_report::save_attendance($courseid, required_param('participant', PARAM_INT),
+        required_param('attendance', PARAM_ALPHA), $minutes === '' ? null : (int)$minutes);
+    redirect(orange_link('reports.php', $reportparams), get_string('changessaved', 'local_orangeportal'), null, \core\output\notification::NOTIFY_SUCCESS);
+}
 if ($section === 'users') {
     foreach (['report_userid', 'user_page', 'user_cohort'] as $key) { $reportparams[$key] = optional_param($key, 0, PARAM_INT); }
     foreach (['user_search'] as $key) { $reportparams[$key] = optional_param($key, '', PARAM_TEXT); }
@@ -67,22 +79,33 @@ echo $OUTPUT->header();
 echo orange_intro(get_string('administration'), get_string('reportstitle', 'local_orangeportal'), get_string('reportsintro', 'local_orangeportal'));
 echo orange_admin_navigation('reports');
 $tabs = '';
-foreach (['incidents', 'notifications', 'courses', 'users'] as $tab) {
+foreach (['overview', 'incidents', 'notifications', 'courses', 'users'] as $tab) {
     $attrs = ['class' => 'orange-admin-link' . ($section === $tab ? ' active' : '')];
     if ($section === $tab) { $attrs['aria-current'] = 'page'; }
     $tabs .= html_writer::link($reporturl(['section' => $tab]),
-        get_string($tab === 'courses' ? 'reporttraining' : ($tab === 'users' ? 'reportusers' : $tab), 'local_orangeportal'), $attrs);
+        get_string($tab === 'overview' ? 'reportoverview' : ($tab === 'courses' ? 'reporttraining' : ($tab === 'users' ? 'reportusers' : $tab)), 'local_orangeportal'), $attrs);
 }
 echo html_writer::tag('nav', $tabs, ['class' => 'orange-category-tabs',
     'aria-label' => get_string('reportsection', 'local_orangeportal')]);
-if ($section !== 'courses') {
+{
     $periodfields = html_writer::tag('label', get_string('reportperiod', 'local_orangeportal'), ['for' => 'report-period']) .
         html_writer::select(['week' => get_string('reportweek', 'local_orangeportal'),
-            'month' => get_string('reportmonth', 'local_orangeportal'), 'all' => get_string('reportalltime', 'local_orangeportal')],
+            'month' => get_string('reportmonth', 'local_orangeportal'), 'custom' => get_string('trackingcustom', 'local_orangeportal'), 'all' => get_string('reportalltime', 'local_orangeportal')],
             'period', $period, false, ['id' => 'report-period', 'class' => 'custom-select']);
+    foreach (['report_from' => 'datefrom', 'report_to' => 'dateto'] as $field => $label) {
+        $periodfields .= html_writer::tag('label', get_string($label, 'local_orangeportal'), ['for' => $field]) .
+            html_writer::empty_tag('input', ['type' => 'date', 'name' => $field, 'id' => $field,
+                'value' => $reportparams[$field], 'class' => 'form-control']);
+    }
+    $cohorts = [0 => get_string(\local_orangeportal\report_scope::global_access() ? 'reportallcollectives' : 'trackingmycollectives', 'local_orangeportal')];
+    foreach (\local_orangeportal\report_scope::cohorts() as $c) { $cohorts[$c->id] = $c->name; }
+    $periodfields .= html_writer::tag('label', get_string('orangecollectives', 'local_orangeportal'), ['for' => 'report_cohort']) .
+        html_writer::select($cohorts, 'report_cohort', \local_orangeportal\report_scope::selected(), false,
+            ['id' => 'report_cohort', 'class' => 'custom-select']);
     $periodhidden = '';
     foreach ($reportparams as $key => $value) {
-        if ($key !== 'period' && !str_ends_with($key, '_page')) {
+        if (!in_array($key, ['period', 'report_from', 'report_to', 'report_cohort', 'user_cohort', 'report_userid',
+                'incidents_notice', 'notifications_notice', 'incidents_user', 'notifications_user']) && !str_ends_with($key, '_page')) {
             $periodhidden .= html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $key, 'value' => $value]);
         }
     }
@@ -90,64 +113,13 @@ if ($section !== 'courses') {
         ['class' => 'btn btn-primary']), ['method' => 'get', 'class' => 'orange-report-filters']);
     echo html_writer::tag('p', get_string('reportperiodexplanation', 'local_orangeportal'), ['class' => 'text-muted']);
 }
+if ($section === 'overview') { require(__DIR__ . '/report_overview.php'); echo $OUTPUT->footer(); exit; }
 if ($section === 'users') {
     require(__DIR__ . '/report_users.php');
     echo $OUTPUT->footer();
     exit;
 }
-if ($section === 'courses') {
-
-$courses = array_filter(orange_native_courses((int)get_config('local_orangeportal', 'coursescategory')),
-    static fn($course) => (!$courseid || $courseid == $course->id) &&
-        has_capability('moodle/grade:viewall', context_course::instance($course->id)));
-$totalcourses = count($courses);
-$trainingpage = min(max(0, $reportparams['training_page']), max(0, (int)ceil($totalcourses / $perpage) - 1));
-$courses = array_slice($courses, $trainingpage * $perpage, $perpage, true);
-$table = new html_table(); $table->head = [get_string('course'), get_string('activeparticipants', 'local_orangeportal'), get_string('completions', 'local_orangeportal'), get_string('averagegrade', 'local_orangeportal'), get_string('moodlereports', 'local_orangeportal')];
-foreach ($courses as $course) {
-    if ($courseid && $courseid != $course->id) { continue; }
-    $context = context_course::instance($course->id);
-    if (!has_capability('moodle/grade:viewall', $context)) { continue; }
-    [$enrolledsql, $enrolparams] = get_enrolled_sql($context, '', 0, true);
-    $participants = $DB->get_records_sql("SELECT u.id FROM {user} u JOIN ($enrolledsql) eu ON eu.id = u.id
-        WHERE u.deleted = 0 AND u.suspended = 0", $enrolparams);
-    $completed = 0; $grades = [];
-    $participants = array_filter($participants, fn($p) => \local_orangeportal\experience::member((int)$p->id));
-    foreach ($participants as $participant) {
-        if ($DB->record_exists_select('course_completions', 'course = ? AND userid = ? AND timecompleted > 0', [$course->id, $participant->id])) { $completed++; }
-        $grade = $DB->get_record_sql("SELECT gg.id, gg.finalgrade, gi.grademin, gi.grademax FROM {grade_grades} gg
-            JOIN {grade_items} gi ON gi.id = gg.itemid WHERE gi.courseid = ? AND gi.itemtype = 'course'
-            AND gg.userid = ? AND gg.hidden = 0 AND gi.hidden = 0", [$course->id, $participant->id]);
-        if ($grade && $grade->finalgrade !== null && $grade->grademax > $grade->grademin) {
-            $grades[] = 100 * ($grade->finalgrade - $grade->grademin) / ($grade->grademax - $grade->grademin);
-        }
-    }
-    $links = html_writer::link(new moodle_url('/grade/report/grader/index.php', ['id' => $course->id]), get_string('grades')) . ' · ' .
-        html_writer::link(new moodle_url('/report/completion/index.php', ['course' => $course->id]), get_string('completionreport', 'local_orangeportal'));
-    $modinfo = get_fast_modinfo($course);
-    foreach ($modinfo->get_cms() as $cm) {
-        if ($cm->modname == 'quiz' && has_capability('mod/quiz:viewreports', $cm->context)) {
-            $links .= ' · ' . html_writer::link(new moodle_url('/mod/quiz/report.php', ['id' => $cm->id]), get_string('quizreport', 'local_orangeportal', s($cm->name)));
-        } else if ($cm->modname == 'feedback' && has_capability('mod/feedback:viewreports', $cm->context)) {
-            $links .= ' · ' . html_writer::link(new moodle_url('/mod/feedback/analysis.php', ['id' => $cm->id]), get_string('surveyreport', 'local_orangeportal', s($cm->name)));
-        }
-    }
-    $table->data[] = [html_writer::link($reporturl(['courseid' => $course->id, 'training_page' => 0], 'report-training'), s($course->fullname)),
-        count($participants), $completed, $grades ? round(array_sum($grades) / count($grades), 1) : get_string('nogrades', 'local_orangeportal'), $links];
-}
-$training = html_writer::div(html_writer::table($table), 'orange-table-scroll') .
-    $OUTPUT->paging_bar($totalcourses, $trainingpage, $perpage, $reporturl([], 'report-training'), 'training_page');
-if ($courseid) { $training .= html_writer::link($reporturl(['courseid' => 0, 'training_page' => 0], 'report-training'), get_string('allcourses', 'local_orangeportal')); }
-if ($canexport && $totalcourses) {
-    $training .= html_writer::link(orange_link('export.php', ['type' => 'training', 'courseid' => $courseid]),
-        get_string('orangetrainingexport', 'local_orangeportal'), ['class' => 'btn btn-outline-secondary']);
-}
-if (!$totalcourses) { $training .= html_writer::tag('p', get_string('reportnotraining', 'local_orangeportal')); }
-echo $OUTPUT->heading(get_string('reporttraining', 'local_orangeportal'), 3);
-echo html_writer::div($training, 'orange-training-report');
-echo $OUTPUT->footer();
-exit;
-}
+if ($section === 'courses') { require(__DIR__ . '/report_training.php'); echo $OUTPUT->footer(); exit; }
 $kind = $section;
 $selectedid = $reportparams[$kind . '_notice'];
 if (!$selectedid) {
@@ -185,7 +157,7 @@ echo html_writer::tag('p', get_string('reportreadingsummary', 'local_orangeporta
     'total' => $selectednotice->recipients,
     'read' => reading_report::ratio($selectednotice->readcount, $selectednotice->recipients),
     'unread' => reading_report::ratio($selectednotice->unreadcount, $selectednotice->recipients)]));
-$users = \local_orangeportal\orange_scope::users();
+$users = \local_orangeportal\report_scope::users();
     $selectedid = $reportparams[$kind . '_notice'];
     $selecteduser = $reportparams[$kind . '_user'];
     $reading = $reportparams[$kind . '_reading'];
@@ -217,7 +189,7 @@ $users = \local_orangeportal\orange_scope::users();
     $content .= $OUTPUT->paging_bar($data['total'], $data['page'], $perpage, $reporturl([], 'report-' . $kind), $kind . '_page');
     if ($canexport) {
         $content .= html_writer::link(orange_link('export.php', ['type' => 'readings', 'kind' => $kind,
-            'noticeid' => $selectedid, 'userid' => $selecteduser, 'reading' => $reading]),
+            'noticeid' => $selectedid, 'userid' => $selecteduser, 'reading' => $reading] + \local_orangeportal\report_period::params()),
             get_string('orangereadingexport', 'local_orangeportal'), ['class' => 'btn btn-outline-secondary']);
     }
     $reset = [$kind . '_notice' => $selectedid, $kind . '_user' => 0, $kind . '_reading' => '',
@@ -227,12 +199,16 @@ $users = \local_orangeportal\orange_scope::users();
         $notice = $notices[$selectedid];
         $conditions = ['noticeid' => $selectedid];
         if ($selecteduser) { $conditions['userid'] = $selecteduser; }
-        $total = $DB->count_records('local_orange_receipt', $conditions);
+        [$historyscope, $historyparams] = \local_orangeportal\report_scope::user_sql('r.userid', 'historyscope');
+        $historywhere = 'r.noticeid=:historynotice AND ' . $historyscope;
+        $historyparams['historynotice'] = $selectedid;
+        if ($selecteduser) { \local_orangeportal\report_scope::require_user($selecteduser); $historywhere .= ' AND r.userid=:historyuser'; $historyparams['historyuser'] = $selecteduser; }
+        $total = $DB->count_records_sql("SELECT COUNT(1) FROM {local_orange_receipt} r WHERE $historywhere", $historyparams);
         $page = min(max(0, $reportparams[$kind . '_history_page']), max(0, (int)ceil($total / $perpage) - 1));
         $history = new html_table();
         $history->head = [get_string('version', 'local_orangeportal'), get_string('recipient', 'local_orangeportal'),
             get_string('received', 'local_orangeportal'), get_string('read', 'local_orangeportal')];
-        foreach ($DB->get_records('local_orange_receipt', $conditions, 'revision DESC,userid,id', '*', $page * $perpage, $perpage) as $receipt) {
+        foreach ($DB->get_records_sql("SELECT r.* FROM {local_orange_receipt} r WHERE $historywhere ORDER BY r.revision DESC,r.userid,r.id", $historyparams, $page * $perpage, $perpage) as $receipt) {
             $user = core_user::get_user($receipt->userid);
             $history->data[] = [$receipt->revision, s($user ? fullname($user) : get_string('deleteduser', 'local_orangeportal')),
                 $date($receipt->received), $date($receipt->readtime ?: $receipt->confirmed)];

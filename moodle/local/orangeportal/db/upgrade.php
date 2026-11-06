@@ -109,5 +109,22 @@ function xmldb_local_orangeportal_upgrade($oldversion): bool {
         if (!$DB->get_manager()->field_exists($table, $field)) { $DB->get_manager()->add_field($table, $field); }
         upgrade_plugin_savepoint(true, 2026102900, 'local', 'orangeportal');
     }
+    if ($oldversion < 2026110601) {
+        $table = new xmldb_table('local_orange_attendance');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        foreach (['courseid', 'userid', 'authorid', 'timemodified'] as $name) { $table->add_field($name, XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL); }
+        $table->add_field('status', XMLDB_TYPE_CHAR, '12', null, XMLDB_NOTNULL, null, 'unknown');
+        $table->add_field('minutes', XMLDB_TYPE_INTEGER, '10');
+        $table->add_field('collectives', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('course', XMLDB_KEY_FOREIGN, ['courseid'], 'course', ['id']);
+        $table->add_key('user', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+        $table->add_index('participant', XMLDB_INDEX_UNIQUE, ['courseid', 'userid']);
+        if (!$DB->get_manager()->table_exists($table)) { $DB->get_manager()->create_table($table); }
+        update_capabilities('local_orangeportal');
+        \local_orangeportal\orange_administration::install_roles();
+        \local_orangeportal\training_report::install();
+        upgrade_plugin_savepoint(true, 2026110601, 'local', 'orangeportal');
+    }
     return true;
 }

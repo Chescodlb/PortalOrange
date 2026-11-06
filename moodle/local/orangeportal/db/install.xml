@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/orangeportal/db" VERSION="20261029" COMMENT="Orange portal">
+<XMLDB PATH="local/orangeportal/db" VERSION="20261106" COMMENT="Orange portal">
   <TABLES>
+    <TABLE NAME="local_orange_attendance" COMMENT="Explicit attendance per course edition and participant">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="12" NOTNULL="true" DEFAULT="unknown"/>
+        <FIELD NAME="minutes" TYPE="int" LENGTH="10" NOTNULL="false"/>
+        <FIELD NAME="authorid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="collectives" TYPE="text" NOTNULL="true"/>
+      </FIELDS>
+      <KEYS><KEY NAME="primary" TYPE="primary" FIELDS="id"/><KEY NAME="course" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/><KEY NAME="user" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/></KEYS>
+      <INDEXES><INDEX NAME="participant" UNIQUE="true" FIELDS="courseid,userid"/></INDEXES>
+    </TABLE>
+
     <TABLE NAME="local_orange_container" COMMENT="References to native activity container courses without personal data">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>

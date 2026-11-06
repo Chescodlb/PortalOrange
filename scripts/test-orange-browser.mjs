@@ -63,7 +63,51 @@ try {
   };
   const nav = () => evaluate(`Array.from(document.querySelectorAll('.primary-navigation .nav-link')).filter(x=>x.textContent.trim()!=='').map(x=>x.textContent.trim()).filter(x=>!['Más','More'].includes(x))`);
   await send('Page.enable'); await send('Runtime.enable');
-  if (process.argv.includes('--live-updates-only')) {
+  if (process.argv.includes('--edition-reports-only')) {
+    await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
+    for (const language of ['es','en']) {
+      for (const section of ['overview','users','incidents','notifications','courses']) {
+        await navigate('/local/orangeportal/reports.php?section='+section+'&period=all&lang='+language);
+        check(await evaluate(`!!document.querySelector('#report_cohort')&&!document.body.innerText.includes('[[')&&!document.querySelector('.alert-danger')`),language+' / '+section+': filtros comunes y traducciones');
+      }
+      const edition=await evaluate(`document.querySelector('.orange-training-report tbody a')?.href`);
+      check(!!edition,language+': edición accesible');
+      for (const tab of ['summary','participants','evaluations','satisfaction']) {
+        await navigate(edition+'&training_tab='+tab);
+        check(await evaluate(`!!document.querySelector('.orange-category-tabs [aria-current="page"]')&&!document.querySelector('.alert-danger')&&!document.body.innerText.includes('[[')`),language+' / '+tab+': ficha de edición');
+      }
+      await navigate('/course/edit.php?id=4&lang='+language);
+      check(await evaluate(`!!document.querySelector('[name="customfield_orange_edition"]')&&!!document.querySelector('[name="customfield_orange_modality"]')`),language+': campos de edición en formulario nativo');
+      if (language==='en') {
+        check(await evaluate(`document.querySelector('label[for="id_customfield_orange_edition"]').textContent.includes('Edition code')`),'Los campos nativos Orange también cambian a inglés');
+      }
+    }
+    await navigate('/local/orangeportal/reports.php?section=users&period=all');
+    await screenshot('seguimiento-ediciones-desktop');
+    await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+    check(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),'Seguimiento adaptable a móvil');
+    await screenshot('seguimiento-ediciones-mobile');
+    await send('Emulation.clearDeviceMetricsOverride');
+    await logout(); await login('admin.orange',env.ORANGE_DEMO_PASSWORD);
+    for (const type of ['reportusers','training','attendance','evaluations','satisfaction']) {
+      const csv=await evaluate(`fetch('/local/orangeportal/export.php?type=${type}&courseid=4&period=all').then(async r=>({type:r.headers.get('content-type'),body:await r.text()}))`);
+      check(csv.type?.includes('csv')&&!csv.body.includes('[[')&&!csv.body.includes('Exception'), 'CSV autorizado: '+type);
+    }
+    await logout(); await login('coordinador.orange',env.ORANGE_DEMO_PASSWORD);
+    await navigate('/local/orangeportal/reports.php?section=courses&period=all');
+    const coordinated=await evaluate(`document.querySelector('.orange-training-report tbody a')?.href`);
+    if (coordinated) {
+      await navigate(coordinated+'&training_tab=participants');
+      check(await evaluate(`!document.querySelector('.orange-attendance-form')`),'Coordinación ve asistencia sin botones para modificarla');
+    }
+    await navigate('/grade/report/grader/index.php?id=4');
+    check(await evaluate(`!document.querySelector('#user-grades')&&document.body.innerText.includes('Orange')`),'Informe nativo no permite saltar el ámbito de colectivos');
+    await logout(); await login('agente.orange',env.ORANGE_DEMO_PASSWORD);
+    await navigate('/local/orangeportal/reports.php');
+    check(await evaluate(`!document.querySelector('#report_cohort')&&!document.querySelector('.orange-tracking-overview')`),'Agentes no reciben seguimiento de otros usuarios');
+    await writeFile('backups/previews/edition-report-checks.json',JSON.stringify({date:new Date().toISOString(),results},null,2));
+    console.log('Verificaciones de ediciones: '+results.length);
+  } else if (process.argv.includes('--live-updates-only')) {
     const token=crypto.randomUUID().replaceAll('-','').slice(0,12);
     const fixtureCommand=(action,key)=>execFileSync('docker',['compose','exec','-T','web','php',
       'local/orangeportal/cli/live_updates_browser_fixture.php',action,token,...(key?[key]:[])],{encoding:'utf8'});
@@ -350,7 +394,7 @@ try {
       for(const language of ['es','en']) {
         await navigate('/local/orangeportal/reports.php?section=users&lang='+language);
         check(await evaluate(`!!document.querySelector('.orange-user-summary')&&!document.body.textContent.includes('[[')&&!document.querySelector('.alert-danger')`),username+' / '+language+': directorio individual traducido');
-        check(await evaluate(`document.querySelector('#report-period').value==='month'&&!!document.querySelector('#user_search')&&!!document.querySelector('#user_cohort')&&!document.querySelector('#user_centre')`),username+' / '+language+': periodo y filtros de nombre/CE, colectivo/centro');
+        check(await evaluate(`document.querySelector('#report-period').value==='month'&&!!document.querySelector('#user_search')&&!!document.querySelector('#report_cohort')&&!document.querySelector('#user_centre')`),username+' / '+language+': periodo y filtros de nombre/CE, colectivo/centro');
         const profile=await evaluate(`Array.from(document.querySelectorAll('.orange-user-summary tbody tr')).find(r=>r.cells[0].textContent.includes('Agente Orange'))?.querySelector('a')?.href`);
         check(!!profile,username+' / '+language+': ficha del agente accesible');
         await navigate(profile);
@@ -388,7 +432,7 @@ try {
     for(const language of ['es','en']) {
       for(const section of ['incidents','notifications']) {
         await navigate('/local/orangeportal/reports.php?section='+section+'&lang='+language);
-        check(await evaluate(`document.querySelectorAll('.orange-category-tabs a').length===4&&document.querySelector('.orange-category-tabs [aria-current="page"]').href.includes('section=${section}')`),language+' / '+section+': selector de Seguimiento activo');
+        check(await evaluate(`document.querySelectorAll('.orange-category-tabs a').length===5&&document.querySelector('.orange-category-tabs [aria-current="page"]').href.includes('section=${section}')`),language+' / '+section+': selector de Seguimiento activo');
         check(await evaluate(`!!document.querySelector('.orange-reading-summary')&&!document.querySelector('.orange-reading-detail')&&!document.body.textContent.includes('[[')`),language+' / '+section+': resumen por publicación separado del detalle');
         check(await evaluate(`Array.from(document.querySelectorAll('.orange-reading-summary tbody tr')).every(r=>Number(r.cells[2].textContent)===Number(r.cells[3].textContent.match(/— (\\d+)\\//)?.[1]||0)+Number(r.cells[4].textContent.match(/— (\\d+)\\//)?.[1]||0))`),language+' / '+section+': total igual a leídos más sin leer');
         check(await evaluate(`document.querySelectorAll('.orange-reading-summary tbody tr').length<=25`),language+' / '+section+': resumen paginado');
@@ -402,7 +446,7 @@ try {
         await screenshot('seguimiento-'+section+'-'+language);
       }
       await navigate('/local/orangeportal/reports.php?section=courses&lang='+language);
-      check(await evaluate(`!!document.querySelector('.orange-training-report')&&!!document.querySelector('a[href*="/grade/report/grader/"]')&&!document.querySelector('.orange-reading-summary')`),language+': Formación conserva resultados y enlaces');
+      check(await evaluate(`!!document.querySelector('.orange-training-report')&&!!document.querySelector('.orange-training-report a[href*="courseid="]')&&!document.querySelector('.orange-reading-summary')`),language+': Formación conserva resultados y enlaces');
     }
     await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
     await navigate('/local/orangeportal/reports.php?section=notifications');
@@ -413,7 +457,7 @@ try {
     check(await evaluate(`!document.querySelector('[name="pending"]')`),'Comunicados sin filtro de confirmación');
     const detail=await evaluate(`document.querySelector('.orange-notification-title')?.href`);
     check(!!detail,'Comunicado asignado disponible para abrir');
-    await navigate(detail);
+    await navigate(detail+'&detail=1');
     check(await evaluate(`!!document.querySelector('.orange-notice-content')&&!document.querySelector('input[value="confirm"]')`),'Detalle registra lectura sin botón de confirmar');
     const blocked=await evaluate(`fetch(location.href,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({action:'confirm',sesskey:M.cfg.sesskey,revision:'1'})}).then(r=>r.text()).then(html=>!new DOMParser().parseFromString(html,'text/html').querySelector('.orange-notice-content'))`);
     check(blocked,'POST de confirmación antiguo rechazado');
@@ -426,7 +470,7 @@ try {
         await navigate('/local/orangeportal/reports.php?section=courses&lang='+language);
         check(await evaluate(`!!document.querySelector('.orange-intro')&&!document.querySelector('.alert-danger')`),username+' / '+language+': consulta de informes');
         check(await evaluate(`!Array.from(document.querySelectorAll('.orange-admin-links a')).some(e=>/manage.php|options.php|categories.php|users.php|cohorts.php/.test(e.href))&&!document.querySelector('a[href*="export.php"]')`),username+' / '+language+': sin gestión ni exportación');
-        const grades=await evaluate(`document.querySelectorAll('a[href*="/grade/report/grader/"]').length`);
+        const grades=await evaluate(`document.querySelectorAll('.orange-training-report tbody a[href*="courseid="]').length`);
         check((grades>0)===(username==='coordinador.orange'),username+' / '+language+': notas según perfil');
       }
       await screenshot('consulta-'+username.split('.')[0]);
@@ -440,10 +484,14 @@ try {
       check(await evaluate(`!!document.querySelector('.orange-intro')&&!document.querySelector('.orange-admin-links a[href*="manage.php"]')`),username+': histórico de incidencias sin edición');
       if(username==='coordinador.orange') {
         await navigate('/grade/report/grader/index.php?id=4&edit=1');
-        check(await evaluate(`!!document.querySelector('#user-grades')&&!document.querySelector('#user-grades input')`),'Coordinación consulta calificaciones sin campos editables');
+        check(await evaluate(`!document.querySelector('#user-grades')&&document.body.innerText.includes('Orange')`),'Coordinación usa seguimiento Orange para respetar colectivos');
+        for (const suffix of ['', '&userid=0']) {
+          await navigate('/grade/report/user/index.php?id=4'+suffix);
+          check(await evaluate(`document.body.innerText.includes('Orange')&&!document.querySelector('.grade-report-user')`),'El informe por usuario tampoco expone selectores generales: '+(suffix||'sin destinatario'));
+        }
       } else {
         await navigate('/grade/report/grader/index.php?id=4');
-        check(await evaluate(`!document.querySelector('#user-grades')&&/permission|permiso|acceso|capabilit/i.test(document.body.innerText)`),'Calidad no accede al libro de notas de otros');
+        check(await evaluate(`!document.querySelector('#user-grades')&&/Orange|permission|permiso|acceso|capabilit/i.test(document.body.innerText)`),'Calidad no accede al libro de notas de otros');
       }
       await logout();
     }

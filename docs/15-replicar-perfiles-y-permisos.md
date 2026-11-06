@@ -30,9 +30,9 @@ Todos los accesos del plugin requieren pertenecer a la **cohorte configurada com
 | Gestionar publicaciones | `local/orangeportal:manage` | Gestión de Incidencias y Comunicados; publicación, edición, destinatarios y categorías de ambos tipos. | Edición de documentos/cursos nativos, cambio de estados sin su permiso adicional o seguimiento de resultados. |
 | Cambiar estados de incidencias | `local/orangeportal:changestate` | Cambio del estado común y sus datos de cierre. | Publicar incidencias nuevas ni abrir herramientas de gestión sin `manage`. |
 | Ver incidencias abiertas y cerradas y su seguimiento específico | `local/orangeportal:viewallincidents` | Histórico/seguimiento específico de incidencias y consulta ampliada. | Cambiar estados, publicar o consultar notas. |
-| Abrir Seguimiento | `local/orangeportal:viewreports` | Selector Incidencias, Comunicados, Formación y Usuarios; porcentajes, pendientes y lecturas nominales. | Notas o intentos sin sus permisos nativos; edición; exportación. |
+| Abrir Seguimiento | `local/orangeportal:viewreports` | Selector Resumen, Incidencias, Comunicados, Formación y Usuarios; porcentajes, pendientes y lecturas nominales. | Notas o intentos sin sus permisos nativos; edición; exportación. |
 | Gestionar Estados e Impactos | `local/orangeportal:manageoptions` | Herramienta Estados e impactos del portal. | Publicación, notas ni configuración general de Moodle. |
-| Exportar CSV del portal | `local/orangeportal:exportreports` **y** `viewreports` | Exportación de lecturas y formación; esta última exige además acceso a las notas de cada curso. Usuarios exige también `administer`. | Exportación nativa de Moodle, que tiene permisos independientes. No crea un CSV nuevo del directorio estadístico de Usuarios. |
+| Exportar CSV del portal | `local/orangeportal:exportreports` **y** `viewreports` | Exportación de lecturas y formación; esta última exige además acceso a las notas de cada curso. Usuarios exige también `administer`. | Exportación nativa de Moodle, que tiene permisos independientes. Incluye el CSV estadístico de Usuarios y los de asistencia, evaluaciones y satisfacción; todos respetan el ámbito. |
 | Gestionar categorías de Biblioteca o Formaciones | `moodle/category:manage` en la categoría correspondiente | Crear, editar y eliminar categorías vacías de esa rama desde el portal. | Crear cursos/colecciones o editar sus recursos. |
 | Crear una colección o formación | `moodle/course:create` en su categoría | Crear nueva colección documental / nuevo curso. | Editar automáticamente todos los contenidos existentes. |
 | Editar documentos, actividades y evaluaciones existentes | Profesor con permiso de edición o rol equivalente en curso/categoría Orange | Edición nativa de los recursos y actividades autorizados. | Administración general, altas de cuentas ni permisos globales de publicaciones. |
@@ -41,7 +41,7 @@ Todos los accesos del plugin requieren pertenecer a la **cohorte configurada com
 | Ver intentos en la ficha Orange | Permisos anteriores de seguimiento, `moodle/grade:viewall` y `mod/quiz:viewreports` en el cuestionario | Intentos reales, estados y fechas; acceso al informe nativo con su propia comprobación. | Cambiar notas o recalificar. |
 | Consultar encuestas desde la ficha | Seguimiento del curso y `mod/feedback:viewreports` en la actividad | Cumplimentación identificable de encuestas no anónimas. | Atribuir respuestas anónimas a un usuario. |
 
-El permiso `manage` gestiona **ambos tipos de publicación**. Hoy no existe un permiso exclusivo «solo comunicados». Esa separación requeriría ampliar el plugin. Igualmente, `viewreports` muestra lecturas de **Orange en general**: seleccionar un colectivo es un filtro, no una frontera de seguridad por equipo.
+El permiso `manage` gestiona **ambos tipos de publicación**. Hoy no existe un permiso exclusivo «solo comunicados». Esa separación requeriría ampliar el plugin. `viewreports` permite consultar solo los colectivos Orange del responsable. El servidor aplica ese ámbito también por URL y exportación. `local/orangeportal:viewallreports` amplía el seguimiento a todo Orange, conservando los permisos nativos de cada curso.
 
 ## Roles que componen cada perfil
 
@@ -55,7 +55,7 @@ En **Definir roles**, «Nombre completo» es la etiqueta visible y puede cambiar
 | Consulta formativa Orange — `orange_consulta_formativa` | Categoría o curso | Consulta nativa de resultados sin edición; lista completa más abajo. |
 | Gestión de categorías Orange — `orange_gestorcategorias` | Categoría | Solo `moodle/category:manage`. |
 | Creación de contenidos Orange — `orange_creadorcontenidos` | Categoría | Solo `moodle/course:create`. |
-| Administrador de Orange — `orange_administrador` | Sistema | Los siete permisos `local/orangeportal:*` de la tabla anterior. Se crea al instalar el plugin. |
+| Administrador de Orange — `orange_administrador` | Sistema | Los permisos del portal de la tabla anterior, incluido `local/orangeportal:viewallreports` para consulta global Orange. Se crea al instalar el plugin. |
 | Administración de contenidos Orange — `orange_admin_area` | Categoría | Rol auxiliar creado por el plugin; edición nativa basada en Profesor con edición y creación/gestión de contenido en las dos raíces. Se asigna automáticamente al administrador Orange. |
 | Cuenta exclusiva Orange — `orange_cuenta` | Usuario | Marcador técnico sin permisos. Lo aplica el plugin a cuentas creadas desde Usuarios Orange. No asignarlo manualmente para dar acceso. |
 
@@ -186,7 +186,7 @@ Cerrar sesión y entrar con cada cuenta. No validar la delegación usando un adm
 | Coordinador abre notas de un curso no autorizado | Sin acceso a esos resultados. |
 | Usuario de Cristalia-Madrid | Aparece al filtrar su colectivo y no en Centro-Valencia, salvo que pertenezca también a ese centro. |
 
-El seguimiento de lecturas es Orange general, sin restricción por equipo del coordinador. Si se exige consulta exclusiva del equipo propio, debe desarrollarse esa autorización antes de dar acceso general. La selección de centro no sustituye ese desarrollo.
+El seguimiento queda limitado a los colectivos Orange del consultante. Añadir al responsable a los mismos colectivos que las personas supervisadas; la cohorte base de acceso no basta. La capacidad `local/orangeportal:viewallreports` permite consulta global y se reserva a responsables expresamente autorizados. Los informes nativos generales de terceros se bloquean a responsables con ámbito parcial; deben usar Seguimiento Orange.
 
 ## Paso 7 Guardar la configuración del ambiente
 

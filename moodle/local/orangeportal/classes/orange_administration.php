@@ -22,7 +22,7 @@ class orange_administration {
             }
         }
         $admin = $DB->get_field('role', 'id', ['shortname' => 'orange_administrador'], MUST_EXIST);
-        foreach (['administer', 'exportreports', 'manage', 'viewreports', 'viewallincidents', 'changestate', 'manageoptions'] as $cap) {
+        foreach (['administer', 'exportreports', 'manage', 'viewreports', 'viewallreports', 'viewallincidents', 'changestate', 'manageoptions'] as $cap) {
             assign_capability('local/orangeportal:' . $cap, CAP_ALLOW, $admin, \context_system::instance()->id);
         }
         // Native content capabilities are assigned only at the two Orange category roots.

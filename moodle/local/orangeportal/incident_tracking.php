@@ -18,7 +18,7 @@ if (!$id) {
     $table = new html_table();
     $table->head = array_map(fn($key) => get_string($key, 'local_orangeportal'),
         ['incidentidentification', 'incidentopened', 'incidentcloseddate', 'incidentcolumnstate', 'incidentclient', 'incidentproduct', 'incidentassigned', 'incidentreadusers']);
-    $users = \local_orangeportal\orange_scope::users();
+    $users = \local_orangeportal\report_scope::users();
     foreach ($DB->get_records('local_orange_notice', ['kind' => 'incidents'], 'timecreated DESC, id DESC') as $n) {
         $assigned = 0; $read = 0;
         foreach ($users as $u) {
@@ -27,6 +27,7 @@ if (!$id) {
             $r = service::get_receipt($n, (int)$u->id);
             if ($r && $r->readtime) { $read++; }
         }
+        if (!$assigned && (!\local_orangeportal\report_scope::global_access() || \local_orangeportal\report_scope::selected())) { continue; }
         $title = html_writer::link(orange_link('incident_tracking.php', ['id' => $n->id]), s($n->title));
         if ($n->deleted) { $title .= ' · ' . get_string('incidentarchived', 'local_orangeportal'); }
         $table->data[] = [$title, userdate($n->timecreated, '%d/%m/%Y %H:%M'), $n->timeclosed ? userdate($n->timeclosed, '%d/%m/%Y %H:%M') : '—',
@@ -35,6 +36,7 @@ if (!$id) {
     echo html_writer::div(html_writer::table($table), 'orange-table-scroll');
 } else {
     $n = $DB->get_record('local_orange_notice', ['id' => $id, 'kind' => 'incidents'], '*', MUST_EXIST);
+    \local_orangeportal\report_scope::require_notice($id);
     echo $OUTPUT->heading(s($n->title), 3);
     echo html_writer::tag('p', s(get_string('incidentclient', 'local_orangeportal') . ': ' . ($n->client ?: '—') . ' · ' .
         get_string('incidentproduct', 'local_orangeportal') . ': ' . ($n->product ?: '—')));
@@ -50,7 +52,7 @@ if (!$id) {
     }
     $audience = new html_table();
     $audience->head = array_map(fn($key) => get_string($key, 'local_orangeportal'), ['recipient', 'received', 'read']);
-    foreach (\local_orangeportal\orange_scope::users() as $u) {
+    foreach (\local_orangeportal\report_scope::users() as $u) {
         if (!service::assigned($id, (int)$u->id)) { continue; }
         $r = service::get_receipt($n, (int)$u->id);
         $audience->data[] = [s(fullname($u)), $r && $r->received ? userdate($r->received, '%d/%m/%Y %H:%M') : get_string('pending', 'local_orangeportal'),
@@ -68,6 +70,7 @@ if (!$id) {
     $history = new html_table();
     $history->head = array_map(fn($key) => get_string($key, 'local_orangeportal'), ['version', 'recipient', 'received', 'read']);
     foreach ($DB->get_records('local_orange_receipt', ['noticeid' => $id], 'revision DESC, userid') as $r) {
+        if (!isset(\local_orangeportal\report_scope::users()[$r->userid])) { continue; }
         $user = core_user::get_user($r->userid);
         $history->data[] = [$r->revision, s($user ? fullname($user) : '—'), $r->received ? userdate($r->received, '%d/%m/%Y %H:%M') : '—', $r->readtime ? userdate($r->readtime, '%d/%m/%Y %H:%M') : '—'];
     }

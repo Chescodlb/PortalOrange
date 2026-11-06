@@ -324,6 +324,9 @@ class native_content {
     }
     public static function course_deleted(\core\event\course_deleted $event): void {
         global $DB;
+        if ($DB->get_manager()->table_exists('local_orange_attendance')) {
+            $DB->delete_records('local_orange_attendance', ['courseid' => $event->objectid]);
+        }
         $DB->delete_records('local_orange_container', ['courseid' => $event->objectid]);
     }
     /** Empty technical courses do not make an otherwise empty Library category undeletable. */

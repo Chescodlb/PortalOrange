@@ -64,6 +64,8 @@ try {
         (int)$stats->notifications_total === reading_report::data('notifications', 0, $agent->id, '', 0, 25, $since)['total'],
         'Porcentajes de usuario coinciden con su desglose de lecturas');
     $DB->set_field('user', 'idnumber', 'CE-ORANGE-ANALYTICS', ['id' => $agent->id]);
+    // Dataset assertions below use global reporting; scoped viewers are tested separately.
+    \core\session\manager::set_user($DB->get_record('user', ['username' => 'admin.orange'], '*', MUST_EXIST));
     $centres = [];
     foreach (['Cristalia-Madrid', 'Centro-Valencia'] as $name) {
         $centres[] = cohort_add_cohort((object)['name' => 'TEST ' . $name, 'contextid' => context_system::instance()->id,

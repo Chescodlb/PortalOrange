@@ -8,7 +8,7 @@ $userid = optional_param('report_userid', 0, PARAM_INT);
 $usertab = optional_param('user_tab', 'summary', PARAM_ALPHA);
 $userpage = max(0, optional_param('user_page', 0, PARAM_INT));
 $search = optional_param('user_search', '', PARAM_TEXT);
-$cohort = optional_param('user_cohort', 0, PARAM_INT);
+$cohort = \local_orangeportal\report_scope::selected();
 $sort = optional_param('user_sort', 'pending', PARAM_ALPHA);
 $reading = optional_param('user_reading', '', PARAM_ALPHA);
 $ul = static function(array $changes = []) use ($reporturl, $userid, $usertab, $search, $cohort, $sort, $reading): moodle_url {
@@ -24,13 +24,14 @@ $metric = static fn($read, $total) => reading_report::ratio((int)$read, (int)$to
 $criticals = reading_report::critical_pending($userid);
 if (!$userid) {
     $cohortchoices = [0 => $label('reportallcollectives')];
-    foreach (\local_orangeportal\orange_scope::cohorts() as $c) { $cohortchoices[$c->id] = $c->name; }
-    $fields = html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'section', 'value' => 'users']) .
+    foreach (\local_orangeportal\report_scope::cohorts() as $c) { $cohortchoices[$c->id] = $c->name; }
+    $fields = '';
+    foreach (\local_orangeportal\report_period::params() as $key => $value) { $fields .= html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $key, 'value' => $value]); }
+    $fields .= html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'section', 'value' => 'users']) .
         html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'period', 'value' => $period]);
     $fields .= $field('user_search', $label('reportsearchuser'), html_writer::empty_tag('input', [
         'type' => 'search', 'name' => 'user_search', 'id' => 'user_search', 'value' => $search, 'class' => 'form-control']));
-    foreach (['user_cohort' => [$label('reportcollectivecentre'), $cohortchoices, $cohort],
-        'user_sort' => [$label('reportorder'), ['pending' => $label('reportmostpending'), 'name' => get_string('name')], $sort]] as $name => [$caption, $choices, $value]) {
+    foreach (['user_sort' => [$label('reportorder'), ['pending' => $label('reportmostpending'), 'name' => get_string('name')], $sort]] as $name => [$caption, $choices, $value]) {
         $fields .= $field($name, $caption, html_writer::select($choices, $name, $value, false, ['id' => $name, 'class' => 'custom-select']));
     }
     echo html_writer::tag('form', $fields . html_writer::tag('button', get_string('filter'), ['class' => 'btn btn-primary']),
@@ -38,14 +39,14 @@ if (!$userid) {
     $data = reading_report::directory($search, $cohort, $sort, $since, $userpage, $perpage);
     $table = new html_table();
     $table->attributes['class'] = 'generaltable orange-user-summary';
-    $table->head = [get_string('fullnameuser'), $label('reportincidentunread'), $label('reportincidentread'),
+    $table->head = [get_string('fullnameuser'), $label('orangecollectives'), $label('reportincidentunread'), $label('reportincidentread'),
         $label('reportnotificationunread'), $label('reportnotificationread'), $label('reportcriticalunread'),
         $label('reporttrainingfinished'), $label('reportinprogress')];
     foreach ($data['rows'] as $u) {
         $training = user_report::training($u->id);
         $name = html_writer::link($ul(['report_userid' => $u->id, 'user_page' => 0, 'user_tab' => 'summary']), s(fullname($u)));
         if ($u->idnumber !== '') { $name .= html_writer::div(s($u->idnumber), 'small text-muted'); }
-        $table->data[] = [$name, $metric($u->incidents_total - $u->incidents_read, $u->incidents_total),
+        $table->data[] = [$name, s(\local_orangeportal\report_scope::user_cohorts($u->id)), $metric($u->incidents_total - $u->incidents_read, $u->incidents_total),
             $metric($u->incidents_read, $u->incidents_total), $metric($u->notifications_total - $u->notifications_read, $u->notifications_total),
             $metric($u->notifications_read, $u->notifications_total), (int)($criticals[$u->id]->pending ?? 0),
             $training['available'] ? $metric($training['completed'], $training['total']) : $label('reporttrainingrestricted'),
@@ -54,6 +55,10 @@ if (!$userid) {
     echo $OUTPUT->heading($label('reportusers'), 3);
     echo html_writer::tag('p', $label('reportcriticalexplanation'), ['class' => 'text-muted']);
     echo html_writer::div(html_writer::table($table), 'orange-table-scroll');
+    if ($canexport) {
+        echo html_writer::link(orange_link('export.php', ['type' => 'reportusers', 'user_search' => $search, 'user_sort' => $sort] + \local_orangeportal\report_period::params()),
+            $label('trackingexport'), ['class' => 'btn btn-primary']);
+    }
     if (!$data['total']) { echo html_writer::tag('p', $label('reportnoresults')); }
     echo $OUTPUT->paging_bar($data['total'], $data['page'], $perpage, $ul(), 'user_page');
     return;
@@ -67,7 +72,7 @@ echo html_writer::link($ul(['report_userid' => 0, 'user_page' => 0]), $label('ba
 echo $OUTPUT->heading(s(fullname($user)), 3);
 if ($user->idnumber !== '') { echo html_writer::tag('p', s($user->idnumber)); }
 $memberships = [];
-foreach (\local_orangeportal\orange_scope::cohorts() as $c) {
+foreach (\local_orangeportal\report_scope::cohorts() as $c) {
     if ($DB->record_exists('cohort_members', ['cohortid' => $c->id, 'userid' => $userid])) { $memberships[] = $c->name; }
 }
 if ($memberships) { echo html_writer::tag('p', $label('orangecollectives') . ': ' . s(implode(' · ', $memberships))); }
@@ -99,7 +104,7 @@ if ($usertab === 'summary') {
     } else { echo html_writer::tag('p', $label('reporttrainingrestricted')); }
 } else if (in_array($usertab, ['incidents', 'notifications'], true)) {
     $fields = '';
-    foreach (['section' => 'users', 'period' => $period, 'report_userid' => $userid, 'user_tab' => $usertab] as $name => $value) {
+    foreach (['section' => 'users', 'report_userid' => $userid, 'user_tab' => $usertab] + \local_orangeportal\report_period::params() as $name => $value) {
         $fields .= html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $name, 'value' => $value]);
     }
     $fields .= $field('user_reading', $label('updates_reading'), html_writer::select([
@@ -157,7 +162,7 @@ if ($usertab === 'summary') {
                 $attempttable->data[] = [$attempt->attempt, get_string('state' . $attempt->state, 'quiz'),
                     $attempt->timestart ? userdate($attempt->timestart) : '—', $attempt->timefinish ? userdate($attempt->timefinish) : '—'];
             }
-            $link = html_writer::link(new moodle_url('/mod/quiz/report.php', ['id' => $quiz->cmid]), $label('moodlereports'));
+            $link = \local_orangeportal\report_scope::global_access() ? html_writer::link(new moodle_url('/mod/quiz/report.php', ['id' => $quiz->cmid]), $label('moodlereports')) : '';
             echo html_writer::tag('details', html_writer::tag('summary', s($quiz->name) . ' · ' . $quiz->total) .
                 html_writer::div(html_writer::table($attempttable), 'orange-table-scroll') .
                 ($quiz->total > 25 ? html_writer::tag('p', $label('reportattemptlimit')) : '') . $link);

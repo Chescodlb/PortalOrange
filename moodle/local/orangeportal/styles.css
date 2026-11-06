@@ -226,3 +226,12 @@ body.orange-agent-menu .usermenu a[href*="/user/files.php"]{display:none!importa
 .orange-native-activity form{margin:0}.orange-native-module-type{color:#555;font-size:.85rem;margin-right:auto}
 .orange-notice-resources,.orange-training-collection{margin:1.5rem 0;padding:1.25rem;border:1px solid #ddd;border-radius:.5rem}
 @media(max-width:600px){.orange-native-activity{align-items:flex-start}.orange-native-activity>form{max-width:100%}.orange-native-activity button{white-space:normal;text-align:left}.orange-training-collection{padding:.75rem}}
+
+/* Tracking keeps shared filters, scope and explicit attendance usable on smaller screens. */
+.orange-tracking-overview{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:20px 0}
+.orange-tracking-card{border:1px solid #ddd;border-top:3px solid #ff7900;border-radius:8px;padding:20px;min-width:0}
+.orange-tracking-card h4{font-size:1.1rem;font-weight:700}
+.orange-attendance-form{display:flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:240px}
+.orange-attendance-form .form-control{width:140px}
+.orange-report-filters input[type=date]{width:auto}
+@media(max-width:600px){.orange-report-filters>*{max-width:100%}.orange-tracking-overview{grid-template-columns:1fr}}

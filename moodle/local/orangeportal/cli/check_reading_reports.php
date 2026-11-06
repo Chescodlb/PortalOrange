@@ -38,7 +38,7 @@ try {
     $group = $DB->get_record_sql('SELECT g.* FROM {groups} g JOIN {groups_members} m ON m.groupid=g.id WHERE m.userid=?', [$agent->id], IGNORE_MULTIPLE);
     if ($group) { $DB->insert_record('local_orange_audience', (object)['noticeid' => $id, 'targettype' => 'group', 'targetid' => $group->id]); }
     $expected = [];
-    foreach (\local_orangeportal\orange_scope::users() as $u) { if (service::assigned($id, $u->id)) { $expected[] = (int)$u->id; } }
+    foreach (\local_orangeportal\report_scope::users() as $u) { if (service::assigned($id, $u->id)) { $expected[] = (int)$u->id; } }
     $all = reading_report::data('notifications', $id, 0, '', 0, 0);
     $actual = array_map(static fn($r) => (int)$r->userid, array_values($all['rows']));
     sort($expected); sort($actual);
@@ -65,6 +65,8 @@ try {
     reading_check($overview->readcount === 1 && $overview->unreadcount + $overview->readcount === $overview->recipients,
         'Lectura actualiza resumen y coincide con el detalle');
     $DB->delete_records('local_orange_audience', ['noticeid' => $ids[0]]);
+    // Only global reporting lists publications without any assigned recipient.
+    \core\session\manager::set_user($DB->get_record('user', ['username' => 'admin.orange'], '*', MUST_EXIST));
     $empty = reading_report::summary('notifications', 0, 25, $ids[0])['rows'][$ids[0]];
     reading_check($empty->recipients === 0 && $empty->readcount === 0 && $empty->unreadcount === 0,
         'Publicación sin destinatarios actuales permanece en el resumen con ceros');
