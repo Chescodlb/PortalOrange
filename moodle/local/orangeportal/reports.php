@@ -8,8 +8,7 @@ require_login();
 require_capability('local/orangeportal:viewreports', context_system::instance());
 admin_externalpage_setup('orangeportalreports');
 $PAGE->set_secondary_navigation(false);
-$PAGE->set_heading(get_string('reportstitle', 'local_orangeportal'));
-$PAGE->set_title(get_string('reportstitle', 'local_orangeportal') . ' · Orange');
+orange_admin_page(get_string('reportstitle', 'local_orangeportal'));
 $perpage = 25;
 $courseid = optional_param('courseid', 0, PARAM_INT);
 $period = optional_param('period', 'month', PARAM_ALPHA);
@@ -76,7 +75,7 @@ $filterform = static function(string $kind, string $fields) use (&$reportparams)
 $date = static fn($value) => $value ? userdate($value) : get_string('pending', 'local_orangeportal');
 $canexport = has_capability('local/orangeportal:exportreports', context_system::instance());
 echo $OUTPUT->header();
-echo orange_intro(get_string('administration'), get_string('reportstitle', 'local_orangeportal'), get_string('reportsintro', 'local_orangeportal'));
+echo orange_admin_intro(get_string('reportstitle', 'local_orangeportal'));
 echo orange_admin_navigation('reports');
 $tabs = '';
 foreach (['overview', 'incidents', 'notifications', 'courses', 'users'] as $tab) {

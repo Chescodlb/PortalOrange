@@ -13,6 +13,7 @@ $url = orange_link('users.php');
 if ($cohortid && !isset(scope::cohorts()[$cohortid])) { throw new moodle_exception('outsideorange', 'local_orangeportal'); }
 $target = $id ? scope::user($id) : null;
 orange_page(get_string('orangeusers', 'local_orangeportal'), 'administration', $url);
+orange_admin_page(get_string('orangeusers', 'local_orangeportal'));
 $PAGE->set_primary_active_tab('siteadminnode');
 $PAGE->set_secondary_navigation(false);
 if ($action === 'remove') {
@@ -22,6 +23,7 @@ if ($action === 'remove') {
         redirect($url, get_string('orangerevoked', 'local_orangeportal'));
     }
     echo $OUTPUT->header();
+    echo orange_admin_intro(get_string('orangeusers', 'local_orangeportal'));
     echo $OUTPUT->confirm(get_string('orangeconfirmrevoke', 'local_orangeportal', fullname($target)),
         new single_button(orange_link('users.php', ['id' => $id, 'action' => 'remove']), get_string('continue'), 'post'), $url);
     echo $OUTPUT->footer(); exit;
@@ -54,7 +56,7 @@ if ($target || $action === 'new') {
     }
 }
 echo $OUTPUT->header();
-echo orange_intro('', get_string('orangeusers', 'local_orangeportal'), get_string('orangeusersintro', 'local_orangeportal'));
+echo orange_admin_intro(get_string('orangeusers', 'local_orangeportal'), get_string('orangeusersintro', 'local_orangeportal'));
 echo orange_admin_navigation('users');
 if ($form) {
     if ($target) { echo $OUTPUT->heading(s(fullname($target)), 3); }

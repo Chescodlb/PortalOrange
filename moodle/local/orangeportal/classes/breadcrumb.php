@@ -103,10 +103,8 @@ class breadcrumb {
             $section = $DB->get_field('local_orange_notice', 'kind', ['id' => (int)$PAGE->url->get_param('notice')]);
         } else if ($file === 'add_document.php') {
             $section = 'library';
-        } else if ($file === 'manage.php') {
-            // admin_externalpage_setup uses a canonical URL without the current kind.
-            $section = optional_param('kind', 'incidents', PARAM_ALPHA);
-        } else if (in_array($file, ['reports.php', 'options.php', 'users.php', 'cohorts.php'])) {
+        } else if (in_array($file, ['manage.php', 'categories.php', 'reports.php', 'options.php', 'users.php',
+                'cohorts.php', 'import_users.php', 'incident_tracking.php'])) {
             $section = 'administration';
         }
         if (!in_array($section, ['library', 'courses', 'incidents', 'notifications', 'administration'], true)) { return; }

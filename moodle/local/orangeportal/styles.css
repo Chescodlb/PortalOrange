@@ -235,3 +235,14 @@ body.orange-agent-menu .usermenu a[href*="/user/files.php"]{display:none!importa
 .orange-attendance-form .form-control{width:140px}
 .orange-report-filters input[type=date]{width:auto}
 @media(max-width:600px){.orange-report-filters>*{max-width:100%}.orange-tracking-overview{grid-template-columns:1fr}}
+
+/* Administration uses one content heading and a breadcrumb aligned to its right. */
+body.orange-admin-page #page-header{display:none}
+.orange-admin-heading{padding:12px 0 20px;margin-bottom:16px}
+.orange-admin-heading-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.orange-admin-heading-row h2{margin:0;font-size:2rem;letter-spacing:normal;min-width:0}
+.orange-admin-heading p{margin-top:12px}
+.orange-admin-breadcrumb{margin-left:auto;max-width:55%;min-width:0;text-align:right}
+.orange-admin-breadcrumb .breadcrumb{justify-content:flex-end;flex-wrap:wrap;margin:0;padding:4px 0;background:transparent}
+.orange-admin-breadcrumb .breadcrumb-item{overflow-wrap:anywhere}
+@media(max-width:767px){.orange-admin-heading-row{flex-wrap:wrap;gap:8px}.orange-admin-breadcrumb{flex-basis:100%;max-width:100%}.orange-admin-heading-row h2{font-size:1.75rem}}

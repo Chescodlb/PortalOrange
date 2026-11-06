@@ -63,8 +63,9 @@ if (!$state || $state['cursor'] === $state['total']) {
         $form = null;
     }
 }
+orange_admin_page($label('orangeimportusers'));
 echo $OUTPUT->header();
-echo orange_intro('', $label('orangeimportusers'), $label('csvintro'));
+echo orange_admin_intro($label('orangeimportusers'), $label('csvintro'));
 echo orange_admin_navigation('users');
 echo html_writer::link(orange_link('users.php'), $label('backtolist'));
 if ($error) { echo $OUTPUT->notification(s($error), 'error'); }

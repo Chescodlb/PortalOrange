@@ -12,8 +12,7 @@ $new = optional_param('new', 0, PARAM_BOOL);
 if (!in_array($kind, ['incidents', 'notifications'])) { throw new invalid_parameter_exception(get_string('unknownsection', 'local_orangeportal')); }
 if ($kind === 'incidents') { require_capability('local/orangeportal:changestate', context_system::instance()); }
 admin_externalpage_setup('orangeportalmanage');
-$PAGE->set_heading(get_string('publishmanage', 'local_orangeportal'));
-$PAGE->set_title(get_string('publishmanage', 'local_orangeportal') . ' · Orange');
+orange_admin_page(get_string($kind, 'local_orangeportal'));
 $url = orange_link('manage.php', ['kind' => $kind]);
 $deleteid = optional_param('delete', 0, PARAM_INT);
 if ($deleteid && $kind === 'incidents') {
@@ -25,6 +24,7 @@ if ($deleteid && $kind === 'incidents') {
         redirect($url, get_string('incidentdeleted', 'local_orangeportal'));
     }
     echo $OUTPUT->header();
+    echo orange_admin_intro(get_string($kind, 'local_orangeportal'));
     echo $OUTPUT->confirm(get_string('incidentdeleteconfirm', 'local_orangeportal', s($deleting->title)),
         new single_button(orange_link('manage.php', ['kind' => 'incidents', 'delete' => $deleteid, 'confirm' => 1]),
             get_string('delete'), 'post'), $url);
@@ -61,7 +61,7 @@ if ($id || $new || $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 echo $OUTPUT->header();
-echo orange_intro(get_string('administration'), get_string('publications', 'local_orangeportal'), get_string('publicationsintro', 'local_orangeportal'));
+echo orange_admin_intro(get_string($kind, 'local_orangeportal'));
 echo orange_admin_navigation($kind, $kind);
 if ($form) { $form->display(); } else {
     echo html_writer::link(orange_link('manage.php', ['kind' => $kind, 'new' => 1]), get_string('createpublication', 'local_orangeportal'), ['class' => 'btn btn-primary']);

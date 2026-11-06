@@ -19,6 +19,21 @@ function orange_intro(string $eyebrow, string $title, string $description): stri
     return html_writer::div(($eyebrow !== '' ? html_writer::span(s($eyebrow), 'orange-eyebrow') : '') .
         html_writer::tag('h2', s($title)) . html_writer::tag('p', s($description)), 'orange-intro');
 }
+/** One shared heading inside the administration content, with its native breadcrumb. */
+function orange_admin_page(string $title): void {
+    global $PAGE;
+    $PAGE->set_heading($title);
+    $PAGE->set_title($title . ' · Orange');
+    $PAGE->set_pagelayout('standard');
+    $PAGE->set_secondary_navigation(false);
+    $PAGE->add_body_class('orange-admin-page');
+}
+function orange_admin_intro(string $title, string $description = ''): string {
+    global $OUTPUT;
+    $row = html_writer::tag('h2', s($title)) . html_writer::div($OUTPUT->navbar(), 'orange-admin-breadcrumb');
+    return html_writer::tag('header', html_writer::div($row, 'orange-admin-heading-row') .
+        ($description !== '' ? html_writer::tag('p', s($description)) : ''), ['class' => 'orange-intro orange-admin-heading']);
+}
 function orange_admin_navigation(string $active, string $kind = 'incidents'): string {
     $links = [];
     if (has_capability('local/orangeportal:administer', context_system::instance())) {

@@ -12,6 +12,7 @@ $records = notice_options::records($type);
 if ($code !== '' && !isset($records[$code])) { throw new invalid_parameter_exception('Unknown option'); }
 $url = orange_link('options.php', ['type' => $type]);
 orange_page(get_string('manageoptions', 'local_orangeportal'), 'incidents', $url);
+orange_admin_page(get_string('manageoptions', 'local_orangeportal'));
 $PAGE->set_primary_active_tab('siteadminnode');
 $PAGE->set_secondary_navigation(false);
 if ($action === 'delete') {
@@ -27,6 +28,7 @@ if ($action === 'delete') {
         redirect($url, get_string('optiondeleted', 'local_orangeportal'), null, \core\output\notification::NOTIFY_SUCCESS);
     }
     echo $OUTPUT->header();
+    echo orange_admin_intro(get_string('manageoptions', 'local_orangeportal'));
     $confirmurl = orange_link('options.php', ['type' => $type, 'code' => $code, 'action' => 'delete', 'confirm' => 1]);
     echo $OUTPUT->confirm(get_string('deleteoptionconfirm', 'local_orangeportal', s($records[$code]['name'])),
         new single_button($confirmurl, get_string('delete'), 'post'), $url);
@@ -46,7 +48,7 @@ if ($data = $form->get_data()) {
 if ($code !== '') { $form->set_data(['name' => $records[$code]['name'], 'active' => (int)$records[$code]['active'],
     'closed' => $type === 'states' && notice_options::is_closed($code) ? 1 : 0]); }
 echo $OUTPUT->header();
-echo orange_intro('ORANGE', get_string('manageoptions', 'local_orangeportal'), get_string('optionsdescription', 'local_orangeportal'));
+echo orange_admin_intro(get_string('manageoptions', 'local_orangeportal'), get_string('optionsdescription', 'local_orangeportal'));
 echo orange_admin_navigation('options');
 $tabs = '';
 foreach (['states', 'impacts'] as $tab) {

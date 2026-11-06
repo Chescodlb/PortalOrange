@@ -9,9 +9,10 @@ require_capability('local/orangeportal:viewallincidents', context_system::instan
 $id = optional_param('id', 0, PARAM_INT);
 $url = orange_link('incident_tracking.php', $id ? ['id' => $id] : []);
 orange_page(get_string('incidenttracking', 'local_orangeportal'), 'incidents', $url);
+orange_admin_page(get_string('incidenttracking', 'local_orangeportal'));
 $PAGE->set_primary_active_tab('siteadminnode');
 echo $OUTPUT->header();
-echo orange_intro(get_string('administration'), get_string('incidenttracking', 'local_orangeportal'), get_string('incidenttrackingintro', 'local_orangeportal'));
+echo orange_admin_intro(get_string('incidenttracking', 'local_orangeportal'));
 echo orange_admin_navigation('incidenttracking');
 echo html_writer::link(orange_link('index.php', ['section' => 'incidents']), get_string('backtolist', 'local_orangeportal'));
 if (!$id) {

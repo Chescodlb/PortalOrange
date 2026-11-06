@@ -9,13 +9,16 @@ $action = optional_param('action', '', PARAM_ALPHA);
 $url = orange_link('cohorts.php');
 if ($id && !isset(scope::cohorts()[$id])) { throw new moodle_exception('outsideorange', 'local_orangeportal'); }
 orange_page(get_string('orangecollectives', 'local_orangeportal'), 'administration', $url);
+orange_admin_page(get_string('orangecollectives', 'local_orangeportal'));
 $PAGE->set_primary_active_tab('siteadminnode'); $PAGE->set_secondary_navigation(false);
 if ($action === 'delete') {
     if (!$id) { throw new invalid_parameter_exception('Invalid collective'); }
     if (data_submitted() && confirm_sesskey()) {
         admin::delete_cohort($id); redirect($url, get_string('changessaved', 'local_orangeportal'));
     }
-    echo $OUTPUT->header(); echo $OUTPUT->confirm(get_string('orangeconfirmdeletecohort', 'local_orangeportal', scope::cohorts()[$id]->name),
+    echo $OUTPUT->header();
+    echo orange_admin_intro(get_string('orangecollectives', 'local_orangeportal'));
+    echo $OUTPUT->confirm(get_string('orangeconfirmdeletecohort', 'local_orangeportal', scope::cohorts()[$id]->name),
         new single_button(orange_link('cohorts.php', ['action' => 'delete', 'id' => $id]), get_string('delete'), 'post'), $url);
     echo $OUTPUT->footer(); exit;
 }
@@ -35,7 +38,7 @@ if ($id || $action === 'new') {
     if ($id) { $form->set_data((object)['name' => scope::cohorts()[$id]->name]); }
 }
 echo $OUTPUT->header();
-echo orange_intro('', get_string('orangecollectives', 'local_orangeportal'), get_string('orangecollectivesintro', 'local_orangeportal'));
+echo orange_admin_intro(get_string('orangecollectives', 'local_orangeportal'), get_string('orangecollectivesintro', 'local_orangeportal'));
 echo orange_admin_navigation('cohorts');
 if ($form) { $form->display(); }
 else {

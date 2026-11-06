@@ -25,6 +25,7 @@ if ($native) {
     foreach ($excluded as $excludedid) { unset($options[$excludedid]); }
 }
 orange_page(get_string('managecategories', 'local_orangeportal'), $kind, $url);
+orange_admin_page(get_string('managecategories', 'local_orangeportal'));
 $PAGE->set_primary_active_tab('siteadminnode');
 $PAGE->set_secondary_navigation(false);
 if ($deleteid) {
@@ -41,6 +42,7 @@ if ($deleteid) {
         redirect($url, get_string('categorydeleted', 'local_orangeportal'), null, \core\output\notification::NOTIFY_SUCCESS);
     }
     echo $OUTPUT->header();
+    echo orange_admin_intro(get_string('managecategories', 'local_orangeportal'));
     $confirmurl = orange_link('categories.php', ['kind' => $kind, 'delete' => $deleteid, 'confirm' => 1]);
     echo $OUTPUT->confirm(get_string('deletecategoryconfirm', 'local_orangeportal', s($deletecategory->name)),
         new single_button($confirmurl, get_string('delete'), 'post'), $url);
@@ -71,8 +73,7 @@ if ($record) {
 }
 echo $OUTPUT->header();
 $labels = ['library' => get_string('library', 'local_orangeportal'), 'courses' => get_string('courses', 'local_orangeportal'), 'incidents' => get_string('incidents', 'local_orangeportal'), 'notifications' => get_string('notifications', 'local_orangeportal')];
-echo orange_intro(get_string('administration'), get_string('categoriesfor', 'local_orangeportal', $labels[$kind]),
-    get_string('categoryintro', 'local_orangeportal'));
+echo orange_admin_intro(get_string('managecategories', 'local_orangeportal'));
 echo orange_admin_navigation('categories', $kind);
 $categorylinks = '';
 foreach ($labels as $key => $label) {
