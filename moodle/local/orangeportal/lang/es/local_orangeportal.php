@@ -360,6 +360,7 @@ $string['trainingselect'] = 'Selecciona un curso para consultar su información 
 $string['trainingunavailable'] = 'El curso seleccionado no está disponible para esta selección.';
 
 $string['trainingopen'] = 'Abrir formación';
+$string['trainingmanagecontent'] = 'Gestionar contenido';
 
 $string['trainingedit'] = 'Editar curso';
 

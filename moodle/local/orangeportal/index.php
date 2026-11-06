@@ -76,7 +76,6 @@ if (in_array($section, ['library', 'courses'])) {
                 ['class' => 'btn btn-primary orange-create-course']);
         }
     }
-    if ($section === 'courses') { $actions .= html_writer::link(orange_link('collections.php'), get_string('nativecollections', 'local_orangeportal'), ['class' => 'btn btn-primary']); }
     if ($actions) { echo html_writer::div($actions, 'orange-toolbar orange-content-actions'); }
 }
 if ($section === 'library') {

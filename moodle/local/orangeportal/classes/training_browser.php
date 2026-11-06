@@ -83,8 +83,9 @@ class training_browser {
                 \html_writer::link(new \moodle_url('/course/view.php', ['id' => $course->id]), get_string('trainingopen', 'local_orangeportal'),
                     ['class' => 'btn btn-primary orange-training-open']);
 
-            $detail .= \html_writer::link(\orange_link('collections.php', ['course' => $course->id]), get_string('nativecollections', 'local_orangeportal'), ['class' => 'btn btn-primary']);
             if (has_capability('moodle/course:manageactivities', $context)) {
+                $detail .= \html_writer::link(\orange_link('collections.php', ['course' => $course->id]),
+                    get_string('trainingmanagecontent', 'local_orangeportal'), ['class' => 'btn btn-primary orange-training-manage']);
                 $detail .= \html_writer::div(\orange_post_button(new \moodle_url('/course/view.php', ['id' => $course->id]),
                     get_string('trainingedit', 'local_orangeportal'), ['edit' => 1]), 'orange-card-edit');
                 if (has_capability('mod/quiz:addinstance', $context)) {
