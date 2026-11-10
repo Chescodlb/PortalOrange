@@ -6,6 +6,31 @@ defined('MOODLE_INTERNAL') || die();
 class teams {
     const KINDS = ['incidents', 'notifications', 'library', 'courses'];
 
+    private static array $choices = [];
+
+    /** Explicit, request-local consent for exactly one native save event. */
+    public static function choose(string $kind, int $id, bool $notify): void {
+        self::$choices[$kind . ':' . $id] = $notify;
+    }
+    public static function consume(string $kind, int $id): bool {
+        $key = $kind . ':' . $id;
+        $notify = self::$choices[$key] ?? false;
+        unset(self::$choices[$key]);
+        return $notify;
+    }
+    public static function form(\MoodleQuickForm $form, string $kind, string $published): void {
+        $form->addElement('advcheckbox', 'orangenotifyteams', get_string('teamsnotice', 'local_orangeportal'),
+            get_string('teamsonsave', 'local_orangeportal'));
+        $form->setDefault('orangenotifyteams', 0);
+        $form->setType('orangenotifyteams', PARAM_BOOL);
+        $form->disabledIf('orangenotifyteams', $published, 'notchecked');
+        if (!self::enabled($kind, 'created') && !self::enabled($kind, 'updated')) {
+            $form->setConstant('orangenotifyteams', 0);
+            $form->hardFreeze('orangenotifyteams');
+            $form->addElement('static', 'orangeteamsdisabled', '', get_string('teamsnotconfigured', 'local_orangeportal'));
+        }
+        $form->addElement('static', 'orangeteamschoicehint', '', get_string('teamsonsavehint', 'local_orangeportal'));
+    }
     public static function valid_endpoint(string $url): bool {
         $parts = parse_url($url);
         return filter_var($url, FILTER_VALIDATE_URL) && $parts && ($parts['scheme'] ?? '') === 'https' &&
@@ -24,9 +49,11 @@ class teams {
         if (!self::enabled($kind, $action) || !($payload = self::payload($kind, $id, $action))) { return; }
         $task = new \local_orangeportal\task\send_teams();
         $task->set_component('local_orangeportal');
-        $task->set_custom_data((object)['kind' => $kind, 'id' => $id, 'action' => $action,
+        $data = (object)['kind' => $kind, 'id' => $id, 'action' => $action,
             'endpoint' => hash('sha256', get_config('local_orangeportal', 'teamsurl')),
-            'contenthash' => hash('sha256', json_encode($payload))]);
+            'contenthash' => hash('sha256', json_encode($payload))];
+        if ($kind === 'courses') { $data->generation = training_publication::generation($id); }
+        $task->set_custom_data($data);
         $task->set_next_run_time(time() + 60);
         $task->set_attempts_available(5);
         // Identical pending announcements are merged; different edits can queue during a running delivery.
@@ -44,13 +71,12 @@ class teams {
             $map = native_content::mapping((int)$event->courseid);
             if ($map && $map->kind === 'notice') {
                 $kind = $DB->get_field('local_orange_notice', 'kind', ['id' => $map->noticeid]);
-                if ($kind) { self::queue($kind, (int)$map->noticeid, 'updated'); }
+                if ($kind && self::consume($kind, (int)$map->noticeid)) { self::queue($kind, (int)$map->noticeid, 'updated'); }
             } else {
-                self::queue('library', (int)$event->objectid, $action);
-                self::queue('courses', (int)$event->courseid, 'updated');
+                if (self::consume('library', (int)$event->objectid)) { self::queue('library', (int)$event->objectid, $action); }
             }
         } else {
-            self::queue('courses', (int)$event->objectid, $action);
+            if (self::consume('courses', (int)$event->objectid)) { self::queue('courses', (int)$event->objectid, $action); }
         }
     }
 

@@ -61,7 +61,7 @@ class orange_scope {
         if (!$ids) { return []; }
         [$sql, $params] = $DB->get_in_or_equal(array_values($ids));
         return $DB->get_records_sql("SELECT g.*, c.fullname AS coursename FROM {groups} g JOIN {course} c ON c.id=g.courseid
-            WHERE g.courseid $sql ORDER BY c.fullname, g.name", $params);
+            WHERE g.courseid $sql AND (g.idnumber IS NULL OR g.idnumber NOT LIKE 'orange-audience-%') ORDER BY c.fullname, g.name", $params);
     }
     public static function target(string $type, int $id): bool {
         if ($type === 'user') { return isset(self::users()[$id]); }

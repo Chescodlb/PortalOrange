@@ -54,10 +54,31 @@ class hooks {
         }
     }
     public static function headers(\core\hook\output\before_http_headers $hook): void {
-        global $PAGE, $CFG;
+        global $PAGE, $CFG, $SESSION;
+        if ((int)get_config('local_orangeportal', 'version') >= 2026111000 && $PAGE->course->id > SITEID) {
+            content_access::guard((int)$PAGE->course->id);
+        }
         if (!experience::member() || !isloggedin() || isguestuser() ||
                 defined('CLI_SCRIPT') && CLI_SCRIPT) {
             return;
+        }
+        $courseid = (int)$PAGE->course->id;
+        if ($PAGE->url->get_path() === parse_url($CFG->wwwroot . '/course/view.php', PHP_URL_PATH) &&
+                !empty($SESSION->orangelibrarysaved[$courseid])) {
+            $saved = $SESSION->orangelibrarysaved[$courseid];
+            unset($SESSION->orangelibrarysaved[$courseid]);
+            if ($saved['time'] >= time() - HOURSECS && content_access::section($courseid) === 'library' && content_access::author($courseid)) {
+                redirect(new \moodle_url('/local/orangeportal/index.php', ['section' => 'library',
+                    'category' => $PAGE->course->category, 'document' => $saved['id']]));
+            }
+        }
+        if ($PAGE->url->get_path() === parse_url($CFG->wwwroot . '/course/view.php', PHP_URL_PATH) &&
+                !empty($SESSION->orangecreatedcourses[$courseid])) {
+            $created = (int)$SESSION->orangecreatedcourses[$courseid];
+            unset($SESSION->orangecreatedcourses[$courseid]);
+            if ($created >= time() - HOURSECS && content_access::author($courseid)) {
+                redirect(new \moodle_url('/local/orangeportal/collections.php', ['course' => $courseid]));
+            }
         }
         $PAGE->requires->css(new \moodle_url('/local/orangeportal/styles.css', ['v' => filemtime(__DIR__ . '/../styles.css')]));
         // Consumer menus omit optional tools; combined staff roles retain their menu.

@@ -20,6 +20,15 @@ $page->add(new admin_setting_configtext('local_orangeportal/coursescategory', ge
     get_string('coursesroot_desc', 'local_orangeportal'), 0, PARAM_INT));
 $page->add(new admin_setting_configcheckbox('local_orangeportal/automaticalerts', get_string('automaticalerts', 'local_orangeportal'),
     get_string('automaticalerts_desc', 'local_orangeportal'), 1));
+foreach ($page->settings as $setting) {
+    if (in_array($setting->name, ['enabled', 'audiencecohort', 'librarycategory', 'coursescategory'], true)) {
+        $setting->set_updatedcallback(function() {
+            if ((int)get_config('local_orangeportal', 'version') >= 2026111000) {
+                \local_orangeportal\content_access::catalogue();
+            }
+        });
+    }
+}
 $ADMIN->add('orangeportal', $page);
 $teams = new admin_settingpage('local_orangeportal_teams', get_string('teamstitle', 'local_orangeportal'));
 $teams->add(new admin_setting_heading('local_orangeportal/teamsintro', '', get_string('teamsintro', 'local_orangeportal')));

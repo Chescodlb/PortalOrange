@@ -599,7 +599,7 @@ $string['libraryreporthelp'] = 'El periodo filtra por fecha de alta del recurso.
 $string['teamstitle'] = 'Mensajería Teams';
 $string['teamsintro'] = 'Envía avisos a Power Automate mediante POST JSON (titulo, contenido y url). Solo contenido publicado/visible de Orange. No se envían borradores, lecturas, cambios de estado ni avisos personales de calificaciones. El flujo determina el destino en Teams; los destinatarios de Moodle no se convierten automáticamente en destinatarios de Teams. El enlace conserva los permisos del portal.';
 $string['teamsenabled'] = 'Activar envíos a Teams';
-$string['teamsenabled_desc'] = 'Desactivado por defecto. Requiere el cron de Moodle. Los envíos se encolan y se procesan a partir de un minuto después de guardar, con hasta cinco intentos. No se hace ningún envío de prueba al guardar estos ajustes.';
+$string['teamsenabled_desc'] = 'Desactivado por defecto. Requiere el cron de Moodle. Solo se envía cuando se marca Avisar por Teams al guardar en una publicación visible. Los envíos se procesan a partir de un minuto después de guardar, con hasta cinco intentos. No se hace ningún envío de prueba al guardar estos ajustes.';
 $string['teamsurl'] = 'URL del servicio Power Automate';
 $string['teamsurl_desc'] = 'Pega la URL HTTPS completa del disparador, incluida su firma. Es una credencial: solo la pueden configurar administradores generales con permiso de configuración del sitio. No se incluye en los mensajes ni en los registros de configuración. Al cambiarla, los avisos pendientes de la URL anterior se descartan.';
 $string['teamsurlinvalid'] = 'Introduce una URL HTTPS válida, sin usuario, contraseña ni fragmento, o déjala vacía.';
@@ -617,3 +617,48 @@ $string['privacy:metadata:teams'] = 'Si se activa, se envía contenido publicado
 $string['privacy:metadata:teams:title'] = 'Tipo de aviso y título de la publicación.';
 $string['privacy:metadata:teams:content'] = 'Extracto de contenido publicado e impacto; puede incluir datos introducidos por el autor.';
 $string['privacy:metadata:teams:url'] = 'Enlace autenticado al contenido en Moodle.';
+
+// Content creation and Orange audience boundaries.
+$string['contentcollectives'] = 'Colectivos que pueden verlo';
+$string['contentaudiencehint'] = 'Sin destinatarios seleccionados: disponible solo para la cohorte Orange. Basta con estar seleccionado individualmente o pertenecer a uno de los colectivos o grupos elegidos, siempre dentro de Orange. Las restricciones nativas y la matrícula en formaciones siguen aplicándose.';
+$string['contentallorange'] = 'Toda la cohorte Orange';
+$string['contentnativegroup'] = 'Orange · Acceso · {$a}';
+$string['contentavailabilityrequired'] = 'Activa las restricciones de acceso de Moodle para seleccionar colectivos de documentos.';
+$string['contentaudiencenoticedefault'] = 'Si no seleccionas destinatarios, se publica para toda la cohorte Orange. Nunca para usuarios externos a Orange.';
+$string['documentsaveback'] = 'Guardar y volver a Biblioteca';
+$string['trainingsavecontinue'] = 'Guardar y continuar';
+$string['trainingsetup'] = 'Gestionar formación';
+$string['trainingcreatednext'] = 'Formación guardada como borrador. Puedes preparar el contenido y matricular participantes antes de publicarla.';
+$string['trainingsetupintro'] = 'Continúa la preparación de la formación desde estos accesos. Puedes volver a esta pantalla desde el listado de Formaciones.';
+$string['trainingconfigurationaudience'] = 'Configuración y visibilidad';
+$string['trainingenrolseparate'] = 'La selección de colectivos limita la visibilidad y no matricula usuarios. Gestiona las matrículas desde Participantes; si necesitas altas y bajas automáticas, un administrador puede configurar la sincronización de cohorte nativa.';
+$string['trainingparticipantshint'] = 'Selecciona uno o varios usuarios Orange para matricularlos como estudiantes. Solo se ofrecen usuarios que cumplen la selección de colectivos de esta formación. No se crean cuentas nuevas ni se modifica su perfil general.';
+$string['contentcataloguerole'] = 'Lector del catálogo Orange';
+$string['contentcataloguerole_desc'] = 'Permite a miembros Orange consultar únicamente los catálogos de las categorías Orange. No matricula ni concede edición.';
+$string['orangeportal:enrolusers'] = 'Matricular usuarios Orange existentes en una formación Orange';
+$string['contentenrolrole'] = 'Matriculador Orange';
+$string['contentenrolrole_desc'] = 'Permite matricular usuarios Orange existentes únicamente en la categoría de Formaciones Orange, desde el portal.';
+$string['contentcohortunavailable'] = 'Colectivo no disponible ({$a}); revisa esta selección antes de guardar';
+
+// Explicit training publication.
+$string['trainingpublication'] = 'Publicación';
+$string['trainingdraft'] = 'Borrador · no visible para los agentes';
+$string['trainingpublished'] = 'Publicada';
+$string['trainingdrafthint'] = 'Puedes preparar el contenido y matricular participantes. Los agentes no podrán acceder ni se enviarán avisos a Teams hasta que publiques la formación desde Gestionar formación.';
+$string['trainingpublishedhint'] = 'La formación está publicada para sus destinatarios matriculados. Los cambios de contenido podrán generar avisos según la configuración de Teams. Para preparar cambios sin mostrarlos, retira primero la publicación.';
+$string['trainingpublish'] = 'Publicar formación';
+$string['trainingwithdraw'] = 'Retirar publicación';
+$string['trainingnotifyteams'] = 'Avisar por Teams al publicar';
+$string['trainingpublishsuccess'] = 'Formación publicada.';
+$string['trainingwithdrawsuccess'] = 'La formación vuelve a borrador. Se conservan los contenidos, matrículas y resultados.';
+$string['trainingpublicationchanged'] = 'Otra persona ha cambiado la publicación. Recarga la página antes de continuar.';
+
+$string['contentrecipientsusers'] = 'Usuarios individuales de Orange';
+$string['contentrecipientscohorts'] = 'Colectivos Orange';
+$string['contentrecipientsgroups'] = 'Grupos de cursos Orange';
+$string['contentrecipientunavailable'] = 'Destinatario no disponible (ID {$a})';
+
+$string['teamsnotice'] = 'Aviso por Teams';
+$string['teamsonsave'] = 'Avisar por Teams al guardar';
+$string['teamsonsavehint'] = 'El aviso se envía solo si marcas esta opción y guardas la publicación visible. Se enviará en segundo plano después de guardar.';
+$string['teamsnotconfigured'] = 'La integración de Teams no está habilitada para este contenido.';

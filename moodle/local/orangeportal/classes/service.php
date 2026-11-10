@@ -203,6 +203,11 @@ class service {
             throw new \invalid_parameter_exception('Invalid section');
         }
         self::validate_category($data->kind, (int)$data->categoryid);
+        if ($data->published && !array_filter($targets)) {
+            $base = (int)get_config('local_orangeportal', 'audiencecohort');
+            $DB->get_record('cohort', ['id' => $base], '*', MUST_EXIST);
+            $targets = ['cohort' => [$base]];
+        }
         foreach ($targets as $type => $ids) {
             $table = ['user' => 'user', 'cohort' => 'cohort', 'group' => 'groups'][$type] ?? null;
             if (!$table) { throw new \invalid_parameter_exception('Invalid audience'); }
@@ -277,7 +282,9 @@ class service {
                     'targettype' => $type, 'targetid' => $id]);
             }
         }
-        if ($data->published && (!$existing || !$existing->published || $teamschanged)) {
+        $stateonly = $existing && $existing->state !== $data->state && !$teamschanged &&
+            (bool)$existing->published === (bool)$data->published;
+        if ($data->published && !empty($data->orangenotifyteams) && !$stateonly) {
             teams::queue($data->kind, (int)$data->id, !$existing || !$existing->published ? 'created' : 'updated');
         }
         $tx->allow_commit();

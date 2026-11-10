@@ -17,13 +17,13 @@ Disponible a partir de `local_orangeportal` **2026110602**, sin instalar plugins
 
 | Contenido | Alta | Modificación |
 | --- | --- | --- |
-| Incidencia / comunicado | Primera publicación con destinatarios; también al publicar un borrador | Cambios de título, contenido, impacto, categoría, cliente/producto o destinatarios; añadir o editar recursos visibles |
-| Documento de Biblioteca | Creación de una actividad/recurso visible dentro de la raíz de Biblioteca | Edición nativa del recurso visible |
-| Formación | Creación de un curso visible dentro de la raíz de Formaciones | Edición del curso o incorporación/edición de una actividad visible |
+| Incidencia / comunicado | Guardar publicado con **Avisar por Teams al guardar** marcado | Guardar publicado con esa casilla marcada; se excluyen cambios solo de estado |
+| Documento de Biblioteca | Guardar el recurso visible con la casilla Teams marcada | Editar y guardar visible con la casilla Teams marcada |
+| Formación | Guardar la primera publicación con la casilla Teams marcada | Editar y guardar visible con la casilla Teams marcada |
 
-Se excluyen borradores, contenido oculto o retirado, cambios de estado, lecturas, accesos, notas, finalizaciones y avisos personales automáticos. Guardar una incidencia/comunicado sin cambios tampoco avisa. Los cursos técnicos que alojan documentos o recursos de publicaciones no se anuncian como nuevas formaciones. El contenido de otros proyectos queda fuera de las raíces configuradas de Orange.
+Desde **2026111005**, las cuatro áreas tienen el mismo control en **Destinatarios**: **Visible para sus destinatarios** publica o retira el contenido, y **Avisar por Teams al guardar** solicita el aviso de ese guardado. La casilla Teams comienza desmarcada en cada edición y requiere la integración administrativa activa. Si se guarda oculto, no se envía aunque se manipule esa casilla. No es una suscripción a avisos automáticos posteriores.
 
-Para Incidencias y Comunicados, cambiar **solo** el estado no genera aviso; si también se cambia el texto, se avisa de esa modificación de contenido. No se envían avisos de eliminación.
+Añadir o modificar actividades dentro de un comunicado o una formación no envía por sí solo un aviso: se solicita desde el formulario de la publicación o formación al guardar. Las lecturas, accesos, notas, finalizaciones, avisos personales, cambios solo de estado y eliminaciones no anuncian contenido. Otros proyectos y cursos técnicos quedan excluidos. Los trabajos pendientes cuyo contenido ya no coincide con el guardado autorizado se descartan para no anunciar silenciosamente una edición posterior.
 
 ## Petición al flujo
 
@@ -83,3 +83,11 @@ La primera prueba ejecuta el código real de Moodle (guardados, eventos, cola, c
 La segunda comprueba el panel en ambos idiomas y su acceso restringido. Requiere que la instalación local conserve el estado inicial: integración desactivada y URL vacía.
 
 El contrato local procede de los tres campos y método aportados por el cliente; las respuestas de error son escenarios de prueba, no una afirmación sobre respuestas concretas del flujo real. No se ha buscado un mock remoto del propietario: no hace falta conectar ni publicar recursos en Postman para ejecutar estas pruebas locales. El funcionamiento final del flujo y su entrega en Teams deben validarse en pre cuando se autorice enviar.
+
+## Publicación desde Destinatarios — 2026111005
+
+Las nuevas formaciones y documentos empiezan con **Visible para sus destinatarios** desmarcado. Se puede publicar en el mismo guardado marcándolo; no se exige una pantalla posterior. **Editar** en Formaciones abre directamente el formulario nativo, con accesos a contenido, participantes y copia de edición. Guardar una formación nueva continúa a su contenido; guardar su edición vuelve al listado.
+
+Desmarcar Visible y guardar retira la publicación sin borrar matrículas, intentos ni contenidos. La primera publicación conserva su fecha propia para los indicadores. La primera publicación de una formación se anuncia como `created`; las posteriores, como `updated`. En todos los casos se exige marcar Teams para ese guardado. Se invalidan los avisos pendientes antiguos al retirar una formación. Los mensajes ya aceptados por el flujo no pueden retirarse desde Moodle.
+
+Los enlaces antiguos a `training_setup.php` redirigen al formulario de edición; ya no muestran una pantalla intermedia.

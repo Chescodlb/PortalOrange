@@ -31,7 +31,34 @@ class course_creation {
     }
 
     public static function definition(\core_course\hook\after_form_definition $hook): void {
+        global $PAGE;
         $section = self::section();
+        $id = (int)$PAGE->url->get_param('id');
+        if ($section === 'courses' || ($id && experience::member() && content_access::author($id) && content_access::section($id) === 'courses')) {
+            global $DB;
+            $visible = $id ? (int)$DB->get_field('course', 'visible', ['id' => $id], MUST_EXIST) : 0;
+            self::hidden($hook->mform, 'visible', $visible);
+            content_access::field($hook->mform, $id ? content_access::selected('course', $id) : [],
+                $id ? content_access::selected('course', $id, 'users') : [], $id ? content_access::selected('course', $id, 'groups') : []);
+            $form = $hook->mform;
+            $form->addElement('advcheckbox', 'orangepublished', get_string('publishlabel', 'local_orangeportal'),
+                get_string('visibleforrecipients', 'local_orangeportal'));
+            $form->setType('orangepublished', PARAM_BOOL);
+            $form->setDefault('orangepublished', $visible);
+            $context = $id ? \context_course::instance($id) : $PAGE->context;
+            if (!has_capability('moodle/course:visibility', $context)) {
+                $form->setConstant('orangepublished', $visible);
+                $form->hardFreeze('orangepublished');
+            }
+            if ($id) {
+                $state = training_publication::state(get_course($id));
+                $form->addElement('hidden', 'orangegeneration', $state->generation);
+                $form->setType('orangegeneration', PARAM_INT);
+                $form->addElement('static', 'orangetrainingtools', '', training_publication::tools($id));
+                $form->insertElementBefore($form->removeElement('orangetrainingtools', false), 'general');
+            }
+            teams::form($form, 'courses', 'orangepublished');
+        }
         if ($section === 'library') {
             foreach (['fullname', 'shortname', 'category', 'summary_editor', 'visible', 'idnumber',
                     'overviewfiles_filemanager', 'downloadcontent', 'showreports', 'tagshdr', 'tags'] as $name) {
@@ -74,6 +101,23 @@ class course_creation {
     }
 
     public static function after_data(\core_course\hook\after_form_definition_after_data $hook): void {
+        if (self::section() === 'courses' && $hook->mform->elementExists('buttonar')) {
+            $form = $hook->mform;
+            $form->getElement('buttonar')->setElements([
+                $form->createElement('submit', 'saveanddisplay', get_string('trainingsavecontinue', 'local_orangeportal'), ['class' => 'btn-primary']),
+                $form->createElement('cancel'),
+            ]);
+        }
+        global $PAGE;
+        $id = (int)$PAGE->url->get_param('id');
+        if ($id && content_access::section($id) === 'courses' && $hook->mform->elementExists('buttonar') &&
+                $hook->mform->elementExists('orangepublished')) {
+            $form = $hook->mform;
+            $form->getElement('buttonar')->setElements([
+                $form->createElement('submit', 'saveandreturn', get_string('savechanges'), ['class' => 'btn-primary']),
+                $form->createElement('cancel'),
+            ]);
+        }
         if (self::section() !== 'library') { return; }
         // Native formats may add fields after the first definition hook.
         foreach (['numsections' => 1, 'hiddensections' => 1, 'coursedisplay' => 0] as $name => $value) {
@@ -103,6 +147,16 @@ class course_creation {
     }
 
     public static function validation(\core_course\hook\after_form_validation $hook): void {
+        $submitted = $hook->get_data();
+        if (!empty($submitted['orangeaudiencepresent'])) {
+            $hook->add_errors(content_access::validation($submitted));
+            global $PAGE;
+            $id = (int)$PAGE->url->get_param('id');
+            if ($id && isset($submitted['orangegeneration']) &&
+                    (int)$submitted['orangegeneration'] !== training_publication::generation($id)) {
+                $hook->add_errors(['orangepublished' => get_string('trainingpublicationchanged', 'local_orangeportal')]);
+            }
+        }
         $section = self::section();
         if (!$section) { return; }
         $data = $hook->get_data();

@@ -5,4 +5,6 @@ function xmldb_local_orangeportal_install(): void {
     \local_orangeportal\orange_administration::install_roles();
     \local_orangeportal\native_content::install_roles();
     \local_orangeportal\training_report::install();
+    \local_orangeportal\content_access::install_enrol_role();
+    \local_orangeportal\content_access::catalogue();
 }

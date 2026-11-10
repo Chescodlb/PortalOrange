@@ -599,7 +599,7 @@ $string['libraryreporthelp'] = 'The period filters by resource creation date. Re
 $string['teamstitle'] = 'Teams messaging';
 $string['teamsintro'] = 'Sends announcements to Power Automate as JSON POST requests (titulo, contenido and url). Only published/visible Orange content is included. Drafts, reading events, state changes and personal grade alerts are excluded. The flow determines the Teams destination; Moodle recipients do not automatically become Teams recipients. Portal access permissions still apply to links.';
 $string['teamsenabled'] = 'Enable Teams deliveries';
-$string['teamsenabled_desc'] = 'Disabled by default. Requires Moodle cron. Deliveries are queued for at least one minute after saving, with up to five attempts. Saving these settings does not send a test message.';
+$string['teamsenabled_desc'] = 'Disabled by default. Requires Moodle cron. A visible save must explicitly select Notify via Teams when saving. Deliveries are queued for at least one minute after saving, with up to five attempts. Saving these settings does not send a test message.';
 $string['teamsurl'] = 'Power Automate service URL';
 $string['teamsurl_desc'] = 'Paste the complete HTTPS trigger URL, including its signature. This is a credential: only general administrators with site configuration permission can configure it. It is excluded from messages and configuration logs. Changing the URL discards pending announcements for the previous URL.';
 $string['teamsurlinvalid'] = 'Enter a valid HTTPS URL without username, password or fragment, or leave it empty.';
@@ -617,3 +617,48 @@ $string['privacy:metadata:teams'] = 'When enabled, published content is sent to 
 $string['privacy:metadata:teams:title'] = 'Announcement type and publication title.';
 $string['privacy:metadata:teams:content'] = 'Published content excerpt and impact; may contain data entered by its author.';
 $string['privacy:metadata:teams:url'] = 'Authenticated link to the Moodle content.';
+
+// Content creation and Orange audience boundaries.
+$string['contentcollectives'] = 'Collectives allowed to view this content';
+$string['contentaudiencehint'] = 'No recipients selected: available only to the Orange cohort. An individually selected user or a member of any selected collective or group is eligible, always within Orange. Native access restrictions and training enrolment still apply.';
+$string['contentallorange'] = 'Entire Orange cohort';
+$string['contentnativegroup'] = 'Orange · Access · {$a}';
+$string['contentavailabilityrequired'] = 'Enable Moodle availability restrictions to select document collectives.';
+$string['contentaudiencenoticedefault'] = 'If no recipients are selected, the publication targets the entire Orange cohort. It never targets users outside Orange.';
+$string['documentsaveback'] = 'Save and return to Library';
+$string['trainingsavecontinue'] = 'Save and continue';
+$string['trainingsetup'] = 'Manage training';
+$string['trainingcreatednext'] = 'Training saved as a draft. You can prepare content and enrol participants before publishing.';
+$string['trainingsetupintro'] = 'Continue preparing the training using these links. You can return here from the Training list.';
+$string['trainingconfigurationaudience'] = 'Settings and visibility';
+$string['trainingenrolseparate'] = 'Collective selection limits visibility and does not enrol users. Manage enrolments under Participants; an administrator can configure native cohort synchronisation if automatic enrolment and removal is needed.';
+$string['trainingparticipantshint'] = 'Select one or more Orange users to enrol as students. Only users allowed by this training collective selection are offered. No accounts are created and their general profile is unchanged.';
+$string['contentcataloguerole'] = 'Orange catalogue reader';
+$string['contentcataloguerole_desc'] = 'Allows Orange members to browse Orange category catalogues only. Does not enrol users or grant editing.';
+$string['orangeportal:enrolusers'] = 'Enrol existing Orange users in Orange training';
+$string['contentenrolrole'] = 'Orange enrolment operator';
+$string['contentenrolrole_desc'] = 'Allows enrolling existing Orange users only in the Orange Training category through the portal.';
+$string['contentcohortunavailable'] = 'Unavailable collective ({$a}); review this selection before saving';
+
+// Explicit training publication.
+$string['trainingpublication'] = 'Publication';
+$string['trainingdraft'] = 'Draft · hidden from agents';
+$string['trainingpublished'] = 'Published';
+$string['trainingdrafthint'] = 'You can prepare content and enrol participants. Agents cannot access the training and no Teams announcements are sent until you publish it from Manage training.';
+$string['trainingpublishedhint'] = 'The training is published for its enrolled recipients. Content changes may generate announcements according to Teams settings. Withdraw publication first to prepare changes privately.';
+$string['trainingpublish'] = 'Publish training';
+$string['trainingwithdraw'] = 'Withdraw publication';
+$string['trainingnotifyteams'] = 'Announce on Teams when publishing';
+$string['trainingpublishsuccess'] = 'Training published.';
+$string['trainingwithdrawsuccess'] = 'Training returned to draft. Content, enrolments and results are preserved.';
+$string['trainingpublicationchanged'] = 'Someone else changed the publication. Reload the page before continuing.';
+
+$string['contentrecipientsusers'] = 'Individual Orange users';
+$string['contentrecipientscohorts'] = 'Orange collectives';
+$string['contentrecipientsgroups'] = 'Orange course groups';
+$string['contentrecipientunavailable'] = 'Unavailable recipient (ID {$a})';
+
+$string['teamsnotice'] = 'Teams announcement';
+$string['teamsonsave'] = 'Notify via Teams when saving';
+$string['teamsonsavehint'] = 'An announcement is sent only when this option is selected and the publication is saved as visible. It will be sent in the background after saving.';
+$string['teamsnotconfigured'] = 'The Teams integration is not enabled for this content.';

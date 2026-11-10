@@ -88,3 +88,9 @@ Para volver a la versión anterior después de cargar actividades nuevas se requ
 `cli/check_native_content.php` verifica transaccionalmente creación, módulos, permisos, cambios de revisión, destinatarios, borradores, incidencias cerradas y conservación del contenido. No ejecutar contra el campus real.
 
 `cli/native_content_browser_fixture.php create` prepara ejemplos independientes para el navegador; sus IDs se guardan en `backups/previews/native-content-fixture.json`. `node scripts/test-orange-browser.mjs --native-content-only` comprueba formularios ES/EN, cancelación, guardado sin descripción, colecciones, bloques y descarga nativa. Después, `withdraw TOKEN`, `--native-content-withdrawn` y `cleanup TOKEN` permiten verificar la retirada y eliminar únicamente los ejemplos identificados por ese token. Estas herramientas solo admiten localhost.
+
+## Continuación tras guardar y destinatarios — 10/11/2026
+
+Formaciones incorpora **Guardar y continuar**, que abre las colecciones y recursos del curso recién creado. **Editar** abre directamente la configuración nativa, con accesos al contenido, participantes y copia de edición, y con publicación y aviso opcional a Teams dentro de Destinatarios. Los enlaces antiguos a `training_setup.php` redirigen a ese formulario. No hace falta regresar al listado ni activar edición para encontrar esos accesos. La página de participantes del portal usa matrícula manual nativa y restringe la búsqueda a usuarios Orange.
+
+Los documentos de Biblioteca incorporan el selector de colectivos en el formulario nativo del recurso. Tras guardar se vuelve a Biblioteca con el documento seleccionado. Las publicaciones sin destinatarios explícitos pasan a dirigirse a toda la cohorte Orange, conservando la comprobación de pertenencia al proyecto.

@@ -237,3 +237,18 @@ Los permisos y asignaciones viven en la base de datos de cada Moodle; subir carp
 La actualización crea **Autor de recursos Orange** (`orange_autorrecursos`). Es un rol nativo de curso para los contenedores de Biblioteca y publicaciones, con las capacidades de edición de actividades del arquetipo Profesor con edición, sin gestión de matrículas ni roles. El portal añade `moodle/course:view` en ese contexto para permitir el acceso del autor al contenedor. No se asigna al sistema ni se importa manualmente para los agentes.
 
 El portal lo asigna automáticamente cuando la persona conserva el permiso para crear contenido en la categoría de Biblioteca o gestionar la publicación. El acceso nativo comprueba ese ámbito y retira las asignaciones automáticas de quien pierde el permiso. Los roles de Formación, Coordinación, Calidad y Administración no se sustituyen. [Guía de funcionamiento y despliegue](16-actividades-recursos-y-colecciones.md).
+
+## Permisos añadidos para creación y matrícula — 10/11/2026
+
+| Elemento | Permiso / contexto | Quién lo recibe |
+| --- | --- | --- |
+| Catálogos Orange | `moodle/category:viewcourselist`, mediante `orange_catalogo`, en las categorías Biblioteca y Formaciones Orange | Miembros de la cohorte Orange; asignación y retirada automáticas. No matricula ni concede edición. |
+| Matrícula desde el portal | `local/orangeportal:enrolusers`, mediante `orange_matriculador`, solo en la categoría Formaciones Orange | Miembros Orange con `local/orangeportal:manage` o `local/orangeportal:administer` en sistema y `moodle/course:create` en esa categoría. |
+
+Son roles técnicos, no perfiles de negocio adicionales. Los crea la actualización `2026111001`; no necesitan importarse desde los XML antiguos ni asignarse a mano a cada persona. El permiso nuevo no se concede a profesores o gestores generales por arquetipo. Un usuario de Coordinación, Calidad o Agente no recibe capacidad de matricular por pertenecer a Orange. Cambiar o retirar permisos de gestión/creación revoca la asignación automática de matrícula cuando se actualiza su rol.
+
+Crear cuentas sigue reservado a Administración Orange; Formación matricula usuarios ya existentes. La selección de usuarios de la matrícula del portal se limita a Orange y a la audiencia de la formación. La selección de colectivos limita acceso, no concede matrícula ni borra resultados anteriores.
+
+## Publicar o retirar una formación — 2026111002
+
+Los botones de publicación exigen pertenecer a Orange y tener en el curso los permisos nativos `moodle/course:manageactivities`, `moodle/course:update` y `moodle/course:visibility`. No se amplían arquetipos generales del campus. Los agentes y perfiles de consulta no pueden publicar y no acceden a borradores, aunque estén matriculados. El permiso de matrícula del portal sigue siendo independiente: permite preparar participantes antes de publicar.

@@ -56,14 +56,16 @@ class notice extends \moodleform {
             $m->setType($name, PARAM_INT);
         }
         $m->addElement('static', 'audiencenote', '', get_string('audiencenote', 'local_orangeportal'));
+        $m->addElement('static', 'orangeaudiencedefault', '', get_string('contentaudiencenoticedefault', 'local_orangeportal'));
         $m->addElement('advcheckbox', 'published', get_string('publishlabel', 'local_orangeportal'), get_string('visibleforrecipients', 'local_orangeportal'));
+        \local_orangeportal\teams::form($m, $kind, 'published');
         $m->addElement('static', 'revisionnote', '', get_string('revisionnote', 'local_orangeportal'));
         $this->add_action_buttons(true, get_string('savepublication', 'local_orangeportal'));
         $m->addElement('submit', 'saveandresources', get_string('nativesaveandresources', 'local_orangeportal'));
     }
     public function validation($data, $files): array {
         $errors = parent::validation($data, $files);
-        if (!empty($data['published']) && empty($data['users']) && empty($data['cohorts']) && empty($data['groups'])) {
+        if (!get_config('local_orangeportal', 'audiencecohort') && !empty($data['published']) && empty($data['users']) && empty($data['cohorts']) && empty($data['groups'])) {
             $errors['users'] = get_string('recipientsrequired', 'local_orangeportal');
         }
         return $errors;

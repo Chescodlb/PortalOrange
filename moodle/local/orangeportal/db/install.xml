@@ -1,6 +1,30 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/orangeportal/db" VERSION="20261106" COMMENT="Orange portal">
+<XMLDB PATH="local/orangeportal/db" VERSION="20261110" COMMENT="Orange portal">
   <TABLES>
+    <TABLE NAME="local_orange_publication" COMMENT="Training publication history and announcement generation">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="published" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="firstpublished" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="generation" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="notify" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1"/>
+      </FIELDS>
+      <KEYS><KEY NAME="primary" TYPE="primary" FIELDS="id"/><KEY NAME="course" TYPE="foreign-unique" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/></KEYS>
+    </TABLE>
+    <TABLE NAME="local_orange_access" COMMENT="Optional Orange collective selection and owned native availability rule">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="kind" TYPE="char" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="itemid" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="cohorts" TYPE="text" NOTNULL="true"/>
+        <FIELD NAME="userids" TYPE="text" NOTNULL="false"/>
+        <FIELD NAME="groupids" TYPE="text" NOTNULL="false"/>
+        <FIELD NAME="rule" TYPE="text" NOTNULL="true"/>
+      </FIELDS>
+      <KEYS><KEY NAME="primary" TYPE="primary" FIELDS="id"/></KEYS>
+      <INDEXES><INDEX NAME="item" UNIQUE="true" FIELDS="kind,itemid"/></INDEXES>
+    </TABLE>
     <TABLE NAME="local_orange_attendance" COMMENT="Explicit attendance per course edition and participant">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>

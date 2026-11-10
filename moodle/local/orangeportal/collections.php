@@ -40,6 +40,9 @@ if (!$course) {
     }
 } else {
     echo $OUTPUT->heading(format_string($course->fullname), 3);
+    if ($manage) {
+        echo html_writer::link(\local_orangeportal\training_publication::edit_url($id), get_string('edit'), ['class' => 'btn btn-primary']);
+    }
     echo html_writer::link(new moodle_url('/course/view.php', ['id' => $id]), get_string('trainingopen', 'local_orangeportal'), ['class' => 'btn btn-primary']);
     if ($manage) {
         echo orange_post_button(new moodle_url('/course/view.php', ['id' => $id]), get_string('nativeeditblocks', 'local_orangeportal'), ['edit' => 1]);

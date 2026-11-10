@@ -242,3 +242,28 @@ Desde la web: revisar colectivos de cada responsable, sus permisos nativos de lo
 Copiar `local/orangeportal/` completo, ejecutar `php admin/cli/upgrade.php --non-interactive` y `php admin/cli/purge_caches.php` desde la raíz de Moodle. No añade tablas: usa la cola nativa de tareas de Moodle. Requiere cron activo.
 
 Configuración manual por ambiente en **Administración del sitio → Portal Orange → Mensajería Teams**, con administrador general. Pegar la URL firmada de Power Automate, elegir tipos/altas/modificaciones y activar. Empieza desactivado; guardar no envía una prueba. Ver pasos, comportamiento y límites en [Integración con Teams](10-integracion-teams.md). No copiar la URL ni la base de datos de otro ambiente.
+
+## Creación de contenido y destinatarios — 2026111001
+
+Entregar `local/orangeportal/` completo. Ejecutar desde la raíz de Moodle:
+
+```bash
+php admin/cli/upgrade.php --non-interactive
+php admin/cli/purge_caches.php
+```
+
+La actualización crea **`local_orange_access`**, para usuarios, colectivos y grupos destinatarios de documentos/formaciones y la restricción nativa gestionada. No se copia la base de datos ni se reubican contenidos o matrículas existentes. El contenido sin selección específica mantiene como frontera la cohorte Orange y conserva sus restricciones nativas previas. Incidencias y Comunicados nuevos sin destinatarios explícitos se dirigen por defecto a esa cohorte.
+
+Se crean dos roles técnicos automáticos: **Lector del catálogo Orange** (`orange_catalogo`), que permite a miembros Orange consultar las dos categorías Orange, y **Matriculador Orange** (`orange_matriculador`), asignado solo en la categoría de Formaciones Orange a gestores Orange con permiso de creación allí. Ningún arquetipo general del campus recibe el nuevo permiso de matrícula del portal. Los alumnos, Coordinación y Calidad no lo reciben por defecto.
+
+El catálogo nativo de las categorías Orange queda restringido para los roles generales de usuario autenticado e invitado; los miembros Orange reciben el rol de consulta en esas categorías. No cambia el permiso global del campus. Los cambios de raíces restauran las anulaciones previas que el plugin haya registrado y aplican la frontera a las nuevas raíces. La administración general mantiene su acceso. Revisar asignaciones o anulaciones especiales ya existentes en esas categorías como parte de la validación del ambiente.
+
+Comprobar: crear una formación y continuar a contenido/participantes; matricular un usuario Orange; crear documento para un colectivo; probar con un agente de ese colectivo, otro colectivo y un usuario externo; verificar enlace directo y seguimiento. Mantener las restricciones de acceso nativas activadas para usar colectivos por documento.
+
+No se ha enviado ninguna prueba a Teams para esta revisión; las pruebas automáticas utilizan contenido oculto o fuerzan la desactivación solo dentro del proceso de pruebas, sin sobrescribir la configuración guardada.
+
+## Publicación explícita de Formaciones — 2026111005
+
+Copiar `local/orangeportal/` completo y ejecutar la actualización y purga de cachés habituales. Se crea `local_orange_publication` para conservar la primera publicación y la generación de los avisos de cada formación. No cambia la publicación ni las matrículas de cursos existentes.
+
+Validar con una formación de prueba: crear y guardar como borrador; matricular un agente y comprobar que aún no puede verla; marcar Visible para sus destinatarios y guardar sin marcar Teams; comprobar que puede acceder; desmarcar Visible y guardar; comprobar que conserva matrícula y resultados pero pierde acceso al contenido. Con un servicio de pruebas autorizado, comprobar además el aviso de primera publicación y que no se envía nada durante la preparación del borrador.

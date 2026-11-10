@@ -35,14 +35,14 @@ try {
     if (r.exceptionDetails) throw new Error(r.exceptionDetails.text + ': ' + (r.result.description || ''));
     return r.result.value;
   };
-  const wait = async expression => {
-    for (let i = 0; i < 150; i++) { if (await evaluate(expression)) return; await delay(150); }
+  const wait = async (expression, attempts = 150) => {
+    for (let i = 0; i < attempts; i++) { if (await evaluate(expression)) return; await delay(150); }
     throw new Error('Timeout: ' + expression + ' URL=' + await evaluate('location.href') + ' text=' + (await evaluate('document.body.innerText')).slice(0, 600));
   };
   const navigate = async path => {
     await send('Page.navigate', {url: path.startsWith('http') ? path : base + path});
     await delay(500); await wait(`document.readyState !== 'loading' ||
-      (location.pathname==='/login/index.php' && !!document.querySelector('#loginbtn'))`);
+      (location.pathname==='/login/index.php' && !!document.querySelector('#loginbtn'))`, path.includes('/login/') ? 800 : 150);
   };
   const screenshot = async name => {
     await delay(500); const r = await send('Page.captureScreenshot', {format: 'png', captureBeyondViewport: false});
@@ -63,6 +63,97 @@ try {
   };
   const nav = () => evaluate(`Array.from(document.querySelectorAll('.primary-navigation .nav-link')).filter(x=>x.textContent.trim()!=='').map(x=>x.textContent.trim()).filter(x=>!['Más','More'].includes(x))`);
   await send('Page.enable'); await send('Runtime.enable');
+  if (process.argv.includes('--content-flow-only')) {
+    try {
+      await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
+      await navigate('/local/orangeportal/index.php?section=courses');
+      await wait(`!!document.querySelector('.orange-create-course')`);
+      await navigate(await evaluate(`document.querySelector('.orange-create-course').href`));
+      await wait(`location.pathname==='/course/edit.php'&&!!document.querySelector('[name="fullname"]')`);
+      check(await evaluate(`['orangeusers','orangecohorts','orangegroups'].every(n=>document.querySelector('select[name="'+n+'[]"]'))&&
+        !!document.querySelector('[name="orangepublished"]')&&!!document.querySelector('[name="orangenotifyteams"]')`), 'Crear formación reúne destinatarios, publicación y aviso Teams');
+      check(await evaluate(`!document.querySelector('[name="orangepublished"][type="checkbox"]').checked&&
+        !document.querySelector('[name="orangenotifyteams"][type="checkbox"]').checked`), 'Nueva formación comienza sin publicar y sin aviso Teams');
+      const token=Date.now();
+      await evaluate(`document.querySelector('[name="fullname"]').value='TESTWEB FLOW Training ${token}';
+        document.querySelector('[name="shortname"]').value='TESTWEB-FLOW-${token}';
+        const recipient=Array.from(document.querySelector('select[name="orangeusers[]"]').options).find(o=>o.text.includes('(agente.orange)'));
+        recipient.selected=true;
+        document.querySelector('[name="saveanddisplay"]').click()`);
+      await wait(`location.pathname==='/local/orangeportal/collections.php'&&!!document.querySelector('a[href*="/course/edit.php"]')`);
+      const courseid=await evaluate(`new URL(location.href).searchParams.get('course')`);
+      check(true, 'Guardar nueva formación abre su contenido, sin pantalla intermedia');
+      await navigate(await evaluate(`document.querySelector('a[href*="/course/edit.php"]').href`));
+      await wait(`location.pathname==='/course/edit.php'&&!!document.querySelector('[name="orangepublished"]')`);
+      check(await evaluate(`!!document.querySelector('a[href*="collections.php"]')&&!!document.querySelector('a[href*="training_participants.php"]')&&
+        Array.from(document.querySelector('select[name="orangeusers[]"]').selectedOptions).some(o=>o.text.includes('(agente.orange)'))`), 'Editar abre configuración y conserva destinatarios y accesos a contenido y participantes');
+      await navigate(await evaluate(`document.querySelector('a[href*="training_participants.php"]').href`));
+      await wait(`location.pathname==='/local/orangeportal/training_participants.php'&&!!document.querySelector('select[name="users[]"]')`);
+      check(await evaluate(`Array.from(document.querySelector('select[name="users[]"]').options).some(o=>o.text.includes('(agente.orange)'))&&
+        !Array.from(document.querySelector('select[name="users[]"]').options).some(o=>o.text.includes('(usuario.externo)'))`), 'Matrícula ofrece destinatarios Orange y excluye externos');
+      await evaluate(`const option=Array.from(document.querySelector('select[name="users[]"]').options).find(o=>o.text.includes('(agente.orange)'));
+        option.selected=true;document.querySelector('[name="submitbutton"]').click()`);
+      await wait(`!!document.querySelector('table')&&document.querySelector('table').textContent.includes('agente.orange')`);
+      check(true,'Participantes permite matrícula nativa durante la preparación');
+      await navigate(await evaluate(`document.querySelector('a[href*="/course/edit.php"]').href`));
+      await wait(`location.pathname==='/course/edit.php'&&!!document.querySelector('[name="orangepublished"][type="checkbox"]')`);
+      await evaluate(`document.querySelector('[name="orangepublished"][type="checkbox"]').checked=true;
+        document.querySelector('[name="saveandreturn"]').click()`);
+      await wait(`location.pathname==='/local/orangeportal/index.php'&&!!document.querySelector('.orange-training-edit')`);
+      check(await evaluate(`document.querySelectorAll('.orange-training-actions .btn').length===2&&
+        document.querySelector('.orange-training-edit').href.includes('/course/edit.php')`), 'Listado mantiene solo Abrir formación y Editar directo');
+      await logout();
+      await login('agente.orange',env.ORANGE_DEMO_PASSWORD);
+      await navigate('/local/orangeportal/index.php?section=courses&course='+courseid);
+      await wait(`!!document.querySelector('.orange-training-open')`);
+      check(await evaluate(`document.querySelector('.orange-library-detail h4').textContent.includes('TESTWEB FLOW Training')&&
+        !document.querySelector('.orange-training-edit')`), 'El destinatario matriculado ve la formación publicada al guardar');
+      await logout();
+      await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
+      await navigate('/local/orangeportal/training_setup.php?course='+courseid);
+      await wait(`location.pathname==='/course/edit.php'&&!!document.querySelector('[name="orangepublished"][type="checkbox"]')`);
+      check(await evaluate(`document.querySelector('[name="orangepublished"][type="checkbox"]').checked&&
+        !document.querySelector('[name="orangenotifyteams"][type="checkbox"]').checked`), 'Edición conserva publicación y no reutiliza el consentimiento de Teams');
+      await evaluate(`document.querySelector('[name="orangepublished"][type="checkbox"]').checked=false;
+        document.querySelector('[name="saveandreturn"]').click()`);
+      await wait(`location.pathname==='/local/orangeportal/index.php'`);
+      await navigate('/local/orangeportal/training_setup.php?course='+courseid);
+      await wait(`location.pathname==='/course/edit.php'&&!!document.querySelector('[name="orangepublished"][type="checkbox"]')`);
+      check(await evaluate(`!document.querySelector('[name="orangepublished"][type="checkbox"]').checked`), 'Desmarcar Visible y guardar retira la publicación');
+      await evaluate(`document.querySelector('#id_orangeaudiencehdr')?.scrollIntoView()`);
+      await screenshot('formation-publication-recipients');
+      await navigate('/local/orangeportal/add_document.php');
+      await wait(`!!document.querySelector('[name="categoryid"]')`);
+      await evaluate(`document.querySelector('[name="submitbutton"]').click()`);
+      await wait(`!!document.querySelector('.modal.show .modchooser [data-internal="url"] a[data-action="add-chooser-option"]')`);
+      await evaluate(`Array.from(document.querySelectorAll('.modal.show .modchooser [data-internal="url"] a[data-action="add-chooser-option"]')).find(x=>x.getClientRects().length).click()`);
+      await wait(`location.pathname==='/course/modedit.php'&&!!document.querySelector('input[name="externalurl"]')`);
+      check(await evaluate(`['orangeusers','orangecohorts','orangegroups'].every(n=>document.querySelector('select[name="'+n+'[]"]'))&&
+        !document.querySelector('[name="orangepublished"][type="checkbox"]').checked&&!!document.querySelector('[name="orangenotifyteams"]')`), 'Documento incluye destinatarios y comienza sin publicar ni avisar');
+      await evaluate(`document.querySelector('[name="name"]').value='TESTWEB FLOW Document ${token}';
+        document.querySelector('[name="externalurl"]').value='https://example.invalid/fixture';
+        const recipient=Array.from(document.querySelector('select[name="orangeusers[]"]').options).find(o=>o.text.includes('(agente.orange)'));
+        recipient.selected=true;
+        document.querySelector('[name="orangepublished"][type="checkbox"]').checked=true;
+        document.querySelector('[name="submitbutton2"]').click()`);
+      await wait(`location.pathname==='/local/orangeportal/index.php'&&new URL(location.href).searchParams.has('document')&&document.readyState!=='loading'`);
+      check(await evaluate(`document.querySelector('.orange-library-detail').textContent.includes('TESTWEB FLOW Document')`), 'Guardar documento publicado vuelve a Biblioteca con el documento seleccionado');
+      const cmid=await evaluate(`new URL(location.href).searchParams.get('document')`);
+      await navigate('/course/modedit.php?update='+cmid+'&return=0&lang=en');
+      await wait(`location.pathname==='/course/modedit.php'&&!!document.querySelector('[name="orangepublished"][type="checkbox"]')`);
+      check(await evaluate(`document.querySelector('[name="orangepublished"][type="checkbox"]').checked&&
+        Array.from(document.querySelector('select[name="orangeusers[]"]').selectedOptions).some(o=>o.text.includes('(agente.orange)'))&&
+        document.body.textContent.includes('Notify via Teams when saving')`), 'Editar documento conserva publicación y destinatarios y traduce los controles');
+      await evaluate(`document.querySelector('#id_orangeaudiencehdr')?.scrollIntoView()`);
+      await screenshot('document-audience-native-form');
+      await navigate('/local/orangeportal/manage.php?kind=notifications&new=1');
+      await wait(`!!document.querySelector('[name="published"]')`);
+      check(await evaluate(`!!document.querySelector('[name="orangenotifyteams"]')`), 'Comunicados utiliza el mismo control de aviso Teams');
+      console.log('PASS '+results.length+' browser checks for content flow');
+    } finally {
+      execFileSync('docker',['compose','exec','-T','web','php','local/orangeportal/cli/cleanup_content_flow.php'],{stdio:'pipe'});
+    }
+  } else
   if (process.argv.includes('--teams-settings-only')) {
     await navigate('/login/index.php'); await wait(`!!document.querySelector('#username')`);
     await evaluate(`document.querySelector('#username').value=${JSON.stringify(env.MOODLE_ADMIN_USER || 'admin')};
@@ -562,7 +653,7 @@ try {
     check(await evaluate(`!!document.querySelector('.orange-library-browser')&&!document.querySelector('.orange-training-browser')&&document.querySelector('.orange-library-results h3').textContent==='Documentos'`),'Biblioteca conserva su explorador documental');
     await logout();await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
     await navigate(course);
-    check(await evaluate(`!!document.querySelector('.orange-create-quiz')&&!!document.querySelector('.orange-library-detail input[name="edit"]')&&!!document.querySelector('.orange-create-course')`),'Formador conserva creación, edición y evaluaciones');
+    check(await evaluate(`!!document.querySelector('.orange-training-edit[href*="/course/edit.php"]')&&document.querySelectorAll('.orange-training-actions .btn').length===2&&!!document.querySelector('.orange-create-course')`),'Formador conserva creación y solo Abrir formación y Editar en la ficha');
     const creation=await evaluate(`document.querySelector('.orange-create-course').href`);
     check(new URL(creation).searchParams.get('category')===new URL(course).searchParams.get('category'),'Nuevo curso propone la categoría seleccionada');
     await writeFile('backups/previews/training-columns-checks.json',JSON.stringify({date:new Date().toISOString(),results},null,2));

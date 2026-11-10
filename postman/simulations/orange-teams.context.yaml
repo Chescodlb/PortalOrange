@@ -23,6 +23,20 @@ assumptions:
     verification: No real Microsoft endpoint was contacted, as requested by the client. The client reported that their own trigger test works. The local test verified a stable X-Orange-Event-Id header; receiver-side deduplication remains to be configured if required.
     source: Client-supplied contract; docs/10-integracion-teams.md
     updated_at: "2026-11-06"
+  - id: training-draft-publication
+    status: supported
+    claim: In the local publication scenarios, draft saves send nothing, first publication sends a new-training announcement, and withdrawing invalidates pending announcements before silent republication.
+    reason: The real Moodle form, native events, publication service, task queue and HTTPS transport were exercised against the local simulation.
+    verification: On 2026-11-10 the local service recorded only the explicit first-publication announcement and a subsequent published-content update; draft edits and execution of an old-generation task after silent republication recorded no request. Enrolments and resources remained after withdrawal.
+    source: moodle/local/orangeportal/cli/check_training_publication.php; scripts/test-orange-teams.mjs --publication
+    updated_at: "2026-11-10"
+  - id: explicit-save-consent
+    status: supported
+    claim: Across all four Orange content types, Teams delivery requires explicit consent on a visible save; drafts and native edits without consent are silent.
+    reason: Native Moodle course and module saves, publication forms, the notice service, queued tasks and HTTPS delivery were exercised against the local simulation.
+    verification: On 2026-11-10 the local simulator recorded five authorized JSON POSTs (training creation and update, document update, incident and announcement). Drafts, unchecked saves and later native updates without consent produced no jobs.
+    source: moodle/local/orangeportal/cli/check_publication_save.php; scripts/test-orange-teams.mjs --save-consent
+    updated_at: "2026-11-10"
 fingerprints:
   - id: local-verification
     date: "2026-11-06"

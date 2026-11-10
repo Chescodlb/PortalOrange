@@ -40,7 +40,7 @@ if ($id || $new || $_SERVER['REQUEST_METHOD'] === 'POST') {
         $record = (object)['id' => $data->id, 'revision' => $data->revision, 'kind' => $data->kind, 'categoryid' => $data->categoryid,
             'title' => $data->title, 'content' => format_text($data->body['text'], $data->body['format'],
                 ['context' => context_system::instance(), 'filter' => false]),
-            'impact' => $data->impact, 'state' => $data->state, 'published' => (int)$data->published];
+            'impact' => $data->impact, 'state' => $data->state, 'published' => (int)$data->published, 'orangenotifyteams' => !empty($data->orangenotifyteams)];
         if ($kind === 'incidents') { $record->client = $data->client; $record->product = $data->product; }
         $savedid = service::save_notice($record, ['user' => $data->users ?? [], 'cohort' => $data->cohorts ?? [], 'group' => $data->groups ?? []]);
         if (!empty($data->saveandresources)) {

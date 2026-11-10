@@ -69,7 +69,7 @@ try {
             'impact' => notice_options::default_code('impacts'), 'client' => '', 'product' => ''];
         $id = service::save_notice($data, []); $notices[] = $id;
         teams_check(!teams::payload($kind, $id, 'created'), "$kind borrador excluido");
-        $data = teams_notice($id); $data->published = 1;
+        $data = teams_notice($id); $data->published = 1; $data->orangenotifyteams = 1;
         service::save_notice($data, $targets);
         $jobs = teams_jobs(); $job = end($jobs); $custom = json_decode($job->customdata);
         teams_check($custom->kind === $kind && $custom->action === 'created' && $custom->id === $id,
@@ -77,7 +77,7 @@ try {
         $count = count($jobs);
         service::save_notice(teams_notice($id), $targets);
         teams_check(count(teams_jobs()) === $count, "$kind guardar sin cambios no avisa");
-        $data = teams_notice($id); $data->title .= ' modificado'; service::save_notice($data, $targets);
+        $data = teams_notice($id); $data->orangenotifyteams = 1; $data->title .= ' modificado'; service::save_notice($data, $targets);
         teams_check(count(teams_jobs()) === $count + 1, "$kind modificar texto encola actualización");
         if ($kind === 'incidents') {
             $count = count(teams_jobs());
@@ -98,14 +98,16 @@ try {
         } else { $catid = (int)get_config('local_orangeportal', $kind === 'library' ? 'librarycategory' : 'coursescategory'); }
         $count = count(teams_jobs());
         $course = create_course((object)['category' => $catid, 'fullname' => 'TEST Teams ' . $kind,
-            'shortname' => 'TEAMS-' . $kind . '-' . uniqid(), 'summary' => '<p>Resumen</p>', 'visible' => 1]);
+            'shortname' => 'TEAMS-' . $kind . '-' . uniqid(), 'summary' => '<p>Resumen</p>', 'visible' => $kind === 'courses' ? 0 : 1,
+            'orangeaudiencepresent' => (int)($kind === 'courses'), 'orangepublished' => 1, 'orangenotifyteams' => 1]);
         $courses[] = (int)$course->id;
         teams_check(count(teams_jobs()) === $count + ($kind === 'courses' ? 1 : 0), "$kind evento nativo de curso respeta ámbito");
         $data = (object)['modulename' => 'page', 'course' => $course->id, 'section' => 0, 'visible' => 1,
+            'orangeaudiencepresent' => (int)($kind === 'library'), 'orangepublished' => 1, 'orangenotifyteams' => 1,
             'name' => 'TEST Teams document', 'introeditor' => ['text' => '<p>Intro</p>', 'format' => FORMAT_HTML, 'itemid' => 0],
             'content' => '<p>Contenido</p>', 'contentformat' => FORMAT_HTML, 'display' => 0, 'completion' => 0];
         $count = count(teams_jobs()); $module = create_module($data);
-        teams_check(count(teams_jobs()) === $count + ($kind !== 'outside' ? 1 : 0), "$kind evento nativo de recurso respeta ámbito");
+        teams_check(count(teams_jobs()) === $count + ($kind === 'library' ? 1 : 0), "$kind evento nativo de recurso respeta ámbito");
         if ($kind === 'library') {
             $docid = (int)$module->coursemodule;
             $count = count(teams_jobs());
@@ -122,6 +124,7 @@ try {
             $DB->set_field('course_modules', 'visible', 1, ['id' => $docid]);
         }
         if ($kind === 'courses') {
+            $course->orangeaudiencepresent = 1; $course->orangepublished = 1; $course->orangenotifyteams = 1;
             $course->fullname .= ' actualizado'; update_course($course);
             teams_check(str_contains(teams::payload('courses', $course->id, 'updated')['titulo'], 'actualizado'),
                 'La formación usa el contenido actual');
@@ -146,9 +149,8 @@ try {
     $data->course = $courses[0]; $data->visible = 1; $data->name = 'TEST Teams notice resource';
     $data->introeditor = ['text' => '<p>Intro</p>', 'format' => FORMAT_HTML, 'itemid' => 0];
     create_module($data);
-    $jobs = teams_jobs(); $last = json_decode(end($jobs)->customdata);
-    teams_check(count($jobs) === $count + 1 && $last->kind === 'notifications' && $last->action === 'updated',
-        'Recurso de comunicado genera actualización de su publicación');
+    $jobs = teams_jobs();
+    teams_check(count($jobs) === $count, 'Añadir recurso de comunicado no avisa sin consentimiento desde su publicación');
     foreach (teams_jobs() as $job) {
         if (in_array($job->id, $oldjobs)) { continue; }
         $task = \core\task\manager::adhoc_task_from_record($job);
@@ -158,7 +160,7 @@ try {
         $DB->delete_records('task_adhoc', ['id' => $job->id]);
     }
     $state = teams_fixture('__stats');
-    teams_check(count($state['requests']) >= 8 && strlen($state['requests'][0]['eventid']) === 64 &&
+    teams_check(count($state['requests']) >= 4 && strlen($state['requests'][0]['eventid']) === 64 &&
         str_starts_with($state['requests'][0]['type'], 'application/json'), 'Entrega HTTPS real a simulación con JSON e ID estable');
     foreach ([400, 429, 500, 302] as $code) {
         teams_fixture('__control?code=' . $code);

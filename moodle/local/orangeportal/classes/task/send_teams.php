@@ -11,8 +11,10 @@ class send_teams extends \core\task\adhoc_task {
         $endpoint = (string)get_config('local_orangeportal', 'teamsurl');
         if (!\local_orangeportal\teams::enabled($data->kind, $data->action) ||
                 !hash_equals((string)$data->endpoint, hash('sha256', $endpoint))) { return; }
+        if ($data->kind === 'courses' && (int)($data->generation ?? 0) !==
+                \local_orangeportal\training_publication::generation((int)$data->id)) { return; }
         $payload = \local_orangeportal\teams::payload($data->kind, (int)$data->id, $data->action);
-        if (!$payload) { return; }
+        if (!$payload || !hash_equals((string)$data->contenthash, hash('sha256', json_encode($payload)))) { return; }
         $eventid = hash('sha256', $CFG->wwwroot . ':teams:' . $this->get_id());
         \local_orangeportal\teams::post($endpoint, $payload, $eventid);
         mtrace('Teams: HTTP request accepted.');

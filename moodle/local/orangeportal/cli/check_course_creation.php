@@ -13,8 +13,8 @@ function creation_check(bool $condition, string $label): void {
     if (!$condition) { throw new RuntimeException($label); }
     $checks++; echo 'PASS ' . $label . PHP_EOL;
 }
-foreach (['formador.orange', 'admin'] as $username) {
-    $user = $username === 'admin' ? get_admin() : $DB->get_record('user', ['username' => $username], '*', MUST_EXIST);
+foreach (['formador.orange', 'admin.orange'] as $username) {
+    $user = $DB->get_record('user', ['username' => $username], '*', MUST_EXIST);
     \core\session\manager::set_user($user);
     foreach (['courses', 'library'] as $section) {
         $root = native_categories::root($section);

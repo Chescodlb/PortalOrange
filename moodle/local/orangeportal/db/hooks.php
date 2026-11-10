@@ -1,6 +1,8 @@
 <?php
 defined('MOODLE_INTERNAL') || die();
 $callbacks = [
+    ['hook' => \core_course\hook\after_form_submission::class,
+        'callback' => [\local_orangeportal\content_access::class, 'created']],
     ['hook' => \core_course\hook\after_form_definition_after_data::class,
         'callback' => [\local_orangeportal\training_report::class, 'course_form']],
     ['hook' => \core_course\hook\after_form_definition_after_data::class,

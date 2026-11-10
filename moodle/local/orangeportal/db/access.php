@@ -1,6 +1,10 @@
 <?php
 defined('MOODLE_INTERNAL') || die();
 $capabilities = [
+    'local/orangeportal:enrolusers' => [
+        'captype' => 'write', 'contextlevel' => CONTEXT_COURSE, 'riskbitmask' => RISK_PERSONAL,
+        'archetypes' => [],
+    ],
     'local/orangeportal:viewallreports' => [
         'captype' => 'read', 'contextlevel' => CONTEXT_SYSTEM,
         'riskbitmask' => RISK_PERSONAL, 'archetypes' => [],

@@ -12,6 +12,7 @@ class document_reads {
     public static function record(int $userid, int $cmid, ?int $time = null): void {
         global $DB;
         if (!experience::member($userid)) { return; }
+        if ((int)get_config('local_orangeportal', 'version') >= 2026111000 && !content_access::module($cmid, $userid)) { return; }
         $record = $DB->get_record_sql('SELECT cm.id, m.name, c.category
             FROM {course_modules} cm JOIN {modules} m ON m.id = cm.module
             JOIN {course} c ON c.id = cm.course WHERE cm.id = ?', [$cmid]);

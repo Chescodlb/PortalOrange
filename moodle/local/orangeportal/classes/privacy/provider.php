@@ -15,7 +15,8 @@ class provider implements \core_privacy\local\metadata\provider,
         $collection->add_external_location_link('teams', [
             'titulo' => 'privacy:metadata:teams:title', 'contenido' => 'privacy:metadata:teams:content',
             'url' => 'privacy:metadata:teams:url'], 'privacy:metadata:teams');
-        foreach (['local_orange_attendance' => ['userid', 'courseid', 'status', 'minutes', 'authorid', 'timemodified', 'collectives'],
+        foreach (['local_orange_access' => ['kind', 'itemid', 'userids', 'cohorts', 'groupids'],
+                'local_orange_attendance' => ['userid', 'courseid', 'status', 'minutes', 'authorid', 'timemodified', 'collectives'],
                 'local_orange_doc_read' => ['userid', 'cmid', 'readtime'],
                 'local_orange_notice' => ['authorid', 'title', 'content', 'timecreated', 'client', 'product', 'closedby', 'timeclosed', 'deleted', 'deletedby'],
                 'local_orange_revision' => ['authorid', 'title', 'content', 'timecreated'],
@@ -24,7 +25,7 @@ class provider implements \core_privacy\local\metadata\provider,
                 'local_orange_state_log' => ['userid', 'noticeid', 'oldstate', 'newstate', 'timecreated']] as $table => $fields) {
             $mapping = [];
             foreach ($fields as $field) {
-                $mapping[$field] = 'privacy:metadata:' . (in_array($field, ['userid', 'authorid', 'targetid', 'closedby', 'deletedby']) ? 'userid' :
+                $mapping[$field] = 'privacy:metadata:' . (in_array($field, ['userid', 'userids', 'authorid', 'targetid', 'closedby', 'deletedby']) ? 'userid' :
                     (in_array($field, ['received', 'readtime', 'confirmed', 'timecreated', 'timeclosed', 'timemodified', 'deleted']) ? 'time' :
                     (in_array($field, ['oldstate', 'newstate', 'status']) ? 'state' : 'content')));
             }
@@ -32,9 +33,18 @@ class provider implements \core_privacy\local\metadata\provider,
         }
         return $collection;
     }
+    private static function content_assignments(int $userid): array {
+        global $DB;
+        $records = [];
+        foreach ($DB->get_records_select('local_orange_access', 'userids IS NOT NULL') as $record) {
+            if (in_array($userid, json_decode($record->userids ?: '[]', true), true)) { $records[] = $record; }
+        }
+        return $records;
+    }
     public static function get_contexts_for_userid(int $userid): contextlist {
         global $DB;
         $list = new contextlist();
+        if (self::content_assignments($userid)) { $list->add_system_context(); }
         foreach (['local_orange_attendance' => 'userid', 'local_orange_doc_read' => 'userid', 'local_orange_receipt' => 'userid', 'local_orange_state_log' => 'userid',
                 'local_orange_notice' => 'authorid', 'local_orange_revision' => 'authorid'] as $table => $field) {
             if ($DB->record_exists($table, [$field => $userid])) { $list->add_system_context(); return $list; }
@@ -54,6 +64,10 @@ class provider implements \core_privacy\local\metadata\provider,
                 'local_orange_notice' => 'authorid', 'local_orange_revision' => 'authorid'] as $table => $field) {
             $userlist->add_from_sql($field, "SELECT $field FROM {{$table}}");
         }
+        global $DB;
+        foreach ($DB->get_records_select('local_orange_access', 'userids IS NOT NULL') as $record) {
+            foreach (json_decode($record->userids ?: '[]', true) as $userid) { if ($userid > 0) { $userlist->add_user($userid); } }
+        }
         $userlist->add_from_sql('authorid', 'SELECT authorid FROM {local_orange_attendance} WHERE authorid > 0');
         $userlist->add_from_sql('targetid', "SELECT targetid FROM {local_orange_audience} WHERE targettype = 'user'");
         foreach (['closedby', 'deletedby'] as $field) {
@@ -71,6 +85,7 @@ class provider implements \core_privacy\local\metadata\provider,
             $data->$table = array_values($DB->get_records($table, [$field => $userid]));
         }
         $data->attendanceactions = array_values($DB->get_records('local_orange_attendance', ['authorid' => $userid]));
+        $data->contentassignments = array_map(fn($r) => (object)['kind' => $r->kind, 'itemid' => $r->itemid], self::content_assignments((int)$userid));
         $data->individualassignments = array_values($DB->get_records('local_orange_audience', ['targettype' => 'user', 'targetid' => $userid]));
         $data->incidentactions = array_values($DB->get_records_select('local_orange_notice',
             'closedby = ? OR deletedby = ?', [$userid, $userid]));
@@ -79,12 +94,31 @@ class provider implements \core_privacy\local\metadata\provider,
     public static function delete_data_for_all_users_in_context(\context $context): void {
         global $DB;
         if ($context->contextlevel != CONTEXT_SYSTEM) { return; }
+        foreach ($DB->get_records_select('local_orange_access', 'userids IS NOT NULL') as $record) {
+            foreach (json_decode($record->userids ?: '[]', true) as $userid) { if ($userid > 0) { self::erase_content($userid); } }
+        }
         foreach (['local_orange_attendance', 'local_orange_doc_read', 'local_orange_receipt', 'local_orange_state_log', 'local_orange_audience', 'local_orange_revision', 'local_orange_notice'] as $table) {
             $DB->delete_records($table);
         }
     }
+    private static function erase_content(int $userid): void {
+        global $DB, $CFG;
+        require_once($CFG->dirroot . '/group/lib.php');
+        foreach (self::content_assignments($userid) as $record) {
+            $ids = array_values(array_diff(json_decode($record->userids, true), [$userid]));
+            // Keep an empty explicit audience closed rather than broadening it to all Orange.
+            if (!$ids && !json_decode($record->cohorts, true) && !json_decode($record->groupids ?: '[]', true)) { $ids = [0]; }
+            $DB->set_field('local_orange_access', 'userids', json_encode($ids), ['id' => $record->id]);
+        }
+        foreach ($DB->get_records('groups', ['idnumber' => 'orange-audience-user-' . $userid]) as $group) {
+            foreach ($DB->get_records('groups_members', ['groupid' => $group->id]) as $member) { groups_remove_member($group, $member->userid); }
+            $DB->update_record('groups', (object)['id' => $group->id, 'idnumber' => 'orange-audience-erased-' . $group->id,
+                'name' => 'Orange · ' . get_string('deleted')]);
+        }
+    }
     private static function erase(int $userid): void {
         global $DB;
+        self::erase_content($userid);
         $DB->delete_records('local_orange_attendance', ['userid' => $userid]);
         $DB->set_field('local_orange_attendance', 'authorid', 0, ['authorid' => $userid]);
         $DB->delete_records('local_orange_doc_read', ['userid' => $userid]);

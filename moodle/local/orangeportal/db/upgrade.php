@@ -130,5 +130,56 @@ function xmldb_local_orangeportal_upgrade($oldversion): bool {
         // Observer registration is refreshed by Moodle. Delivery uses the native task_adhoc queue.
         upgrade_plugin_savepoint(true, 2026110602, 'local', 'orangeportal');
     }
+    if ($oldversion < 2026111000) {
+        $table = new xmldb_table('local_orange_access');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table->add_field('kind', XMLDB_TYPE_CHAR, '10', null, XMLDB_NOTNULL);
+        $table->add_field('itemid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('cohorts', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL);
+        $table->add_field('rule', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_index('item', XMLDB_INDEX_UNIQUE, ['kind', 'itemid']);
+        if (!$DB->get_manager()->table_exists($table)) { $DB->get_manager()->create_table($table); }
+        \local_orangeportal\content_access::catalogue();
+        upgrade_plugin_savepoint(true, 2026111000, 'local', 'orangeportal');
+    }
+    if ($oldversion < 2026111001) {
+        update_capabilities('local_orangeportal');
+        \local_orangeportal\content_access::install_enrol_role();
+        upgrade_plugin_savepoint(true, 2026111001, 'local', 'orangeportal');
+    }
+    if ($oldversion < 2026111002) {
+        $table = new xmldb_table('local_orange_publication');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        foreach (['published', 'firstpublished', 'generation'] as $name) {
+            $table->add_field($name, XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        }
+        $table->add_field('notify', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '1');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('course', XMLDB_KEY_FOREIGN_UNIQUE, ['courseid'], 'course', ['id']);
+        if (!$DB->get_manager()->table_exists($table)) { $DB->get_manager()->create_table($table); }
+        upgrade_plugin_savepoint(true, 2026111002, 'local', 'orangeportal');
+    }
+    if ($oldversion < 2026111003) {
+        $table = new xmldb_table('local_orange_access');
+        foreach (['userids', 'groupids'] as $name) {
+            $field = new xmldb_field($name, XMLDB_TYPE_TEXT);
+            if (!$DB->get_manager()->field_exists($table, $field)) { $DB->get_manager()->add_field($table, $field); }
+        }
+        upgrade_plugin_savepoint(true, 2026111003, 'local', 'orangeportal');
+    }
+    if ($oldversion < 2026111004) {
+        $table = new xmldb_table('local_orange_access');
+        foreach (['users' => 'userids', 'groups' => 'groupids'] as $old => $new) {
+            $field = new xmldb_field($old, XMLDB_TYPE_TEXT);
+            if ($DB->get_manager()->field_exists($table, $field)) { $DB->get_manager()->rename_field($table, $field, $new); }
+        }
+        upgrade_plugin_savepoint(true, 2026111004, 'local', 'orangeportal');
+    }
+    if ($oldversion < 2026111005) {
+        // Refresh forms and explicit announcement consent; no schema or permission changes.
+        upgrade_plugin_savepoint(true, 2026111005, 'local', 'orangeportal');
+    }
     return true;
 }

@@ -31,6 +31,8 @@ class library_report {
             $times = document_reads::times((int)$user->id);
             $access = []; $infos = [];
             foreach ($documents as $doc) {
+                if ((int)get_config('local_orangeportal', 'version') >= 2026111000 &&
+                        !content_access::module((int)$doc->id, (int)$user->id)) { continue; }
                 $course = $doc->course;
                 if (!array_key_exists($course->id, $access)) {
                     $context = \context_course::instance($course->id);

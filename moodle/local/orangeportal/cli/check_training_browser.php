@@ -7,6 +7,8 @@ require_once $CFG->dirroot . '/course/lib.php';
 use local_orangeportal\training_browser;
 if (!preg_match('~^http://(localhost|127\\.0\\.0\\.1):~', $CFG->wwwroot)) { throw new coding_exception('Local demo only.'); }
 function training_check(bool $ok, string $label): void { if (!$ok) { throw new RuntimeException($label); } echo "PASS $label\n"; }
+// Visibility changes in this regression must never queue external notifications.
+$CFG->forced_plugin_settings['local_orangeportal']['teamsenabled'] = 0;
 $root = (int)get_config('local_orangeportal', 'coursescategory');
 $initial = $DB->get_record('course_categories', ['parent' => $root, 'name' => 'Formación inicial'], '*', MUST_EXIST);
 $continuous = $DB->get_record('course_categories', ['parent' => $root, 'name' => 'Formación continua'], '*', MUST_EXIST);
@@ -36,7 +38,9 @@ try {
     \core\session\manager::set_user($trainer);
     training_check(isset(training_browser::courses($root)[$course->id]), 'Formador conserva gestión de cursos ocultos según permisos nativos');
     $html = training_browser::render($initial->id, '', $course->id, 'newest');
-    training_check(str_contains($html, 'orange-create-quiz') && str_contains($html, 'name="edit"'), 'Formador conserva edición y creación de evaluación');
+    training_check(str_contains($html, 'orange-training-edit') && str_contains($html, '/course/edit.php') &&
+        substr_count($html, 'class="btn btn-primary ') === 2 && !str_contains($html, 'orange-create-quiz'),
+        'Formador dispone solo de Abrir formación y Editar, con acceso a la gestión completa');
 } finally {
     try { $tx->rollback(new RuntimeException('training-test-rollback')); }
     catch (RuntimeException $e) { if ($e->getMessage() !== 'training-test-rollback') { throw $e; } }

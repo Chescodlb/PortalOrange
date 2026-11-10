@@ -132,3 +132,15 @@ En pantallas de hasta 575 px, cada columna de categorías ocupa el 85 % del expl
 El explorador establece su propio contexto de posición para contener también las etiquetas accesibles de sus controles. Esto evita que una etiqueta de una columna fuera de vista ensanche la página en tablet o móvil. Revisión visual a 1920, 1440, 768 y 390 px: el desbordamiento queda dentro del explorador y la cabecera permanece dentro de la pantalla.
 
 El listado de Documentos muestra solo el título y el indicador personal de lectura. Seleccionar un título conserva la ficha con ruta, descripción y botón Abrir documento. La búsqueda continúa consultando nombre y descripción aunque esta última no aparezca en cada fila.
+
+## Colectivos por documento y aislamiento Orange — 10/11/2026
+
+Al añadir un documento se elige la categoría, se abre el selector visual nativo de actividades/recursos y, en el formulario nativo, aparece **Destinatarios**, con usuarios individuales de Orange, colectivos Orange y grupos de cursos Orange. Sin selección, el documento queda para la cohorte Orange; basta estar seleccionado individualmente o pertenecer a uno de los colectivos o grupos elegidos, siempre dentro de Orange. Los autores con permiso de edición conservan acceso para gestionarlo.
+
+**Guardar y volver a Biblioteca** regresa al listado con el documento seleccionado. Editar el documento permite cambiar los tres tipos de destinatarios y conserva su selección. Las restricciones nativas adicionales (fechas, finalización, etc.) se mantienen.
+
+La selección se guarda en `local_orange_access`; se acompaña de grupos nativos `Orange · Acceso · …` que reflejan los destinatarios individuales y la pertenencia a colectivos o grupos de otros cursos Orange para las restricciones de disponibilidad. Son grupos técnicos: no modificarlos manualmente. Las altas, bajas, matrículas y eliminación de colectivos o grupos actualizan su acceso. Eliminar el último destinatario existente fuera del formulario no convierte la publicación en contenido para todo Orange. Si Moodle tiene desactivadas las restricciones de acceso, hay que activarlas antes de restringir documentos a colectivos.
+
+La frontera Orange se comprueba también en el acceso nativo y descargas. Un usuario externo no obtiene acceso aunque tenga una matrícula accidental. El seguimiento de Biblioteca utiliza la misma selección para calcular destinatarios y pendientes.
+
+Desde **2026111005**, el bloque Destinatarios incluye **Visible para sus destinatarios** y **Avisar por Teams al guardar**. Un documento nuevo empieza sin publicar. Marcar Visible lo publica en ese guardado; desmarcarlo lo retira sin borrar el recurso. Teams requiere marcar su casilla en cada guardado, además de tener la integración activa. No se avisa de documentos guardados como ocultos.

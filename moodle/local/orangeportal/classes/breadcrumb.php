@@ -97,7 +97,7 @@ class breadcrumb {
                 $section = $category && in_array((int)get_config('local_orangeportal', 'librarycategory'),
                     array_map('intval', explode('/', $category->path)), true) ? 'library' : 'courses';
             }
-        } else if ($file === 'collections.php') {
+        } else if (in_array($file, ['collections.php', 'training_setup.php', 'training_participants.php'], true)) {
             $section = 'courses';
         } else if ($file === 'resources.php') {
             $section = $DB->get_field('local_orange_notice', 'kind', ['id' => (int)$PAGE->url->get_param('notice')]);

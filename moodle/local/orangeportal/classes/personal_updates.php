@@ -11,7 +11,9 @@ class personal_updates {
     }
 
     public static function new_course(\stdClass $course, array $access, int $joined): bool {
-        return $joined > 0 && $course->visible && $course->timecreated >= $joined && empty($access[$course->id]);
+        $published = (int)get_config('local_orangeportal', 'version') >= 2026111002 ?
+            training_publication::published_time($course) : (int)$course->timecreated;
+        return $joined > 0 && $course->visible && $published >= $joined && empty($access[$course->id]);
     }
 
     public static function course_access(): array {

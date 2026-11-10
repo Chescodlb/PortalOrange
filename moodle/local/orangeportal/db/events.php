@@ -1,8 +1,20 @@
 <?php
 defined('MOODLE_INTERNAL') || die();
 $observers = [
-    ['eventname' => '\\core\\event\\course_created', 'callback' => '\\local_orangeportal\\teams::changed'],
-    ['eventname' => '\\core\\event\\course_updated', 'callback' => '\\local_orangeportal\\teams::changed'],
+    ['eventname' => '\\core\\event\\group_member_added', 'callback' => '\\local_orangeportal\\content_access::group_changed'],
+    ['eventname' => '\\core\\event\\group_member_removed', 'callback' => '\\local_orangeportal\\content_access::group_changed'],
+    ['eventname' => '\\core\\event\\group_deleted', 'callback' => '\\local_orangeportal\\content_access::group_changed'],
+    ['eventname' => '\\core\\event\\role_assigned', 'callback' => '\\local_orangeportal\\content_access::role_changed'],
+    ['eventname' => '\\core\\event\\role_unassigned', 'callback' => '\\local_orangeportal\\content_access::role_changed'],
+    ['eventname' => '\\core\\event\\cohort_deleted', 'callback' => '\\local_orangeportal\\content_access::cohort_deleted'],
+    ['eventname' => '\\core\\event\\user_enrolment_created', 'callback' => '\\local_orangeportal\\content_access::membership'],
+    ['eventname' => '\\core\\event\\cohort_member_added', 'callback' => '\\local_orangeportal\\content_access::membership'],
+    ['eventname' => '\\core\\event\\cohort_member_removed', 'callback' => '\\local_orangeportal\\content_access::membership'],
+    ['eventname' => '\\core\\event\\course_deleted', 'callback' => '\\local_orangeportal\\content_access::deleted'],
+    ['eventname' => '\\core\\event\\course_module_deleted', 'callback' => '\\local_orangeportal\\content_access::deleted'],
+    ['eventname' => '\\core\\event\\course_created', 'callback' => '\\local_orangeportal\\training_publication::changed'],
+    ['eventname' => '\\core\\event\\course_updated', 'callback' => '\\local_orangeportal\\training_publication::changed'],
+    ['eventname' => '\\core\\event\\course_deleted', 'callback' => '\\local_orangeportal\\training_publication::deleted'],
     ['eventname' => '\\core\\event\\course_module_created', 'callback' => '\\local_orangeportal\\teams::changed'],
     ['eventname' => '\\core\\event\\course_module_updated', 'callback' => '\\local_orangeportal\\teams::changed'],
     ['eventname' => '\\core\\event\\course_deleted', 'callback' => '\\local_orangeportal\\native_content::course_deleted'],

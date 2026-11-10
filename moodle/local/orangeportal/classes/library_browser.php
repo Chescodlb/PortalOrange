@@ -23,6 +23,7 @@ class library_browser {
         }
         foreach (\orange_native_courses($rootid) as $course) {
             foreach (get_fast_modinfo($course)->get_cms() as $cm) {
+                if ((int)get_config('local_orangeportal', 'version') >= 2026111000 && !content_access::module((int)$cm->id)) { continue; }
                 if (!$cm->uservisible ||
                         !$cm->is_visible_on_course_page()) { continue; }
                 $viewcap = 'mod/' . $cm->modname . ($cm->modname === 'book' ? ':read' : ':view');

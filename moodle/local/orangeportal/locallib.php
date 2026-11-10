@@ -120,6 +120,8 @@ function orange_native_courses(int $rootid): array {
         ['id' => $rootid, 'path' => $root->path . '/%']);
     $allowed = [];
     foreach ($DB->get_records_list('course', 'category', array_keys($categories), 'fullname') as $course) {
+        if ((int)get_config('local_orangeportal', 'version') >= 2026111000 &&
+                !\local_orangeportal\content_access::course((int)$course->id)) { continue; }
         $context = context_course::instance($course->id);
         if ((is_enrolled($context, $USER, '', true) || has_capability('moodle/course:view', $context)) &&
                 core_course_category::get($course->category, IGNORE_MISSING)->is_uservisible() &&

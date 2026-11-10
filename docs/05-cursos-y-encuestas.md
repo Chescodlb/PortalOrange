@@ -84,3 +84,23 @@ En la demo local, `cli/configure_training_branches.php` crea las dos categorías
 Desde **Formaciones > Colecciones de formación**, seleccionar un curso para ver sus secciones existentes. Cada colección equivale a una sección nativa: Formación puede crearla por nombre, editarla y añadir actividades o recursos desde su bloque. El agente solo consulta las secciones y recursos disponibles según su matrícula y restricciones.
 
 **Editar formación y bloques laterales** abre la edición nativa del curso, incluido **Agregar un bloque**. Se conservan las capacidades y los bloques instalados de Moodle; no se crea otro sistema de contenidos. [Pasos y actualización](16-actividades-recursos-y-colecciones.md).
+
+## Crear y continuar la preparación — 10/11/2026
+
+Desde Formaciones, **Crear nueva formación** abre la configuración nativa con el bloque **Destinatarios** con usuarios individuales de Orange, colectivos Orange y grupos de cursos Orange. **Guardar y continuar** abre directamente el contenido y las secciones del curso. **Editar** abre el formulario nativo, con accesos a contenido y participantes, sin una pantalla intermedia. La misma gestión está disponible desde el detalle de la formación y sus colecciones.
+
+La matrícula sigue siendo un paso separado. **Participantes** permite seleccionar uno o varios usuarios existentes de Orange, filtrados por los destinatarios autorizados para la formación, y los matricula como estudiantes mediante el plugin manual nativo. No crea cuentas ni cambia el perfil general. Los participantes ya matriculados conservan sus datos e intentos.
+
+Sin destinatarios seleccionados, la frontera de acceso es la cohorte Orange; esto no matricula automáticamente a toda la cohorte. Con destinatarios seleccionados, cada alumno necesita pertenecer a Orange, estar seleccionado individualmente o pertenecer a uno de los colectivos o grupos elegidos, y tener la matrícula nativa necesaria. Cambiar destinatarios no borra matrículas ni histórico. La sincronización de cohorte nativa sigue siendo una alternativa que puede configurar administración si necesita altas y bajas automáticas.
+
+Las nuevas formaciones no habilitan acceso de invitados ni automatrícula por defecto. Los perfiles de edición autorizados conservan acceso para gestionar contenidos aunque no pertenezcan al colectivo destinatario.
+
+## Publicación y avisos desde Destinatarios — 2026111005
+
+Las nuevas formaciones comienzan con **Visible para sus destinatarios** desmarcado. Marcarlo y guardar publica la formación para los destinatarios matriculados. Se pueden preparar contenidos y matrículas antes de publicar. Desmarcarlo y guardar retira la publicación conservando contenidos, matrículas, intentos y resultados.
+
+**Avisar por Teams al guardar** solicita un aviso solo para ese guardado visible y comienza desmarcado en cada edición. Si la integración general no está activa, se muestra deshabilitado. Guardar sin marcarlo y añadir recursos dentro de una formación no envían avisos automáticos.
+
+La lista mantiene solo **Abrir formación** y **Editar** para los perfiles autorizados; el agente ve únicamente Abrir formación. Editar abre directamente la configuración nativa y sus destinatarios. La misma página incluye accesos a contenido, participantes y copia de edición según permisos. Las matrículas se gestionan aparte: publicar no matricula automáticamente.
+
+Las formaciones existentes conservan su visibilidad. La copia nativa de una edición mantiene las opciones propias de Moodle: elegir **Ocultar** para preparar la nueva edición en privado.
