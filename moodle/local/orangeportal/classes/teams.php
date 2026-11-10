@@ -139,25 +139,72 @@ class teams {
             'contenido' => trim($extra . "\n\n" . self::text($content)), 'url' => $url->out(false)];
     }
 
+    /** Redact credentials from provider echoes and diagnostic text before writing task logs. */
+    public static function log_text(string $text, string $endpoint): string {
+        $parts = parse_url($endpoint);
+        $destination = preg_replace('/[?#].*$/s', '', $endpoint);
+        $text = str_replace([$endpoint, trim(json_encode($endpoint), '"'), rawurlencode($endpoint)], $destination . '?[oculto]', $text);
+        parse_str($parts['query'] ?? '', $params);
+        foreach ($params as $key => $value) {
+            if (!preg_match('/sig|token|secret|password|authorization|^key$|^code$/i', $key)) { continue; }
+            foreach ((array)$value as $secret) {
+                if (!is_scalar($secret) || (string)$secret === '') { continue; }
+                $secret = (string)$secret;
+                $text = str_replace(array_unique([$secret, rawurlencode($secret), urlencode($secret),
+                    trim(json_encode($secret), '"')]), '[oculto]', $text);
+            }
+        }
+        $redact = function($value, $key = '') use (&$redact) {
+            if (preg_match('/^(sig|signature|.*token|.*secret|password|authorization|api[-_]?key)$/i', (string)$key)) { return '[oculto]'; }
+            if (is_array($value)) {
+                foreach ($value as $k => $v) { $value[$k] = $redact($v, $k); }
+                return $value;
+            }
+            if (is_string($value)) {
+                $value = preg_replace('~([?&](?:amp;)?(?:sig|signature|token|access_token|secret|key|code)=)[^&\s"\x27<>\\\\]+~i', '$1[oculto]', $value);
+                $value = preg_replace('/\bBearer\s+[^\s"\x27<>]+/i', 'Bearer [oculto]', $value);
+            }
+            return $value;
+        };
+        $decoded = json_decode($text, true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $text = json_encode($redact($decoded), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE);
+        } else { $text = $redact($text); }
+        $text = preg_replace('/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/', '', $text);
+        return str_replace(["\r", "\n"], ['\\r', '\\n'], $text);
+    }
+
     /** JSON POST through Moodle's proxy, certificate and URL security configuration. */
     public static function post(string $endpoint, array $payload, string $eventid = ''): void {
         global $CFG;
         require_once($CFG->libdir . '/filelib.php');
         if (!self::valid_endpoint($endpoint)) { throw new \RuntimeException('Teams: invalid HTTPS endpoint'); }
+        $json = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        mtrace('Teams: destino POST ' . self::log_text(preg_replace('/[?#].*$/s', '', $endpoint), $endpoint) . ' (parámetros de URL ocultos).');
+        mtrace('Teams: JSON enviado: ' . self::log_text($json, $endpoint));
+        if ($eventid !== '') { mtrace('Teams: identificador de envío: ' . $eventid); }
         $curl = new \curl();
         $curl->setHeader(['Content-Type: application/json; charset=utf-8', 'Accept: application/json']);
         if ($eventid !== '') { $curl->setHeader('X-Orange-Event-Id: ' . $eventid); }
+        $start = microtime(true); $body = ''; $error = '';
         try {
-            $curl->post($endpoint, json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR),
+            $body = $curl->post($endpoint, $json,
                 ['CURLOPT_CONNECTTIMEOUT' => 5, 'CURLOPT_TIMEOUT' => 15, 'CURLOPT_FOLLOWLOCATION' => false,
                     'CURLOPT_SSL_VERIFYPEER' => true, 'CURLOPT_SSL_VERIFYHOST' => 2]);
             $info = $curl->get_info();
             $code = (int)($info['http_code'] ?? 0);
             $errno = (int)$curl->get_errno();
+            if ($errno) { $error = (string)$curl->error; }
         } catch (\Throwable $e) {
-            // Provider responses and exception strings can contain the signed URL. Never log them.
             $code = 0; $errno = -1;
+            $error = 'No se pudo completar la petición HTTPS.';
         }
+        mtrace('Teams: respuesta HTTP ' . $code . ' (' . round((microtime(true) - $start) * 1000) . ' ms).');
+        $response = self::log_text(is_string($body) ? $body : json_encode($body), $endpoint);
+        $truncated = \core_text::strlen($response) > 4000;
+        mtrace('Teams: cuerpo de respuesta: ' . ($response !== '' ? \core_text::substr($response, 0, 4000) : '(vacío)') .
+            ($truncated ? ' [truncado a 4000 caracteres]' : ''));
+        if ($errno) { mtrace('Teams: error de transporte ' . $errno . ': ' . \core_text::substr(self::log_text($error, $endpoint), 0, 1000)); }
         set_config('teamslastattempt', time(), 'local_orangeportal');
         set_config('teamslastresult', $errno ? 'transport' : 'HTTP ' . $code, 'local_orangeportal');
         if ($errno || $code < 200 || $code >= 300) {

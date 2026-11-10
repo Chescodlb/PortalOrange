@@ -37,6 +37,13 @@ assumptions:
     verification: On 2026-11-10 the local simulator recorded five authorized JSON POSTs (training creation and update, document update, incident and announcement). Drafts, unchecked saves and later native updates without consent produced no jobs.
     source: moodle/local/orangeportal/cli/check_publication_save.php; scripts/test-orange-teams.mjs --save-consent
     updated_at: "2026-11-10"
+  - id: delivery-diagnostics
+    status: supported
+    claim: New task executions expose the destination without query credentials, request JSON, HTTP status, bounded response body and explicit skip reasons.
+    reason: Actual HTTPS calls against the local simulator exercised empty 202 responses, JSON 403 errors reflecting fake credentials, and oversized response bodies.
+    verification: On 2026-11-10 three local POSTs verified request visibility, empty-body reporting, preserved error codes, token redaction and explicit truncation. A disabled task logged its skip reason without making an HTTP request.
+    source: moodle/local/orangeportal/cli/check_teams_logs.php; scripts/test-orange-teams.mjs --delivery-logs
+    updated_at: "2026-11-10"
 fingerprints:
   - id: local-verification
     date: "2026-11-06"

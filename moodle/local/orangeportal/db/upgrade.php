@@ -181,5 +181,9 @@ function xmldb_local_orangeportal_upgrade($oldversion): bool {
         // Refresh forms and explicit announcement consent; no schema or permission changes.
         upgrade_plugin_savepoint(true, 2026111005, 'local', 'orangeportal');
     }
+    if ($oldversion < 2026111006) {
+        // Detailed, credential-redacted delivery logs; no schema changes.
+        upgrade_plugin_savepoint(true, 2026111006, 'local', 'orangeportal');
+    }
     return true;
 }

@@ -50,7 +50,7 @@ Los guardados encolan tareas `\local_orangeportal\task\send_teams` en la tabla n
 
 El cliente HTTPS respeta proxy y restricciones HTTP de Moodle, verifica certificados, no sigue redirecciones y limita conexión a 5 segundos y petición a 15 segundos. Cualquier respuesta 2xx se considera **aceptada por el flujo**, no confirmación de entrega final en Teams.
 
-Los fallos conservan la tarea y Moodle reintenta con espera creciente, hasta **cinco intentos**. El panel muestra último intento, resultado HTTP y última aceptación, además de enlaces a la cola y registros de tareas. Si se agotan los intentos, revisar el motivo y usar las herramientas nativas de tareas de Moodle para reprogramar la tarea detenida. Los registros de la integración excluyen la URL firmada y el cuerpo de la respuesta del proveedor.
+Los fallos conservan la tarea y Moodle reintenta con espera creciente, hasta **cinco intentos**. El panel muestra último intento, resultado HTTP y última aceptación, además de enlaces a la cola y registros de tareas. Si se agotan los intentos, revisar el motivo y usar las herramientas nativas de tareas de Moodle para reprogramar la tarea detenida. Desde `2026111006`, el registro de cada tarea muestra el destino sin parámetros de URL, el JSON enviado, el identificador de envío, el código HTTP, la duración y el cuerpo de respuesta (hasta 4.000 caracteres). Si el cuerpo está vacío, lo indica expresamente. Se ocultan firmas y tokens conocidos y las credenciales identificables reflejadas por el proveedor; no se registran cabeceras de autenticación ni la URL firmada completa. Los errores de transporte incluyen código y detalle depurado. Las tareas descartadas indican el motivo y no figuran como envíos realizados.
 
 Antes de cada intento se vuelve a comprobar activación, tipo de aviso, visibilidad y existencia del contenido. Si se retira o elimina el contenido, la tarea no envía. Al cambiar la URL, las tareas destinadas a la URL anterior se descartan; no se trasladan al nuevo destino. Desactivar la integración impide nuevos envíos y descarta las tareas pendientes cuando el cron las procesa; no hay reenvío histórico automático al reactivarla.
 
@@ -91,3 +91,11 @@ Las nuevas formaciones y documentos empiezan con **Visible para sus destinatario
 Desmarcar Visible y guardar retira la publicación sin borrar matrículas, intentos ni contenidos. La primera publicación conserva su fecha propia para los indicadores. La primera publicación de una formación se anuncia como `created`; las posteriores, como `updated`. En todos los casos se exige marcar Teams para ese guardado. Se invalidan los avisos pendientes antiguos al retirar una formación. Los mensajes ya aceptados por el flujo no pueden retirarse desde Moodle.
 
 Los enlaces antiguos a `training_setup.php` redirigen al formulario de edición; ya no muestran una pantalla intermedia.
+
+## Consultar una llamada concreta
+
+Entrar como administrador general en **Administración del sitio → Servidor → Tareas → Registros de tareas** (`/admin/tasklogs.php`) y buscar **Enviar aviso Orange a Teams**. Abrir la ejecución correspondiente para ver publicación/tipo, solicitud y respuesta. La ampliación de logs se aplica a ejecuciones nuevas; no reconstruye el JSON ni la respuesta de tareas ya completadas.
+
+Un `HTTP 202` con cuerpo vacío es una respuesta válida de aceptación: el seguimiento posterior de la entrega se consulta en el historial del flujo de Power Automate. Los datos publicados y la respuesta depurada quedan en los registros de tareas de Moodle, con sus permisos y conservación habituales. No ejecutar tareas pendientes reales para diagnosticar sin considerar que pueden enviar mensajes.
+
+Prueba local del diagnóstico: `node scripts/test-orange-teams.mjs --delivery-logs`. Utiliza el simulador, credenciales ficticias y una configuración limitada al proceso; no llama al servicio Microsoft ni cambia la URL configurada del ambiente.

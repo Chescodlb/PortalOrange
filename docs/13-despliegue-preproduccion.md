@@ -267,3 +267,7 @@ No se ha enviado ninguna prueba a Teams para esta revisión; las pruebas automá
 Copiar `local/orangeportal/` completo y ejecutar la actualización y purga de cachés habituales. Se crea `local_orange_publication` para conservar la primera publicación y la generación de los avisos de cada formación. No cambia la publicación ni las matrículas de cursos existentes.
 
 Validar con una formación de prueba: crear y guardar como borrador; matricular un agente y comprobar que aún no puede verla; marcar Visible para sus destinatarios y guardar sin marcar Teams; comprobar que puede acceder; desmarcar Visible y guardar; comprobar que conserva matrícula y resultados pero pierde acceso al contenido. Con un servicio de pruebas autorizado, comprobar además el aviso de primera publicación y que no se envía nada durante la preparación del borrador.
+
+## Registro detallado de Teams — 2026111006
+
+Copiar `local/orangeportal/` completo, ejecutar `php admin/cli/upgrade.php --non-interactive` y `php admin/cli/purge_caches.php`. No añade tablas ni cambia la URL configurada. Las siguientes ejecuciones de Enviar aviso Orange a Teams mostrarán destino sin parámetros secretos, JSON enviado, código HTTP y respuesta depurada. Los registros anteriores no se reconstruyen y las tareas terminadas no se reenvían automáticamente.

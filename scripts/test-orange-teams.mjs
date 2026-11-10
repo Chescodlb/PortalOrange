@@ -9,6 +9,7 @@ import http from 'node:http';
 const folder = await mkdtemp(join(tmpdir(), 'orange-teams-'));
 const publicationOnly = process.argv.includes('--publication');
 const saveConsent = process.argv.includes('--save-consent');
+const deliveryLogs = process.argv.includes('--delivery-logs');
 let simulation, proxy;
 const command = (cmd, args) => execFileSync(cmd, args, {encoding: 'utf8', timeout: 180000});
 const run = (cmd, args) => new Promise((resolve, reject) => {
@@ -43,11 +44,11 @@ try {
   command('docker', ['compose', 'cp', join(folder, 'ca.pem'), 'web:/tmp/orange-teams-test-ca.pem']);
   const output = await run('docker', ['compose', 'exec', '-T', 'web', 'php',
     '-d', 'curl.cainfo=/tmp/orange-teams-test-ca.pem',
-    saveConsent ? 'local/orangeportal/cli/check_publication_save.php' : publicationOnly ? 'local/orangeportal/cli/check_training_publication.php' : 'local/orangeportal/cli/check_teams.php',
+    deliveryLogs ? 'local/orangeportal/cli/check_teams_logs.php' : saveConsent ? 'local/orangeportal/cli/check_publication_save.php' : publicationOnly ? 'local/orangeportal/cli/check_training_publication.php' : 'local/orangeportal/cli/check_teams.php',
     '--endpoint=https://host.docker.internal:4017/teams/invoke']);
   process.stdout.write(output);
   const state = await (await fetch('http://127.0.0.1:4016/teams/__stats')).json();
-  if (state.requests.length < (saveConsent ? 4 : publicationOnly ? 2 : 10) || !logs.includes('request')) throw new Error('Missing evidence of actual HTTP requests');
+  if (state.requests.length < (deliveryLogs ? 3 : saveConsent ? 4 : publicationOnly ? 2 : 10) || !logs.includes('request')) throw new Error('Missing evidence of actual HTTP requests');
   console.log(`PASS Postman simulation recorded ${state.requests.length} real JSON POST requests; no Microsoft calls`);
   await writeFile(join(folder, 'simulation.ndjson'), logs);
 } finally {
