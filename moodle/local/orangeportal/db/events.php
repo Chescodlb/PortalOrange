@@ -1,6 +1,10 @@
 <?php
 defined('MOODLE_INTERNAL') || die();
 $observers = [
+    ['eventname' => '\\core\\event\\course_created', 'callback' => '\\local_orangeportal\\teams::changed'],
+    ['eventname' => '\\core\\event\\course_updated', 'callback' => '\\local_orangeportal\\teams::changed'],
+    ['eventname' => '\\core\\event\\course_module_created', 'callback' => '\\local_orangeportal\\teams::changed'],
+    ['eventname' => '\\core\\event\\course_module_updated', 'callback' => '\\local_orangeportal\\teams::changed'],
     ['eventname' => '\\core\\event\\course_deleted', 'callback' => '\\local_orangeportal\\native_content::course_deleted'],
     ['eventname' => '\\core\\event\\course_module_created', 'callback' => '\\local_orangeportal\\native_content::module_changed'],
     ['eventname' => '\\core\\event\\course_module_updated', 'callback' => '\\local_orangeportal\\native_content::module_changed'],

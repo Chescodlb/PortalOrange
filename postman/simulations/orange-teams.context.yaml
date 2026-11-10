@@ -1,0 +1,30 @@
+purpose:
+  stands_in_for: Client-managed Power Automate HTTP trigger for Orange content announcements.
+  unblocks: Local verification of Moodle events, persistent task delivery, JSON serialization, TLS and retries without contacting Microsoft.
+assumptions:
+  - id: three-field-contract
+    status: supported
+    claim: The requested client contract is a JSON POST with titulo, contenido and url strings.
+    reason: The client supplied this contract; the local mock rejects other shapes.
+    verification: On 2026-11-06 real Moodle events and delivery tasks made 15 HTTPS POSTs through the simulation; payload validation passed, including error scenarios.
+    source: postman/contracts/orange-teams.openapi.json; moodle/local/orangeportal/cli/check_teams.php; scripts/test-orange-teams.mjs
+    updated_at: "2026-11-06"
+  - id: failures-preserve-work
+    status: supported
+    claim: In the local scenarios a 500 response preserves the Moodle delivery task and schedules a retry, and a later 202 completes the task.
+    reason: Verification inspected actual task_adhoc records using the native Moodle task manager.
+    verification: On 2026-11-06 failure left four attempts and a 60-second delay; the subsequent accepted attempt removed the task. Additional local HTTP 400, 429 and 302 scenarios raised sanitized errors; redirect following was disabled.
+    source: moodle/local/orangeportal/cli/check_teams.php; moodle/local/orangeportal/classes/task/send_teams.php
+    updated_at: "2026-11-06"
+  - id: teams-final-delivery
+    status: unknown
+    claim: Acceptance by the Power Automate trigger results in the intended final Teams message and prevents duplicates after ambiguous failures.
+    reason: A 2xx only demonstrates trigger acceptance; flow delivery and idempotency are outside the supplied contract.
+    verification: No real Microsoft endpoint was contacted, as requested by the client. The client reported that their own trigger test works. The local test verified a stable X-Orange-Event-Id header; receiver-side deduplication remains to be configured if required.
+    source: Client-supplied contract; docs/10-integracion-teams.md
+    updated_at: "2026-11-06"
+fingerprints:
+  - id: local-verification
+    date: "2026-11-06"
+    commit: null
+    cli: "Postman 1.75.0; status command is unavailable in this installed build. Mock-owner discovery skipped; no remote workspace is used."

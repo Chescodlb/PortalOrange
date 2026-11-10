@@ -1,49 +1,85 @@
-# Avisos de incidencias en Microsoft Teams
+# Avisos de contenido Orange en Microsoft Teams
 
-La integración debe avisar a personas, chats grupales o canales cuando se publique una incidencia. Moodle seguirá gestionando destinatarios, acceso, estado compartido y confirmaciones de lectura. La evaluación se realiza en la rama `feature/teams-notifications`; todavía no hay envío real ni plugins Microsoft instalados.
+Disponible a partir de `local_orangeportal` **2026110602**, sin instalar plugins Microsoft ni modificar Moodle o Moove. Usa el flujo de Power Automate suministrado por el cliente. La URL firmada se configura por ambiente y no forma parte del código.
 
-## Plugins oficiales de Moodle
+## Configurar desde la web
 
-Se ha revisado el código oficial de Microsoft 365 para Moodle, etiqueta `v4.5.8`, commit `d2dbddcd95a8bf2476367ee6ff036f0ab03c0687`. Tanto `local_o365` como `auth_oidc` requieren Moodle `2024100700`, compatible con la instalación 4.5.1. `local_o365` depende de `auth_oidc` versión `2024100740`.
+1. Entrar con un **administrador general de Moodle** que tenga `moodle/site:config`. El rol Administrador Orange no concede este permiso ni acceso a la URL.
+2. Abrir **Administración del sitio → Portal Orange → Mensajería Teams**. Ruta directa: `/admin/settings.php?section=local_orangeportal_teams`.
+3. Pegar la URL HTTPS completa del disparador de Power Automate en **URL del servicio Power Automate**. El campo se oculta y Moodle enmascara su valor en el historial de configuración. Se almacena como configuración del plugin, por lo que también hay que proteger las copias de la base de datos.
+4. Elegir los tipos: Incidencias, Comunicados, Biblioteca y Formaciones. También se puede activar o desactivar por separado el aviso de alta y el de modificación.
+5. Activar **Activar envíos a Teams** y guardar. Guardar la configuración no envía ningún mensaje de prueba ni recorre el contenido existente.
+6. Asegurar que el servidor ejecuta el cron habitual de Moodle cada minuto. No hay un servicio adicional que instalar.
 
-La compatibilidad declarada no sustituye una prueba de instalación. La descarga para revisión permanece en una carpeta temporal, fuera del código servido por Moodle.
+**Durante el desarrollo no se ha llamado al endpoint real de pre.** La instalación queda desactivada y con URL vacía. Activarla en pre permitirá que futuras publicaciones reales generen mensajes.
 
-La actualización `2023100904` de `local_o365` elimina expresamente la integración del bot: borra sus ajustes y la tabla `local_o365_notif`. Esa eliminación sigue presente en 4.5.8. No se puede utilizar la documentación antigua del bot como guía de instalación actual. Los plugins mantienen otras funciones de identidad y sincronización de cursos con Teams, pero no ofrecen aquel mecanismo de avisos.
+## Cuándo se avisa
 
-Fuentes: [versión oficial](https://github.com/microsoft/o365-moodle/blob/v4.5.8/local/o365/version.php), [eliminación del bot](https://github.com/microsoft/o365-moodle/blob/v4.5.8/local/o365/db/upgrade.php).
+| Contenido | Alta | Modificación |
+| --- | --- | --- |
+| Incidencia / comunicado | Primera publicación con destinatarios; también al publicar un borrador | Cambios de título, contenido, impacto, categoría, cliente/producto o destinatarios; añadir o editar recursos visibles |
+| Documento de Biblioteca | Creación de una actividad/recurso visible dentro de la raíz de Biblioteca | Edición nativa del recurso visible |
+| Formación | Creación de un curso visible dentro de la raíz de Formaciones | Edición del curso o incorporación/edición de una actividad visible |
 
-## Primera alternativa a validar
+Se excluyen borradores, contenido oculto o retirado, cambios de estado, lecturas, accesos, notas, finalizaciones y avisos personales automáticos. Guardar una incidencia/comunicado sin cambios tampoco avisa. Los cursos técnicos que alojan documentos o recursos de publicaciones no se anuncian como nuevas formaciones. El contenido de otros proyectos queda fuera de las raíces configuradas de Orange.
 
-Teams Workflows y Power Automate permiten configurar la acción «Post a message in a chat or channel». Como Flow bot admite canal, chat grupal y mensaje directo a una persona. La propuesta es reutilizar ese envío y desarrollar solo la conexión de las incidencias del portal con el flujo. La disponibilidad, licencias, políticas y autenticación del disparador deben validarse en el entorno del cliente.
+Para Incidencias y Comunicados, cambiar **solo** el estado no genera aviso; si también se cambia el texto, se avisa de esa modificación de contenido. No se envían avisos de eliminación.
 
-Si esta alternativa no está disponible, se evaluará una aplicación de Teams con mensajes proactivos. Requiere instalar la aplicación en los ámbitos destinatarios y configurar su acceso. No usar permisos de migración de Microsoft Graph para enviar avisos ordinarios.
+## Petición al flujo
 
-Fuentes: [envíos mediante Power Automate](https://learn.microsoft.com/en-us/power-automate/teams/send-a-message-in-teams), [Workflows y webhooks](https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/connectors-using), [mensajes proactivos](https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/conversations/send-proactive-messages).
+```json
+{
+  "titulo": "Nueva incidencia: Interrupción del servicio",
+  "contenido": "Impacto: Crítico\nCliente afectado: Empresas\nProducto: Activación\n\nDescripción de la incidencia.",
+  "url": "https://campus.example.invalid/local/orangeportal/view.php?id=123"
+}
+```
 
-## Configuración para la prueba en Microsoft
+- Método `POST`; `Content-Type: application/json; charset=utf-8`.
+- El contrato mantiene exactamente `titulo`, `contenido` y `url`.
+- Títulos diferenciados: Nueva incidencia / Incidencia actualizada, Nuevo comunicado / Comunicado actualizado, Nuevo documento de Biblioteca / Documento de Biblioteca actualizado, Nueva formación / Formación actualizada.
+- El extracto se convierte a texto, con un máximo de 2.000 caracteres para la descripción. No adjunta archivos, notas, listas de destinatarios ni datos del autor.
+- Los enlaces usan la URL configurada en Moodle. Mantienen autenticación, permisos y seguimiento de lectura; no son enlaces públicos de descarga.
+- El mensaje compartido usa español para no depender del idioma del editor. El panel administrativo está traducido a español e inglés.
 
-1. Confirmar que Workflows o Power Automate están habilitados y designar un responsable y un sustituto del flujo.
-2. Preparar una persona, un chat grupal existente y un canal de pruebas. No es necesario crear o sincronizar equipos para todos los cursos.
-3. Crear un flujo con un disparador HTTPS adecuado para recibir el aviso del portal. Elegir su autenticación y comprobar las licencias antes de conectar Moodle.
-4. Añadir la acción de Teams con destino de prueba y un mensaje fijo. Verificar cada destino por separado.
-5. Sustituir el texto fijo por los campos acordados y devolver o registrar el resultado de la publicación. La aceptación de una petición por el flujo no demuestra que el mensaje ya se haya publicado.
+**Destino:** el flujo configura el chat, persona o canal de Teams. Una cohorte, grupo o destinatario Moodle no se convierte automáticamente en un destino Teams. Debe elegirse un canal adecuado para el contenido que se enviará.
 
-Los flujos tienen propietarios y conexiones que requieren mantenimiento. Una URL que autorice el envío debe tratarse como credencial y permanecer fuera de Git y de los registros públicos.
+## Cola, errores y seguimiento
 
-## Adaptación prevista en Moodle
+Los guardados encolan tareas `\local_orangeportal\task\send_teams` en la tabla nativa `task_adhoc`. No hay tablas nuevas ni copia de credenciales o contenido en la cola. La espera inicial es de un minuto, más el tiempo hasta que el cron recoja la tarea. Los avisos idénticos pendientes se agrupan; antes de enviar se consulta de nuevo el contenido vigente.
 
-La publicación y asignación están centralizadas en `classes/service.php`. Actualmente no generan un mensaje nativo mediante `message_send()` ni un evento propio de publicación. Instalar un conector no añade automáticamente el aviso de incidencia.
+El cliente HTTPS respeta proxy y restricciones HTTP de Moodle, verifica certificados, no sigue redirecciones y limita conexión a 5 segundos y petición a 15 segundos. Cualquier respuesta 2xx se considera **aceptada por el flujo**, no confirmación de entrega final en Teams.
 
-La adaptación debe usar configuración administrativa y tareas de Moodle para mapear destinos, guardar envíos pendientes junto con la publicación y procesarlos después de confirmar la transacción. Debe registrar errores, reintentar de forma controlada y distinguir pendiente, aceptado por el flujo y publicación confirmada. Los reintentos ambiguos necesitan deduplicación también en el receptor.
+Los fallos conservan la tarea y Moodle reintenta con espera creciente, hasta **cinco intentos**. El panel muestra último intento, resultado HTTP y última aceptación, además de enlaces a la cola y registros de tareas. Si se agotan los intentos, revisar el motivo y usar las herramientas nativas de tareas de Moodle para reprogramar la tarea detenida. Los registros de la integración excluyen la URL firmada y el cuerpo de la respuesta del proveedor.
 
-El disparador inicial propuesto es la primera publicación de una incidencia; borradores no generan avisos. Nuevas versiones, reasignaciones y cambios de estado quedan pendientes de definición. Antes de enviar se comprobará que la publicación siga vigente y que su asignación corresponda al destino.
+Antes de cada intento se vuelve a comprobar activación, tipo de aviso, visibilidad y existencia del contenido. Si se retira o elimina el contenido, la tarea no envía. Al cambiar la URL, las tareas destinadas a la URL anterior se descartan; no se trasladan al nuevo destino. Desactivar la integración impide nuevos envíos y descarta las tareas pendientes cuando el cron las procesa; no hay reenvío histórico automático al reactivarla.
 
-Una cohorte o grupo Moodle no equivale automáticamente a los miembros de un chat o canal. La primera prueba utilizará un aviso genérico con enlace, sin contenido de la incidencia ni datos personales. El acceso al enlace seguirá sujeto a los permisos de Moodle. Un usuario sin destino configurado debe quedar identificado en gestión, sin impedir guardar la incidencia.
+Un timeout puede ocurrir después de que el flujo haya aceptado el mensaje. La cabecera `X-Orange-Event-Id` permanece estable durante los reintentos de una tarea y permite deduplicar en Power Automate si se añade esa lógica al flujo. Sin deduplicación en el receptor, no se garantiza una única entrega ante un fallo ambiguo.
 
-## Acceso y verificación
+## Desplegar esta actualización
 
-Una conexión saliente al flujo puede probarse desde Docker sin publicar Moodle en Internet. Para que otros usuarios abran la incidencia hace falta una URL del portal accesible para ellos; `localhost:8080` apunta al equipo de cada destinatario. Una aplicación con callbacks de Microsoft necesitaría además un endpoint HTTPS accesible.
+1. Copiar la versión completa y actual de `local/orangeportal/`, comprobando que `version.php` contiene `2026110602`. Esta integración no requiere cambios en el tema.
+2. Desde la raíz de Moodle ejecutar:
 
-La prueba funcional debe cubrir los tres destinos, borradores, falta de configuración, fallos de red, reintentos, retirada de la incidencia y acceso denegado de usuarios no asignados. Teams no modificará las fechas de recibido, leído o confirmado del portal.
+```bash
+php admin/cli/upgrade.php --non-interactive
+php admin/cli/purge_caches.php
+```
 
-El siguiente paso depende de confirmar la disponibilidad del flujo y su autenticación. Hasta entonces no se instalará la suite Microsoft 365 solo para intentar recuperar el bot eliminado ni se enviarán avisos reales.
+3. Configurar el panel anterior con la URL específica del ambiente. No copiar la base de datos de desarrollo ni reutilizar automáticamente la URL de pre en producción.
+4. Confirmar que el cron está funcionando. Con la integración activa, una publicación real nueva debe dejar una tarea y, después de ejecutarse, una aceptación HTTP en el panel.
+
+## Prueba local reproducible
+
+Con Docker local y Postman CLI instalados:
+
+```bash
+node scripts/test-orange-teams.mjs
+node scripts/test-orange-browser.mjs --teams-settings-only
+```
+
+La primera prueba ejecuta el código real de Moodle (guardados, eventos, cola, cliente HTTPS y reintentos) contra la simulación local `postman/simulations/orange-teams.sim.yaml`. Genera un certificado temporal para el simulador; no desactiva la verificación TLS del cliente ni cambia la política HTTP persistida del sitio. Al terminar limpia datos ficticios y restaura los ajustes iniciales.
+
+La segunda comprueba el panel en ambos idiomas y su acceso restringido. Requiere que la instalación local conserve el estado inicial: integración desactivada y URL vacía.
+
+El contrato local procede de los tres campos y método aportados por el cliente; las respuestas de error son escenarios de prueba, no una afirmación sobre respuestas concretas del flujo real. No se ha buscado un mock remoto del propietario: no hace falta conectar ni publicar recursos en Postman para ejecutar estas pruebas locales. El funcionamiento final del flujo y su entrega en Teams deben validarse en pre cuando se autorice enviar.

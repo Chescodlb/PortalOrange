@@ -224,6 +224,21 @@ class service {
             throw new \invalid_parameter_exception(get_string('noticeopeninginvalid', 'local_orangeportal'));
         }
         $data->openactivity = (int)($data->openactivity ?? $existing->openactivity ?? 0);
+        $oldtargets = [];
+        if ($existing) {
+            foreach ($DB->get_records('local_orange_audience', ['noticeid' => $existing->id]) as $target) {
+                $oldtargets[] = $target->targettype . ':' . $target->targetid;
+            }
+        }
+        $newtargets = [];
+        foreach ($targets as $type => $ids) {
+            foreach (array_unique($ids) as $id) { $newtargets[] = $type . ':' . $id; }
+        }
+        sort($oldtargets); sort($newtargets);
+        $teamschanged = $oldtargets !== $newtargets;
+        foreach (['title', 'content', 'impact', 'categoryid', 'client', 'product'] as $field) {
+            if ($existing && isset($data->$field) && (string)$existing->$field !== (string)$data->$field) { $teamschanged = true; }
+        }
         incident_workflow::change_metadata($data, $existing);
         notice_options::validate_selection('states', $data->state, $existing->state ?? null);
         notice_options::validate_selection('impacts', $data->impact, $existing->impact ?? null);
@@ -261,6 +276,9 @@ class service {
                 $DB->insert_record('local_orange_audience', (object)['noticeid' => $data->id,
                     'targettype' => $type, 'targetid' => $id]);
             }
+        }
+        if ($data->published && (!$existing || !$existing->published || $teamschanged)) {
+            teams::queue($data->kind, (int)$data->id, !$existing || !$existing->published ? 'created' : 'updated');
         }
         $tx->allow_commit();
         return (int)$data->id;

@@ -1,0 +1,67 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Orange Power Automate messaging",
+    "version": "1.0.0",
+    "description": "Contract supplied by the client. The real signed URL is configured in Moodle, never stored here."
+  },
+  "servers": [
+    {
+      "url": "https://teams-webhook.example.invalid"
+    }
+  ],
+  "paths": {
+    "/invoke": {
+      "post": {
+        "operationId": "announceOrangeContent",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "titulo",
+                  "contenido",
+                  "url"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "titulo": {
+                    "type": "string"
+                  },
+                  "contenido": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              },
+              "example": {
+                "titulo": "Nuevo comunicado: Ejemplo",
+                "contenido": "Contenido de ejemplo",
+                "url": "https://campus.example.invalid/local/orangeportal/view.php?id=1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted by the flow; does not prove delivery to Teams"
+          },
+          "400": {
+            "description": "Invalid payload"
+          },
+          "429": {
+            "description": "Rate limited"
+          },
+          "500": {
+            "description": "Provider unavailable"
+          }
+        }
+      }
+    }
+  }
+}

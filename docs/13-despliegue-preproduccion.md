@@ -236,3 +236,9 @@ php admin/cli/purge_caches.php
 La actualización crea la tabla `local_orange_attendance`, los campos de curso `orange_*` y la capacidad `local/orangeportal:viewallreports`. La concede al rol técnico Administrador Orange; los demás responsables quedan limitados a sus colectivos actuales. No importa registros de Excel, usuarios ni cursos de desarrollo. No reinstalar ni ejecutar inicializadores de demo.
 
 Desde la web: revisar colectivos de cada responsable, sus permisos nativos de los cursos y exportación; completar los datos de cada edición en Configuración del curso > Orange. Validar que cada coordinador solo ve su equipo en lista, ficha y CSV. Calidad no debe recibir notas por esta actualización. Confirmar cron para copiar cursos y consolidar finalizaciones. Consultar [Seguimiento](09-informes.md) y [permisos](15-replicar-perfiles-y-permisos.md).
+
+## Actualización de mensajería Teams — 2026110602
+
+Copiar `local/orangeportal/` completo, ejecutar `php admin/cli/upgrade.php --non-interactive` y `php admin/cli/purge_caches.php` desde la raíz de Moodle. No añade tablas: usa la cola nativa de tareas de Moodle. Requiere cron activo.
+
+Configuración manual por ambiente en **Administración del sitio → Portal Orange → Mensajería Teams**, con administrador general. Pegar la URL firmada de Power Automate, elegir tipos/altas/modificaciones y activar. Empieza desactivado; guardar no envía una prueba. Ver pasos, comportamiento y límites en [Integración con Teams](10-integracion-teams.md). No copiar la URL ni la base de datos de otro ambiente.

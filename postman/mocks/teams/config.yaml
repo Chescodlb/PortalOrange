@@ -1,0 +1,10 @@
+version: 1
+name: Orange Power Automate messaging
+slug: orange-power-automate-messaging
+interceptRequests: true
+protocol: http
+port: 4016
+scenarios:
+  - name: default
+    path: ./default.js
+    default: true

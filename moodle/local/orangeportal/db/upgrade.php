@@ -126,5 +126,9 @@ function xmldb_local_orangeportal_upgrade($oldversion): bool {
         \local_orangeportal\training_report::install();
         upgrade_plugin_savepoint(true, 2026110601, 'local', 'orangeportal');
     }
+    if ($oldversion < 2026110602) {
+        // Observer registration is refreshed by Moodle. Delivery uses the native task_adhoc queue.
+        upgrade_plugin_savepoint(true, 2026110602, 'local', 'orangeportal');
+    }
     return true;
 }

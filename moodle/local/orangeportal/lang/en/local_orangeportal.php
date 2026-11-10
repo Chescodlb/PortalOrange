@@ -594,3 +594,26 @@ $string['libraryreportsearch'] = 'Search document or collection';
 $string['libraryreportadded'] = 'Resource creation date';
 $string['libraryreportfirstread'] = 'First recorded opening';
 $string['libraryreporthelp'] = 'The period filters by resource creation date. Recipients are users within your scope who can currently access the document. Read means a recorded opening, not proof of full reading. The first available recorded date is shown; earlier openings without evidence cannot be reconstructed.';
+
+// Configurable outbound Teams announcements.
+$string['teamstitle'] = 'Teams messaging';
+$string['teamsintro'] = 'Sends announcements to Power Automate as JSON POST requests (titulo, contenido and url). Only published/visible Orange content is included. Drafts, reading events, state changes and personal grade alerts are excluded. The flow determines the Teams destination; Moodle recipients do not automatically become Teams recipients. Portal access permissions still apply to links.';
+$string['teamsenabled'] = 'Enable Teams deliveries';
+$string['teamsenabled_desc'] = 'Disabled by default. Requires Moodle cron. Deliveries are queued for at least one minute after saving, with up to five attempts. Saving these settings does not send a test message.';
+$string['teamsurl'] = 'Power Automate service URL';
+$string['teamsurl_desc'] = 'Paste the complete HTTPS trigger URL, including its signature. This is a credential: only general administrators with site configuration permission can configure it. It is excluded from messages and configuration logs. Changing the URL discards pending announcements for the previous URL.';
+$string['teamsurlinvalid'] = 'Enter a valid HTTPS URL without username, password or fragment, or leave it empty.';
+$string['teamstype_desc'] = 'Send announcements for this content type.';
+$string['teams_created'] = 'Announce new publications';
+$string['teams_updated'] = 'Announce content updates';
+$string['teamstask'] = 'Send Orange announcement to Teams';
+$string['teamsnever'] = 'No delivery has been attempted yet.';
+$string['teamslastattempt'] = 'Last attempt';
+$string['teamslastsuccess'] = 'Last request accepted by the service';
+$string['teamsstatus'] = 'Integration status';
+$string['teamsqueue'] = 'View pending or failed delivery tasks';
+$string['teamstasklogs'] = 'View task logs';
+$string['privacy:metadata:teams'] = 'When enabled, published content is sent to the messaging service configured by the administrator.';
+$string['privacy:metadata:teams:title'] = 'Announcement type and publication title.';
+$string['privacy:metadata:teams:content'] = 'Published content excerpt and impact; may contain data entered by its author.';
+$string['privacy:metadata:teams:url'] = 'Authenticated link to the Moodle content.';

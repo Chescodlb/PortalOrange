@@ -63,6 +63,35 @@ try {
   };
   const nav = () => evaluate(`Array.from(document.querySelectorAll('.primary-navigation .nav-link')).filter(x=>x.textContent.trim()!=='').map(x=>x.textContent.trim()).filter(x=>!['Más','More'].includes(x))`);
   await send('Page.enable'); await send('Runtime.enable');
+  if (process.argv.includes('--teams-settings-only')) {
+    await navigate('/login/index.php'); await wait(`!!document.querySelector('#username')`);
+    await evaluate(`document.querySelector('#username').value=${JSON.stringify(env.MOODLE_ADMIN_USER || 'admin')};
+      document.querySelector('#password').value=${JSON.stringify(env.MOODLE_ADMIN_PASSWORD)};
+      document.querySelector('#loginbtn').click()`);
+    await wait(`location.pathname !== '/login/index.php' && document.readyState !== 'loading'`);
+    for (const language of ['es', 'en']) {
+      await navigate('/admin/settings.php?section=local_orangeportal_teams&lang=' + language);
+      await wait(`!!document.querySelector('[name="s_local_orangeportal_teamsurl"]')`);
+      const text = await evaluate('document.body.innerText');
+      check(text.includes(language === 'es' ? 'Mensajería Teams' : 'Teams messaging'), 'Panel Teams traducido ' + language);
+      check(await evaluate(`document.querySelector('[name="s_local_orangeportal_teamsurl"]').value === ''`), 'URL sin configurar ' + language);
+      check(await evaluate(`!document.querySelector('[name="s_local_orangeportal_teamsenabled"][type="checkbox"]').checked`),
+        'Envíos desactivados por defecto ' + language);
+      for (const kind of ['incidents','notifications','library','courses','created','updated']) {
+        check(await evaluate(`!!document.querySelector('[name="s_local_orangeportal_teams_${kind}"][type="checkbox"]')`),
+          'Control Teams ' + kind + ' ' + language);
+      }
+      check(await evaluate(`!!document.querySelector('a[href*="/admin/tool/task/adhoctasks.php"]') &&
+        !!document.querySelector('a[href*="/admin/tasklogs.php"]')`), 'Enlaces a cola y registros ' + language);
+      await screenshot('teams-settings-' + language);
+    }
+    await logout(); await login('admin.orange',env.ORANGE_DEMO_PASSWORD);
+    await navigate('/admin/settings.php?section=local_orangeportal_teams');
+    check(!(await evaluate(`!!document.querySelector('[name="s_local_orangeportal_teamsurl"]')`)),
+      'Administrador Orange no accede a la credencial del campus');
+    console.log('PASS ' + results.length + ' browser checks for Teams settings');
+    process.exitCode = 0;
+  } else
   if (process.argv.includes('--edition-reports-only')) {
     await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
     for (const language of ['es','en']) {

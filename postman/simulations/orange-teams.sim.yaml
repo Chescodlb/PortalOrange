@@ -1,0 +1,13 @@
+# Simulation scaffold. Add fault-injection scenarios under each mock, e.g.:
+#   scenarios:
+#     - overrides:
+#         conditions:
+#           latency: { delay_ms: 500 }
+# Then serve it with: postman simulation run <this file>
+
+simulation: orange-teams
+routing: path
+mocks:
+  - name: Orange Power Automate messaging
+    routeKey: teams
+    path: ../mocks/teams/config.yaml

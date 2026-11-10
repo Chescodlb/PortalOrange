@@ -594,3 +594,26 @@ $string['libraryreportsearch'] = 'Buscar documento o colección';
 $string['libraryreportadded'] = 'Fecha de alta del recurso';
 $string['libraryreportfirstread'] = 'Primera lectura registrada';
 $string['libraryreporthelp'] = 'El periodo filtra por fecha de alta del recurso. Los destinatarios son los usuarios de tu ámbito que pueden acceder actualmente al documento. Leído indica una apertura registrada, no acredita lectura completa. Se muestra la primera fecha registrada disponible; no se reconstruyen aperturas anteriores sin evidencia.';
+
+// Configurable outbound Teams announcements.
+$string['teamstitle'] = 'Mensajería Teams';
+$string['teamsintro'] = 'Envía avisos a Power Automate mediante POST JSON (titulo, contenido y url). Solo contenido publicado/visible de Orange. No se envían borradores, lecturas, cambios de estado ni avisos personales de calificaciones. El flujo determina el destino en Teams; los destinatarios de Moodle no se convierten automáticamente en destinatarios de Teams. El enlace conserva los permisos del portal.';
+$string['teamsenabled'] = 'Activar envíos a Teams';
+$string['teamsenabled_desc'] = 'Desactivado por defecto. Requiere el cron de Moodle. Los envíos se encolan y se procesan a partir de un minuto después de guardar, con hasta cinco intentos. No se hace ningún envío de prueba al guardar estos ajustes.';
+$string['teamsurl'] = 'URL del servicio Power Automate';
+$string['teamsurl_desc'] = 'Pega la URL HTTPS completa del disparador, incluida su firma. Es una credencial: solo la pueden configurar administradores generales con permiso de configuración del sitio. No se incluye en los mensajes ni en los registros de configuración. Al cambiarla, los avisos pendientes de la URL anterior se descartan.';
+$string['teamsurlinvalid'] = 'Introduce una URL HTTPS válida, sin usuario, contraseña ni fragmento, o déjala vacía.';
+$string['teamstype_desc'] = 'Enviar avisos de este tipo de contenido.';
+$string['teams_created'] = 'Avisar de nuevas publicaciones';
+$string['teams_updated'] = 'Avisar de modificaciones de contenido';
+$string['teamstask'] = 'Enviar aviso Orange a Teams';
+$string['teamsnever'] = 'Todavía no se ha intentado ningún envío.';
+$string['teamslastattempt'] = 'Último intento';
+$string['teamslastsuccess'] = 'Última petición aceptada por el servicio';
+$string['teamsstatus'] = 'Estado de la integración';
+$string['teamsqueue'] = 'Ver tareas de envío pendientes o fallidas';
+$string['teamstasklogs'] = 'Ver registros de tareas';
+$string['privacy:metadata:teams'] = 'Si se activa, se envía contenido publicado al servicio de mensajería configurado por el administrador.';
+$string['privacy:metadata:teams:title'] = 'Tipo de aviso y título de la publicación.';
+$string['privacy:metadata:teams:content'] = 'Extracto de contenido publicado e impacto; puede incluir datos introducidos por el autor.';
+$string['privacy:metadata:teams:url'] = 'Enlace autenticado al contenido en Moodle.';
