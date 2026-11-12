@@ -30,13 +30,17 @@ Añadir o modificar actividades dentro de un comunicado o una formación no env�
 ```json
 {
   "titulo": "Nueva incidencia: Interrupción del servicio",
-  "contenido": "Impacto: Crítico\nCliente afectado: Empresas\nProducto: Activación\n\nDescripción de la incidencia.",
-  "url": "https://campus.example.invalid/local/orangeportal/view.php?id=123"
+  "fechaPublicacion": "2026-11-11T11:30:00",
+  "servicioAfectado": "Servicio de Atención al Cliente",
+  "contenido": "Tenemos incidencia en la plataforma",
+  "url": "https://campusabai.abaigroup.com/local/orangeportal/view.php?id=123"
 }
 ```
 
 - Método `POST`; `Content-Type: application/json; charset=utf-8`.
-- El contrato mantiene exactamente `titulo`, `contenido` y `url`.
+- El contrato incluye exactamente `titulo`, `fechaPublicacion`, `servicioAfectado`, `contenido` y `url`.
+- `servicioAfectado` toma el campo **Cliente afectado**; se envía vacío si no existe. `contenido` contiene solo la descripción, sin añadir impacto ni producto.
+- `fechaPublicacion` usa `YYYY-MM-DDTHH:mm:ss`, sin sufijo horario y en la zona horaria del sitio, independiente del editor: fecha mostrada en la ficha (`timecreated`) para incidencias y comunicados, alta del recurso (`course_modules.added`) para Biblioteca y primera publicación para Formaciones. No es la fecha del envío ni de la última modificación.
 - Títulos diferenciados: Nueva incidencia / Incidencia actualizada, Nuevo comunicado / Comunicado actualizado, Nuevo documento de Biblioteca / Documento de Biblioteca actualizado, Nueva formación / Formación actualizada.
 - El extracto se convierte a texto, con un máximo de 2.000 caracteres para la descripción. No adjunta archivos, notas, listas de destinatarios ni datos del autor.
 - Los enlaces usan la URL configurada en Moodle. Mantienen autenticación, permisos y seguimiento de lectura; no son enlaces públicos de descarga.
@@ -82,7 +86,7 @@ La primera prueba ejecuta el código real de Moodle (guardados, eventos, cola, c
 
 La segunda comprueba el panel en ambos idiomas y su acceso restringido. Requiere que la instalación local conserve el estado inicial: integración desactivada y URL vacía.
 
-El contrato local procede de los tres campos y método aportados por el cliente; las respuestas de error son escenarios de prueba, no una afirmación sobre respuestas concretas del flujo real. No se ha buscado un mock remoto del propietario: no hace falta conectar ni publicar recursos en Postman para ejecutar estas pruebas locales. El funcionamiento final del flujo y su entrega en Teams deben validarse en pre cuando se autorice enviar.
+El contrato local procede de los cinco campos y método aportados por el cliente; las respuestas de error son escenarios de prueba, no una afirmación sobre respuestas concretas del flujo real. No se ha buscado un mock remoto del propietario: no hace falta conectar ni publicar recursos en Postman para ejecutar estas pruebas locales. El funcionamiento final del flujo y su entrega en Teams deben validarse en pre cuando se autorice enviar.
 
 ## Publicación desde Destinatarios — 2026111005
 

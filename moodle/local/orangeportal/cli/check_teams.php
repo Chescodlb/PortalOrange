@@ -134,7 +134,7 @@ try {
         }
     }
     $payload = teams::payload('incidents', $notices[0], 'created');
-    teams_check(array_keys($payload) === ['titulo', 'contenido', 'url'] && !str_contains($payload['contenido'], '<p>') &&
+    teams_check(array_keys($payload) === ['titulo', 'fechaPublicacion', 'servicioAfectado', 'contenido', 'url'] && !str_contains($payload['contenido'], '<p>') &&
         str_contains($payload['titulo'], 'Nueva incidencia:'), 'Contrato exacto y contenido sin HTML');
     // A notice resource is an update of its publication, never an extra Library/training announcement.
     $DB->insert_record('local_orange_container', (object)['kind' => 'notice', 'categoryid' => 0,

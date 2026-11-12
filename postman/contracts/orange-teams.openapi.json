@@ -22,6 +22,8 @@
                 "type": "object",
                 "required": [
                   "titulo",
+                  "fechaPublicacion",
+                  "servicioAfectado",
                   "contenido",
                   "url"
                 ],
@@ -29,6 +31,15 @@
                 "properties": {
                   "titulo": {
                     "type": "string"
+                  },
+                  "fechaPublicacion": {
+                    "type": "string",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$",
+                    "description": "Publication date in the Moodle site timezone, without an offset."
+                  },
+                  "servicioAfectado": {
+                    "type": "string",
+                    "description": "Affected client; empty when the content has no affected client."
                   },
                   "contenido": {
                     "type": "string"
@@ -40,9 +51,11 @@
                 }
               },
               "example": {
-                "titulo": "Nuevo comunicado: Ejemplo",
-                "contenido": "Contenido de ejemplo",
-                "url": "https://campus.example.invalid/local/orangeportal/view.php?id=1"
+                "titulo": "Comunicado Prioritario",
+                "fechaPublicacion": "2026-11-11T11:30:00",
+                "servicioAfectado": "Servicio de Atención al Cliente",
+                "contenido": "Tenemos incidencia en la plataforma",
+                "url": "https://campusabai.abaigroup.com/"
               }
             }
           }

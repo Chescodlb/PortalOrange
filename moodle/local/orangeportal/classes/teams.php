@@ -104,17 +104,14 @@ class teams {
     public static function payload(string $kind, int $id, string $action): ?array {
         global $DB;
         if (!in_array($kind, self::KINDS, true) || !in_array($action, ['created', 'updated'], true)) { return null; }
-        $extra = '';
+        $affectedservice = '';
         if (in_array($kind, ['incidents', 'notifications'], true)) {
             $record = $DB->get_record('local_orange_notice', ['id' => $id, 'kind' => $kind, 'published' => 1, 'deleted' => 0]);
             if (!$record || !$DB->record_exists('local_orange_audience', ['noticeid' => $id])) { return null; }
             $name = $record->title; $content = $record->content;
             $url = new \moodle_url('/local/orangeportal/view.php', ['id' => $id]);
-            $extra = 'Impacto: ' . (service::impacts()[$record->impact] ?? $record->impact);
-            if ($kind === 'incidents') {
-                if ($record->client !== '') { $extra .= "\nCliente afectado: " . self::text($record->client); }
-                if ($record->product !== '') { $extra .= "\nProducto: " . self::text($record->product); }
-            }
+            $affectedservice = self::text($record->client ?? '');
+            $published = (int)$record->timecreated;
         } else if ($kind === 'library') {
             $cm = $DB->get_record('course_modules', ['id' => $id, 'visible' => 1, 'deletioninprogress' => 0]);
             if (!$cm || !self::visible_course((int)$cm->course, 'library') ||
@@ -123,11 +120,13 @@ class teams {
             $record = $DB->get_record($module, ['id' => $cm->instance]);
             if (!$record) { return null; }
             $name = $record->name; $content = $record->intro ?? '';
+            $published = (int)$cm->added;
             $url = new \moodle_url('/local/orangeportal/activity.php', ['id' => $id]);
         } else {
             $record = self::visible_course($id, 'courses');
             if (!$record) { return null; }
             $name = $record->fullname; $content = $record->summary;
+            $published = training_publication::published_time($record);
             $url = new \moodle_url('/course/view.php', ['id' => $id]);
         }
         // Fixed language is intentional: the shared channel must not depend on the saving editor's language.
@@ -136,7 +135,10 @@ class teams {
             'library' => ['Nuevo documento de Biblioteca', 'Documento de Biblioteca actualizado'],
             'courses' => ['Nueva formación', 'Formación actualizada']];
         return ['titulo' => $labels[$kind][$action === 'created' ? 0 : 1] . ': ' . self::text($name),
-            'contenido' => trim($extra . "\n\n" . self::text($content)), 'url' => $url->out(false)];
+            'fechaPublicacion' => (new \DateTimeImmutable('@' . $published))
+                ->setTimezone(\core_date::get_server_timezone_object())->format('Y-m-d\TH:i:s'),
+            'servicioAfectado' => $affectedservice,
+            'contenido' => self::text($content), 'url' => $url->out(false)];
     }
 
     /** Redact credentials from provider echoes and diagnostic text before writing task logs. */

@@ -86,13 +86,22 @@ try {
     foreach (['incidents', 'notifications'] as $kind) {
         $record = (object)['kind' => $kind, 'title' => 'TEST save consent ' . $kind,
             'categoryid' => $DB->get_field('local_orange_category', 'id', ['kind' => $kind], IGNORE_MULTIPLE),
-            'content' => '<p>TEST</p>', 'published' => 1, 'client' => '', 'product' => '',
+            'content' => '<p>TEST</p>', 'published' => 1,
+            'client' => $kind === 'incidents' ? 'Servicio de Atención al Cliente' : '', 'product' => 'Producto de prueba',
             'state' => \local_orangeportal\notice_options::default_code('states'),
             'impact' => \local_orangeportal\notice_options::default_code('impacts'), 'orangenotifyteams' => 0];
         $record->id = service::save_notice($record, []); $notices[] = $record->id;
         save_check(!save_jobs($kind, $record->id), "$kind publicación visible sin marcar Teams no avisa");
         $record->orangenotifyteams = 1; $record->content = '<p>TEST updated</p>';
         service::save_notice($record, []);
+        $payload = \local_orangeportal\teams::payload($kind, $record->id, 'updated');
+        $stored = $DB->get_record('local_orange_notice', ['id' => $record->id], '*', MUST_EXIST);
+        $expecteddate = (new DateTimeImmutable('@' . $stored->timecreated))
+            ->setTimezone(core_date::get_server_timezone_object())->format('Y-m-d\TH:i:s');
+        save_check(array_keys($payload) === ['titulo', 'fechaPublicacion', 'servicioAfectado', 'contenido', 'url'] &&
+            $payload['fechaPublicacion'] === $expecteddate && $payload['servicioAfectado'] === $record->client &&
+            $payload['contenido'] === 'TEST updated',
+            "$kind contrato de cinco campos: fecha de publicación, cliente afectado y descripción sin metadatos");
         save_dispatch($kind, $record->id);
         if ($kind === 'incidents') {
             $otherstates = array_values(array_diff(array_keys(service::states(true)), [$record->state]));

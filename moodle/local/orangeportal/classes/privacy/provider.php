@@ -14,7 +14,8 @@ class provider implements \core_privacy\local\metadata\provider,
     public static function get_metadata(collection $collection): collection {
         $collection->add_external_location_link('teams', [
             'titulo' => 'privacy:metadata:teams:title', 'contenido' => 'privacy:metadata:teams:content',
-            'url' => 'privacy:metadata:teams:url'], 'privacy:metadata:teams');
+            'fechaPublicacion' => 'privacy:metadata:teams:published',
+            'servicioAfectado' => 'privacy:metadata:teams:service', 'url' => 'privacy:metadata:teams:url'], 'privacy:metadata:teams');
         foreach (['local_orange_access' => ['kind', 'itemid', 'userids', 'cohorts', 'groupids'],
                 'local_orange_attendance' => ['userid', 'courseid', 'status', 'minutes', 'authorid', 'timemodified', 'collectives'],
                 'local_orange_doc_read' => ['userid', 'cmid', 'readtime'],

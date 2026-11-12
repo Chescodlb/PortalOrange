@@ -14,8 +14,9 @@ http.createServer((req, res) => {
     res.writeHead(501); return res.end('{}');
   }
   const body = req.body;
-  if (!body || Object.keys(body).sort().join(',') !== 'contenido,titulo,url' ||
-      Object.values(body).some(value => typeof value !== 'string') || !/^https?:\/\//.test(body.url)) {
+  if (!body || Object.keys(body).sort().join(',') !== 'contenido,fechaPublicacion,servicioAfectado,titulo,url' ||
+      Object.values(body).some(value => typeof value !== 'string') || !/^https?:\/\//.test(body.url) ||
+      !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(body.fechaPublicacion)) {
     res.writeHead(400); return res.end('{"error":"Invalid contract"}');
   }
   state.requests.push({body, eventid: req.headers['x-orange-event-id'], type: req.headers['content-type']});

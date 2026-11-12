@@ -4,11 +4,18 @@ purpose:
 assumptions:
   - id: three-field-contract
     status: supported
-    claim: The requested client contract is a JSON POST with titulo, contenido and url strings.
-    reason: The client supplied this contract; the local mock rejects other shapes.
+    claim: Until 2026-11-10 the client contract was a JSON POST with titulo, contenido and url strings.
+    reason: Historical client contract, superseded by the five-field request on 2026-11-11; retained as evidence for earlier runs.
     verification: On 2026-11-06 real Moodle events and delivery tasks made 15 HTTPS POSTs through the simulation; payload validation passed, including error scenarios.
     source: postman/contracts/orange-teams.openapi.json; moodle/local/orangeportal/cli/check_teams.php; scripts/test-orange-teams.mjs
     updated_at: "2026-11-06"
+  - id: five-field-contract
+    status: supported
+    claim: In the local save-consent scenarios Moodle sends titulo, fechaPublicacion, servicioAfectado, contenido and url strings; affected client maps to servicioAfectado and description alone maps to contenido.
+    reason: The client supplied the new shape; real Moodle tasks sent HTTPS requests to the updated local contract validator.
+    verification: On 2026-11-11 node scripts/test-orange-teams.mjs --save-consent passed with five recorded POSTs and 202 responses. Explicit assertions checked notice publication dates, populated incident client, empty announcement client and plain descriptions without impact or product. PHP syntax checks passed. The general suite stopped earlier at its library creation queue assertion before reaching its transport checks; that suite is not claimed as passing. No Microsoft service was contacted.
+    source: postman/contracts/orange-teams.openapi.json; moodle/local/orangeportal/classes/teams.php; moodle/local/orangeportal/cli/check_publication_save.php; scripts/test-orange-teams.mjs --save-consent
+    updated_at: "2026-11-11"
   - id: failures-preserve-work
     status: supported
     claim: In the local scenarios a 500 response preserves the Moodle delivery task and schedules a retry, and a later 202 completes the task.

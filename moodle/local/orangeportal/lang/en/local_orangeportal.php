@@ -597,7 +597,7 @@ $string['libraryreporthelp'] = 'The period filters by resource creation date. Re
 
 // Configurable outbound Teams announcements.
 $string['teamstitle'] = 'Teams messaging';
-$string['teamsintro'] = 'Sends announcements to Power Automate as JSON POST requests (titulo, contenido and url). Only published/visible Orange content is included. Drafts, reading events, state changes and personal grade alerts are excluded. The flow determines the Teams destination; Moodle recipients do not automatically become Teams recipients. Portal access permissions still apply to links.';
+$string['teamsintro'] = 'Sends announcements to Power Automate as JSON POST requests (titulo, fechaPublicacion, servicioAfectado, contenido and url). Only published/visible Orange content is included. Drafts, reading events, state changes and personal grade alerts are excluded. The flow determines the Teams destination; Moodle recipients do not automatically become Teams recipients. Portal access permissions still apply to links.';
 $string['teamsenabled'] = 'Enable Teams deliveries';
 $string['teamsenabled_desc'] = 'Disabled by default. Requires Moodle cron. A visible save must explicitly select Notify via Teams when saving. Deliveries are queued for at least one minute after saving, with up to five attempts. Saving these settings does not send a test message.';
 $string['teamsurl'] = 'Power Automate service URL';
@@ -615,7 +615,9 @@ $string['teamsqueue'] = 'View pending or failed delivery tasks';
 $string['teamstasklogs'] = 'View task logs';
 $string['privacy:metadata:teams'] = 'When enabled, published content is sent to the messaging service configured by the administrator.';
 $string['privacy:metadata:teams:title'] = 'Announcement type and publication title.';
-$string['privacy:metadata:teams:content'] = 'Published content excerpt and impact; may contain data entered by its author.';
+$string['privacy:metadata:teams:content'] = 'Published description; may contain data entered by its author.';
+$string['privacy:metadata:teams:published'] = 'Publication date in the site timezone.';
+$string['privacy:metadata:teams:service'] = 'Affected client specified in the publication.';
 $string['privacy:metadata:teams:url'] = 'Authenticated link to the Moodle content.';
 
 // Content creation and Orange audience boundaries.

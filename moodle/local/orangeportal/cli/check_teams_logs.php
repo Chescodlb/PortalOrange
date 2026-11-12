@@ -26,7 +26,7 @@ foreach (['teamslastattempt', 'teamslastsuccess', 'teamslastresult'] as $key) { 
 $wrapper = $CFG->mtrace_wrapper ?? null;
 try {
     $CFG->mtrace_wrapper = 'orange_capture_delivery_log';
-    $payload = ['titulo' => 'Comunicado de prueba de logs', 'contenido' => 'Detalle de prueba', 'url' => 'http://localhost:8080/local/orangeportal/view.php?id=123'];
+    $payload = ['titulo' => 'Comunicado de prueba de logs', 'fechaPublicacion' => '2026-11-11T11:30:00', 'servicioAfectado' => 'Servicio de Atención al Cliente', 'contenido' => 'Detalle de prueba', 'url' => 'http://localhost:8080/local/orangeportal/view.php?id=123'];
     logs_control(202, '');
     teams::post($endpoint, $payload, 'test-local-correlation');
     logs_check(str_contains($captured, 'destino POST ' . $base . '/invoke') &&
