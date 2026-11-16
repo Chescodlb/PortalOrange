@@ -5,9 +5,9 @@ defined('MOODLE_INTERNAL') || die();
 /** Server-side paging shared by reading tables and filtered CSV exports. */
 class reading_report {
     public static function data(string $kind, int $noticeid = 0, int $userid = 0, string $reading = '',
-            int $page = 0, int $perpage = 25, int $since = 0): array {
+            int $page = 0, int $perpage = 25, int $since = 0, bool $criticalunread = false): array {
         global $DB;
-        [$from, $where, $params, $readtime] = self::query($kind, $noticeid, $userid, $reading, $since);
+        [$from, $where, $params, $readtime] = self::query($kind, $noticeid, $userid, $reading, $since, $criticalunread);
         $total = $DB->count_records_sql("SELECT COUNT(1) $from WHERE $where", $params);
         $page = $perpage > 0 ? min(max(0, $page), max(0, (int)ceil($total / $perpage) - 1)) : 0;
         $rowkey = $DB->sql_concat('n.id', "':'", 'u.id');
@@ -20,7 +20,8 @@ class reading_report {
         return ['total' => $total, 'page' => $page, 'rows' => $rows];
     }
     /** One row per published notice, including notices with no current recipients. */
-    public static function summary(string $kind, int $page = 0, int $perpage = 25, int $noticeid = 0, int $since = 0): array {
+    public static function summary(string $kind, int $page = 0, int $perpage = 25, int $noticeid = 0,
+            int $since = 0, bool $criticalunread = false): array {
         global $DB;
         [$from, $where, $params, $readtime] = self::query($kind, $noticeid, 0, '', $since);
         if (!in_array($kind, ['incidents', 'notifications'], true)) { throw new \invalid_parameter_exception('Invalid report section'); }
@@ -30,13 +31,16 @@ class reading_report {
         if ($since) { $noticewhere .= ' AND COALESCE(v.timecreated,n.timecreated)>=:summarysince'; $noticeparams['summarysince'] = $since; }
         $noticefrom = 'FROM {local_orange_notice} n LEFT JOIN {local_orange_revision} v ON v.noticeid=n.id AND v.revision=n.revision';
         if (report_period::until()) { $noticewhere .= ' AND COALESCE(v.timecreated,n.timecreated)<:summaryuntil'; $noticeparams['summaryuntil'] = report_period::until(); }
-        if (!report_scope::global_access() || report_scope::selected()) {
-            $noticewhere .= " AND n.id IN (SELECT n.id $from WHERE $where)";
-            $noticeparams += $params;
+        if (!report_scope::global_access() || report_scope::selected() || $criticalunread) {
+            $eligiblewhere = $where;
+            $eligibleparams = $params;
+            if ($criticalunread) { $eligiblewhere .= self::critical_unread_where($readtime, $eligibleparams); }
+            $noticewhere .= " AND n.id IN (SELECT n.id $from WHERE $eligiblewhere)";
+            $noticeparams += $eligibleparams;
         }
         $total = $DB->count_records_sql("SELECT COUNT(1) $noticefrom WHERE $noticewhere", $noticeparams);
         $page = min(max(0, $page), max(0, (int)ceil($total / $perpage) - 1));
-        $notices = $DB->get_records_sql("SELECT n.id,n.title,n.revision,n.timecreated,
+        $notices = $DB->get_records_sql("SELECT n.id,n.title,n.impact,n.revision,n.timecreated,
             COALESCE(v.timecreated,n.timecreated) AS publicationdate $noticefrom WHERE $noticewhere
             ORDER BY COALESCE(v.timecreated,n.timecreated) DESC,n.id DESC", $noticeparams, $page * $perpage, $perpage);
         $stats = [];
@@ -86,7 +90,15 @@ class reading_report {
     /** Unread critical publications across the whole history, independent of the selected window. */
     public static function critical_pending(int $userid = 0): array {
         global $DB;
-        [$from, $where, $params, $readtime] = self::query('', 0, $userid, 'unread', -1);
+        [$from, $where, $params] = self::query('', 0, $userid, '', -1, true);
+        return $DB->get_records_sql("SELECT u.id,COUNT(1) AS pending $from
+            WHERE $where GROUP BY u.id", $params);
+    }
+
+    /** Shared by the actionable list, its recipient detail, exports and historical user statistics. */
+    private static function critical_unread_where(string $readtime, array &$params): string {
+        global $DB;
+        $where = " AND n.impact='critical' AND ($readtime)=0";
         $closed = array_keys(array_filter(notice_options::records('states'), static fn($r, $code) =>
             notice_options::is_closed($code), ARRAY_FILTER_USE_BOTH));
         if ($closed) {
@@ -94,8 +106,7 @@ class reading_report {
             $where .= " AND (n.kind<>'incidents' OR n.state $sql)";
             $params += $extra;
         }
-        return $DB->get_records_sql("SELECT u.id,COUNT(1) AS pending $from
-            WHERE $where AND n.impact='critical' GROUP BY u.id", $params);
+        return $where;
     }
 
     /** Users are paged after aggregating their pending readings, so ordering is global. */
@@ -156,7 +167,8 @@ class reading_report {
         return ['rows' => $rows, 'total' => $total, 'page' => $page];
     }
 
-    private static function query(string $kind, int $noticeid, int $userid, string $reading, int $since = 0): array {
+    private static function query(string $kind, int $noticeid, int $userid, string $reading, int $since = 0,
+            bool $criticalunread = false): array {
         global $DB;
         experience::require_access();
         require_capability('local/orangeportal:viewreports', \context_system::instance());
@@ -182,6 +194,7 @@ class reading_report {
         // Legacy confirmation evidence remains readable; no new confirmations are written.
         $readtime = 'CASE WHEN r.readtime>0 THEN r.readtime ELSE COALESCE(r.confirmed,0) END';
         if ($reading !== '') { $where .= " AND ($readtime)" . ($reading === 'read' ? '>0' : '=0'); }
+        if ($criticalunread) { $where .= self::critical_unread_where($readtime, $params); }
         return [$from, $where, $params, $readtime];
     }
 

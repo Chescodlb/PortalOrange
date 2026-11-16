@@ -22,7 +22,7 @@ class incident_browser {
         $client = optional_param('incidentclient', '', PARAM_TEXT);
         $product = optional_param('incidentproduct', '', PARAM_TEXT);
         $category = optional_param('category', 0, PARAM_INT);
-        $unread = optional_param('unread', 0, PARAM_BOOL);
+        $unread = optional_param('unread', 1, PARAM_BOOL);
         $personal = optional_param('personal', 0, PARAM_BOOL);
         $priority = optional_param('priority', '', PARAM_ALPHA);
         if (!in_array($priority, ['', 'normal', 'critical'], true)) { $priority = ''; }
@@ -72,13 +72,18 @@ class incident_browser {
             $form .= self::field($key, get_string($key, 'local_orangeportal'), \html_writer::empty_tag('input',
                 ['type' => 'date', 'name' => $key, 'id' => 'incident-' . $key, 'value' => $value, 'class' => 'form-control']));
         }
-        $form .= \html_writer::tag('label', \html_writer::checkbox('unread', 1, (bool)$unread,
-            get_string('incidentunreadonly', 'local_orangeportal')), ['class' => 'orange-incident-unread-filter']);
-        $form .= \html_writer::tag('button', get_string('incidentapplyfilters', 'local_orangeportal'), ['class' => 'btn btn-primary', 'type' => 'submit']);
-        $form .= \html_writer::link(\orange_link('index.php', ['section' => 'incidents']), get_string('incidentclearfilters', 'local_orangeportal'),
-            ['class' => 'orange-incident-reset']);
+        $switchattrs = ['type' => 'checkbox', 'name' => 'unread', 'value' => 1, 'id' => 'incident-unread', 'role' => 'switch'];
+        if ($unread) { $switchattrs['checked'] = 'checked'; }
+        $unreadswitch = \html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'unread', 'value' => 0]) .
+            \html_writer::tag('label', \html_writer::empty_tag('input', $switchattrs) .
+            \html_writer::span('', 'orange-unread-switch-track', ['aria-hidden' => 'true']) .
+            \html_writer::span(get_string('incidentunreadonly', 'local_orangeportal'), 'orange-unread-switch-text'),
+            ['class' => 'orange-unread-switch', 'for' => 'incident-unread']);
+        $reset = \html_writer::link(\orange_link('index.php', ['section' => 'incidents']), get_string('incidentclearfilters', 'local_orangeportal'),
+            ['class' => 'btn btn-outline-light orange-incident-reset']);
         $sidebar = \html_writer::tag('aside', \html_writer::tag('h3', get_string('incidentfilters', 'local_orangeportal')) .
-            \html_writer::tag('form', $form, ['method' => 'get', 'action' => \orange_link('index.php')->out(false)]),
+            \html_writer::tag('form', $unreadswitch . $reset . $form, ['method' => 'get', 'action' => \orange_link('index.php')->out(false),
+                'data-orange-auto-filter' => '1']),
             ['class' => 'orange-incidents-filters', 'aria-label' => get_string('incidentfilters', 'local_orangeportal')]);
         $rows = ''; $count = 0;
         foreach ($scope as $n) {

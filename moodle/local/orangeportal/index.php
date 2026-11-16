@@ -8,7 +8,7 @@ $query = optional_param('q', '', PARAM_TEXT);
 $document = $section === 'library' ? optional_param('document', 0, PARAM_INT) : 0;
 $status = optional_param('state', '', PARAM_ALPHA);
 $impact = optional_param('impact', '', PARAM_ALPHA);
-$unread = optional_param('unread', 0, PARAM_BOOL);
+$unread = optional_param('unread', in_array($section, ['incidents', 'notifications']) ? 1 : 0, PARAM_BOOL);
 $personal = optional_param('personal', 0, PARAM_BOOL);
 $datefrom = in_array($section, ['incidents', 'notifications']) ? optional_param('datefrom', '', PARAM_RAW_TRIMMED) : '';
 $dateto = in_array($section, ['incidents', 'notifications']) ? optional_param('dateto', '', PARAM_RAW_TRIMMED) : '';
@@ -22,6 +22,8 @@ if (in_array($section, ['library', 'courses'])) { $PAGE->requires->js('/local/or
 if ($document) { $PAGE->url->param('document', $document); }
 if (in_array($section, ['incidents', 'notifications'])) {
     $PAGE->add_body_class('orange-wide-listing');
+    $PAGE->requires->js(new moodle_url('/local/orangeportal/notice_filters.js',
+        ['v' => filemtime(__DIR__ . '/notice_filters.js')]));
 }
 if ($section === 'incidents') {
     echo $OUTPUT->header();
@@ -135,19 +137,28 @@ if (in_array($section, ['incidents', 'notifications'])) {
 
 }
 if ($section === 'notifications') {
-    $search .= $filterfield('orange-unread', get_string('updates_reading', 'local_orangeportal'),
-        html_writer::select([0 => get_string('updates_allreading', 'local_orangeportal'),
-            1 => get_string('updates_unread', 'local_orangeportal')], 'unread', $unread, false,
-            ['id' => 'orange-unread', 'class' => 'custom-select']));
+    $switchattrs = ['type' => 'checkbox', 'name' => 'unread', 'value' => 1, 'id' => 'orange-unread', 'role' => 'switch'];
+    if ($unread) { $switchattrs['checked'] = 'checked'; }
+    $unreadswitch = html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'unread', 'value' => 0]) .
+        html_writer::tag('label', html_writer::empty_tag('input', $switchattrs) .
+        html_writer::span('', 'orange-unread-switch-track', ['aria-hidden' => 'true']) .
+        html_writer::span(get_string('incidentunreadonly', 'local_orangeportal'), 'orange-unread-switch-text'),
+        ['class' => 'orange-unread-switch', 'for' => 'orange-unread']);
+    $reset = html_writer::link(orange_link('index.php', ['section' => 'notifications']),
+        get_string('incidentclearfilters', 'local_orangeportal'), ['class' => 'btn btn-outline-light orange-incident-reset']);
+    $search = $unreadswitch . $reset . $search;
 }
 if ($personal) { $search .= html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'personal', 'value' => 1]); }
 if ($section === 'courses' && $unread) {
     $search .= html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'unread', 'value' => 1]);
     $search .= html_writer::link(orange_link('index.php', ['section' => 'courses']), get_string('updates_showall', 'local_orangeportal'));
 }
-$search .= html_writer::tag('button', get_string('search'), ['type' => 'submit', 'class' => 'btn btn-primary']);
+if ($section !== 'notifications') {
+    $search .= html_writer::tag('button', get_string('search'), ['type' => 'submit', 'class' => 'btn btn-primary']);
+}
 $searchform = html_writer::tag('form', $search, ['method' => 'get', 'action' => orange_link('index.php')->out(false),
-    'class' => $section === 'notifications' ? 'orange-communications-filter-form' : 'orange-search orange-list-filters']);
+    'class' => $section === 'notifications' ? 'orange-communications-filter-form' : 'orange-search orange-list-filters',
+    'data-orange-auto-filter' => '1']);
 if ($section !== 'notifications') { echo $searchform; }
 if ($dateerror) { echo $OUTPUT->notification($dateerror, 'error'); }
 $tree = ''; $cards = ''; $rows = ''; $count = 0;
@@ -261,9 +272,7 @@ $content = html_writer::tag('p', $count . ' ' . ($section == 'library' ? 'colecc
     $listing;
 if ($section === 'notifications') {
     $filtertitle = get_string('communicationfilters', 'local_orangeportal');
-    $reset = html_writer::link(orange_link('index.php', ['section' => 'notifications']),
-        get_string('incidentclearfilters', 'local_orangeportal'), ['class' => 'orange-incident-reset']);
-    echo html_writer::div(html_writer::tag('aside', html_writer::tag('h3', $filtertitle) . $searchform . $reset,
+    echo html_writer::div(html_writer::tag('aside', html_writer::tag('h3', $filtertitle) . $searchform,
         ['class' => 'orange-incidents-filters orange-communications-filters', 'aria-label' => $filtertitle]) .
         html_writer::div($content, 'orange-incidents-results'), 'orange-incidents-layout orange-communications-layout');
 } else if ($tree) {

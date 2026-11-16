@@ -604,6 +604,149 @@ try {
     check(await evaluate(`!document.querySelector('.orange-user-summary')&&!document.querySelector('.orange-user-tabs')`),'Agente no accede al seguimiento de otras personas');
     await writeFile('backups/previews/user-report-checks.json',JSON.stringify({date:new Date().toISOString(),results},null,2));
     console.log('Verificaciones de seguimiento individual: '+results.length);
+  } else if (process.argv.includes('--auto-notice-filters-only')) {
+    await login('formador.orange', env.ORANGE_DEMO_PASSWORD);
+    for (const section of ['notifications', 'incidents']) {
+      const path = '/local/orangeportal/index.php?section=' + section + '&lang=es';
+      await navigate(path);
+      await wait(`!!document.querySelector('.orange-incidents-filters form[data-orange-auto-filter="1"][data-orange-filters-ready="1"]')`);
+      check(await evaluate(`document.querySelector('input[role="switch"]').checked`), section + ': solo sin leer activo por defecto');
+      check(await evaluate(`(()=>{const side=document.querySelector('.orange-incidents-filters');return side.querySelector('.orange-incident-reset').getBoundingClientRect().bottom<side.querySelector('input[type="search"]').getBoundingClientRect().top})()`),
+        section + ': Limpiar filtros está antes de la búsqueda');
+      const names = await evaluate(`Array.from(document.querySelectorAll('.orange-incidents-filters form select')).filter(s=>s.options.length>1).map(s=>s.name)`);
+      for (const name of names) {
+        await navigate(path);
+        await wait(`!!document.querySelector('form[data-orange-filters-ready="1"]')`);
+        const value = await evaluate(`(()=>{const s=document.querySelector('.orange-incidents-filters select[name="${name}"]');
+          const option=Array.from(s.options).find(o=>o.value!==s.value);s.value=option.value;
+          s.dispatchEvent(new Event('change',{bubbles:true}));return option.value})()`);
+        await wait(`document.readyState==='complete'&&new URLSearchParams(location.search).get(${JSON.stringify(name)})===${JSON.stringify(value)}&&!!document.querySelector('form[data-orange-filters-ready="1"]')`);
+        check(await evaluate(`document.querySelector('.orange-incidents-filters select[name="${name}"]').value===${JSON.stringify(value)}`),
+          section + ' / ' + name + ': seleccionar aplica sin pulsar Buscar');
+      }
+      {
+        await navigate(path + '&unread=0');
+        await wait(`!!document.querySelector('form[data-orange-filters-ready="1"] input[type="checkbox"][name="unread"]')`);
+        check(await evaluate(`document.querySelector('input[type="checkbox"][name="unread"]').getAttribute('role')==='switch'&&document.querySelector('.orange-unread-switch').getBoundingClientRect().bottom<=document.querySelector('.orange-incident-reset').getBoundingClientRect().top&&!document.querySelector('.orange-incidents-filters button')`),
+          section + ': interruptor arriba y sin botón Buscar');
+        await evaluate(`document.querySelector('.orange-unread-switch').click()`);
+        await wait(`document.readyState==='complete'&&new URLSearchParams(location.search).getAll('unread').at(-1)==='1'&&!!document.querySelector('form[data-orange-filters-ready="1"]')`);
+        check(await evaluate(`document.querySelector('input[type="checkbox"][name="unread"]').checked&&Array.from(document.querySelectorAll('.orange-notification-envelope')).every(i=>i.src.includes('envelope-unread'))`),
+          section + ': interruptor aplica sin leer');
+        await screenshot(section + '-switch-activo');
+        await evaluate(`document.querySelector('input[type="checkbox"][name="unread"]').focus()`);
+        await send('Input.dispatchKeyEvent', {type: 'keyDown', key: ' ', code: 'Space', windowsVirtualKeyCode: 32});
+        await send('Input.dispatchKeyEvent', {type: 'keyUp', key: ' ', code: 'Space', windowsVirtualKeyCode: 32});
+        await wait(`document.readyState==='complete'&&new URLSearchParams(location.search).getAll('unread').at(-1)==='0'&&!!document.querySelector('form[data-orange-filters-ready="1"]')`);
+        check(await evaluate(`!document.querySelector('input[type="checkbox"][name="unread"]').checked`), section + ': desmarcar restaura todas las lecturas automáticamente');
+        await evaluate(`(()=>{const s=document.querySelector('input[type="search"]');s.value='prueba';s.dispatchEvent(new Event('input',{bubbles:true}))})()`);
+        await delay(150);
+        check(await evaluate(`!new URLSearchParams(location.search).get('q')`), section + ': espera una pausa al escribir');
+        await evaluate(`(()=>{const s=document.querySelector('input[type="search"]');s.value='zzsinresultadosauto987';s.dispatchEvent(new Event('input',{bubbles:true}))})()`);
+        await wait(`document.readyState==='complete'&&new URLSearchParams(location.search).get('q')==='zzsinresultadosauto987'&&!!document.querySelector('form[data-orange-filters-ready="1"]')`);
+        check(await evaluate(`!document.querySelector('.orange-notification-title,.orange-incident-title')`), section + ': texto filtra automáticamente con el último valor');
+        await evaluate(`(()=>{const s=document.querySelector('input[type="search"]');s.value='';s.dispatchEvent(new Event('input',{bubbles:true}))})()`);
+        await wait(`document.readyState==='complete'&&new URLSearchParams(location.search).get('q')===''&&!!document.querySelector('form[data-orange-filters-ready="1"]')`);
+        check(await evaluate(`!!document.querySelector('.orange-notification-title,.orange-incident-title')`), section + ': borrar texto restaura resultados');
+      }
+      await navigate(path);
+      await wait(`!!document.querySelector('form[data-orange-filters-ready="1"]')`);
+      await evaluate(`const input=document.querySelector('.orange-incidents-filters [name="datefrom"]');input.value='2020-01-01';input.dispatchEvent(new Event('change',{bubbles:true}))`);
+      await wait(`document.readyState==='complete'&&new URLSearchParams(location.search).get('datefrom')==='2020-01-01'&&!!document.querySelector('form[data-orange-filters-ready="1"]')`);
+      check(await evaluate(`document.querySelector('[name="datefrom"]').value==='2020-01-01'`), section + ': fecha se aplica automáticamente');
+      await send('Emulation.setDeviceMetricsOverride', {width:390,height:844,deviceScaleFactor:1,mobile:true});
+      check(await evaluate(`document.documentElement.scrollWidth<=innerWidth&&document.querySelector('.orange-incident-reset').getBoundingClientRect().width<=innerWidth`), section + ': filtros y limpieza accesibles en móvil');
+      await send('Emulation.clearDeviceMetricsOverride');
+      await screenshot('filtros-automaticos-' + section);
+      await navigate(await evaluate(`document.querySelector('.orange-incident-reset').href`));
+      check(await evaluate(`!new URLSearchParams(location.search).has('datefrom')&&!new URLSearchParams(location.search).has('impact')`), section + ': Limpiar elimina los filtros');
+      check(await evaluate(`document.querySelector('input[role="switch"]').checked`), section + ': Limpiar restaura sin leer por defecto');
+      await navigate('/local/orangeportal/reports.php?section=' + section + '&period=all&lang=es');
+      await wait(`!!document.querySelector('form[data-orange-filters-ready="1"] #report-period')`);
+      check(await evaluate(`document.querySelector('.orange-report-reset').getBoundingClientRect().bottom<document.querySelector('#report-period').closest('form').getBoundingClientRect().top`), section + ': limpieza de Seguimiento encima de sus filtros');
+      await evaluate(`const s=document.querySelector('#report-period');s.value='custom';s.dispatchEvent(new Event('change',{bubbles:true}))`);
+      await delay(250);
+      check(await evaluate(`new URLSearchParams(location.search).get('period')==='all'&&document.querySelector('#report-period').value==='custom'`), section + ': periodo personalizado espera las dos fechas');
+      await evaluate(`document.querySelector('#report_from').value='2020-01-01';document.querySelector('#report_from').dispatchEvent(new Event('change',{bubbles:true}));
+        document.querySelector('#report_to').value='2099-12-31';document.querySelector('#report_to').dispatchEvent(new Event('change',{bubbles:true}))`);
+      await wait(`document.readyState==='complete'&&new URLSearchParams(location.search).get('period')==='custom'&&!!document.querySelector('form[data-orange-filters-ready="1"]')`);
+      check(await evaluate(`!document.querySelector('.alert-danger')&&document.querySelector('#report_to').value==='2099-12-31'`), section + ': rango completo se aplica automáticamente');
+      const detail = await evaluate(`document.querySelector('.orange-reading-summary tbody a')?.href`);
+      if (detail) {
+        await navigate(detail);
+        await wait(`!!document.querySelector('form[data-orange-filters-ready="1"] select[name="${section}_reading"]')`);
+        await evaluate(`const s=document.querySelector('select[name="${section}_reading"]');s.value='unread';s.dispatchEvent(new Event('change',{bubbles:true}))`);
+        await wait(`document.readyState==='complete'&&new URLSearchParams(location.search).get('${section}_reading')==='unread'&&!!document.querySelector('.orange-reading-detail')`);
+        check(await evaluate(`Array.from(document.querySelectorAll('.orange-reading-report tbody tr')).every(r=>r.cells[2].textContent.trim()==='Pendiente')`), section + ': lectura se filtra automáticamente en el detalle');
+      }
+      await navigate(await evaluate(`document.querySelector('.orange-report-reset a').href`));
+      check(await evaluate(`location.search==='?section=${section}'`), section + ': limpieza de Seguimiento vuelve a los filtros iniciales');
+    }
+    await logout();
+    console.log('Verificaciones de filtros automáticos: ' + results.length);
+  } else if (process.argv.includes('--critical-readings-only')) {
+    for (const username of ['admin.orange', 'coordinador.orange']) {
+      await login(username, env.ORANGE_DEMO_PASSWORD);
+      for (const language of ['es', 'en']) {
+        await navigate('/local/orangeportal/reports.php?section=overview&period=all&lang=' + language);
+        check(await evaluate(`document.querySelectorAll('.orange-tracking-card').length===4&&
+          !Array.from(document.querySelectorAll('.orange-tracking-card h4')).some(h=>/critical|críticas/i.test(h.textContent))`),
+          username + ' / ' + language + ': resumen sin cuadro de críticas histórico');
+        for (const section of ['incidents', 'notifications']) {
+          await navigate('/local/orangeportal/reports.php?section=' + section + '&period=all&lang=' + language);
+          const critical = await evaluate(`document.querySelector('.orange-reading-modes a[href*="${section}_criticalunread=1"]').href`);
+          await navigate(critical);
+          check(await evaluate(`!!document.querySelector('.orange-reading-modes a[aria-current="true"][href*="${section}_criticalunread=1"]')&&
+            !document.body.innerText.includes('[[')&&!document.querySelector('.alert-danger')`),
+            username + ' / ' + language + ' / ' + section + ': filtro crítico activo y traducido');
+          const detail = await evaluate(`document.querySelector('.orange-reading-summary tbody a')?.href`);
+          if (detail) {
+            check(new URL(detail).searchParams.get(section + '_criticalunread') === '1' &&
+              new URL(detail).searchParams.get(section + '_reading') === 'unread', 'Abrir publicación conserva críticas sin leer');
+            check(await evaluate(`Array.from(document.querySelectorAll('.orange-reading-summary tbody tr')).every(r=>
+              Number(r.cells[3].textContent)===Number(r.cells[4].textContent.match(/— (\\d+)\\//)?.[1]||0)+
+              Number(r.cells[5].textContent.match(/— (\\d+)\\//)?.[1]||0))`), 'El resumen conserva destinatarios igual a leídos más pendientes');
+            if (username === 'admin.orange' && language === 'es') { await screenshot('seguimiento-criticas-' + section); }
+            await navigate(detail);
+            check(await evaluate(`document.querySelector('#${section}_reading').value==='unread'&&
+              document.querySelector('#${section}_reading').options.length===1&&
+              Array.from(document.querySelectorAll('.orange-reading-report tbody tr')).every(r=>
+                r.cells[2].textContent.trim()===${JSON.stringify(language === 'es' ? 'Pendiente' : 'Pending')})`),
+              'Detalle muestra solo destinatarios pendientes');
+            check(await evaluate(`document.querySelector('#report-history-${section} form [name="${section}_criticalunread"]').value==='1'`),
+              'Consultar versiones conserva el modo crítico');
+            const exporturl = await evaluate(`document.querySelector('.orange-reading-detail a[href*="export.php"]')?.href`);
+            if (username === 'admin.orange') {
+              check(!!exporturl && new URL(exporturl).searchParams.get('criticalunread') === '1', 'CSV conserva el filtro crítico');
+              check(await evaluate(`fetch(${JSON.stringify(exporturl)}).then(r=>r.ok&&r.headers.get('content-type')?.includes('csv'))`),
+                'Exportación filtrada responde como CSV');
+            } else { check(!exporturl, 'Coordinación mantiene consulta sin exportación'); }
+          } else {
+            check(await evaluate(`!document.querySelector('.orange-reading-report')&&!document.querySelector('.alert-danger')`),
+              'Sin críticas pendientes se muestra un listado vacío sin error');
+          }
+          await navigate(critical);
+          await wait(`!!document.querySelector('form[data-orange-filters-ready="1"] #report-period')`);
+          await evaluate(`document.querySelector('#report-period').value='month';
+            document.querySelector('#report-period').dispatchEvent(new Event('change',{bubbles:true}))`);
+          await wait(`document.readyState==='complete'&&new URLSearchParams(location.search).get('period')==='month'`);
+          check(await evaluate(`new URLSearchParams(location.search).get('${section}_criticalunread')==='1'&&
+            !!document.querySelector('.orange-reading-modes [aria-current="true"][href*="${section}_criticalunread=1"]')`),
+            'Cambiar periodo mantiene el filtro crítico');
+          await send('Emulation.setDeviceMetricsOverride', {width:390,height:844,deviceScaleFactor:1,mobile:true});
+          check(await evaluate(`document.documentElement.scrollWidth<=innerWidth&&
+            Array.from(document.querySelectorAll('.orange-reading-modes a')).every(a=>a.getBoundingClientRect().right<=innerWidth)`),
+            'Modo crítico accesible en móvil sin desbordamiento');
+          await send('Emulation.clearDeviceMetricsOverride');
+          const all = await evaluate(`document.querySelector('.orange-reading-modes a[href*="${section}_criticalunread=0"]').href`);
+          await navigate(all);
+          check(await evaluate(`!!document.querySelector('.orange-reading-modes a[aria-current="true"][href*="${section}_criticalunread=0"]')`),
+            'Volver a todas las publicaciones desactiva el filtro');
+        }
+      }
+      await logout();
+    }
+    console.log('Verificaciones de críticas sin leer: ' + results.length);
   } else if (process.argv.includes('--reading-reports-only')) {
     await login('admin.orange',env.ORANGE_DEMO_PASSWORD);
     for(const language of ['es','en']) {
@@ -611,7 +754,7 @@ try {
         await navigate('/local/orangeportal/reports.php?section='+section+'&lang='+language);
         check(await evaluate(`document.querySelectorAll('.orange-category-tabs a').length===6&&document.querySelector('.orange-category-tabs [aria-current="page"]').href.includes('section=${section}')`),language+' / '+section+': selector de Seguimiento activo');
         check(await evaluate(`!!document.querySelector('.orange-reading-summary')&&!document.querySelector('.orange-reading-detail')&&!document.body.textContent.includes('[[')`),language+' / '+section+': resumen por publicación separado del detalle');
-        check(await evaluate(`Array.from(document.querySelectorAll('.orange-reading-summary tbody tr')).every(r=>Number(r.cells[2].textContent)===Number(r.cells[3].textContent.match(/— (\\d+)\\//)?.[1]||0)+Number(r.cells[4].textContent.match(/— (\\d+)\\//)?.[1]||0))`),language+' / '+section+': total igual a leídos más sin leer');
+        check(await evaluate(`Array.from(document.querySelectorAll('.orange-reading-summary tbody tr')).every(r=>Number(r.cells[3].textContent)===Number(r.cells[4].textContent.match(/— (\\d+)\\//)?.[1]||0)+Number(r.cells[5].textContent.match(/— (\\d+)\\//)?.[1]||0))`),language+' / '+section+': total igual a leídos más sin leer');
         check(await evaluate(`document.querySelectorAll('.orange-reading-summary tbody tr').length<=25`),language+' / '+section+': resumen paginado');
         const detail=await evaluate(`document.querySelector('.orange-reading-summary tbody a')?.href`);
         check(!!detail,language+' / '+section+': publicación disponible para abrir detalle');

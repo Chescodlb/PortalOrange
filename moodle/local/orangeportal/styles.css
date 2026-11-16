@@ -135,7 +135,7 @@ body .orange-library-category.is-selected,body .orange-library-document.is-selec
 .orange-incident-filter .form-control,.orange-incident-filter .custom-select{display:block;width:100%;min-width:0;max-width:100%;font-size:.82rem}
 .orange-incident-unread-filter{display:block;font-size:.85rem;margin:12px 0 18px}
 .orange-incident-unread-filter input{margin-right:6px}
-body .orange-incidents-filters .orange-incident-reset{display:block;color:#fff;font-size:.8rem;margin-top:12px}
+body .orange-incidents-filters .orange-incident-reset{display:block;color:#fff;font-size:.82rem;margin:0 0 18px}
 .orange-incidents-results{min-width:0}
 .orange-incident-list-heading{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 16px}
 .orange-incident-list-heading h2{font-size:1.4rem;font-weight:700;margin:0}
@@ -157,8 +157,15 @@ body .orange-incidents-table td:nth-child(2){width:34%;min-width:240px}
 /* Communications reuse the incident sidebar and keep their own existing filters. */
 .orange-communications-filter-form .orange-filter-field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
 .orange-communications-filter-form label{font-size:.82rem;font-weight:700;margin:0}
+.orange-incidents-filters .orange-unread-switch{position:relative;display:flex;align-items:center;gap:12px;grid-column:1/-1;padding:14px 12px;margin:0 0 14px;background:#202428;border:1px solid #8d959c;border-radius:8px;cursor:pointer;font-size:.95rem;font-weight:700;min-height:54px}
+.orange-unread-switch input{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.orange-unread-switch-track{position:relative;display:block;flex:0 0 48px;width:48px;height:28px;border:2px solid #aeb5bc;background:#626a72;border-radius:16px}
+.orange-unread-switch-track::after{content:'';position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff}
+.orange-unread-switch input:checked+.orange-unread-switch-track{background:#ff7900;border-color:#ff7900}
+.orange-unread-switch input:checked+.orange-unread-switch-track::after{transform:translateX(20px);background:#111}
+.orange-unread-switch input:focus-visible+.orange-unread-switch-track{outline:3px solid #fff;outline-offset:3px}
+.orange-incidents-filters form>.orange-incident-reset{grid-column:1/-1}
 .orange-communications-filter-form .form-control,.orange-communications-filter-form .custom-select{width:100%;min-width:0;max-width:100%;font-size:.82rem}
-.orange-communications-filters .orange-incident-reset{margin-top:12px}
 
 /* Five personal Orange indicators; account and logout remain Moodle's user menu. */
 .orange-personal-updates{display:flex;align-items:center;gap:4px;padding:0 6px}

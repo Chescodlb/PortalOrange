@@ -197,5 +197,13 @@ function xmldb_local_orangeportal_upgrade($oldversion): bool {
         // Announcement listing includes impact; no schema or permission changes.
         upgrade_plugin_savepoint(true, 2026111600, 'local', 'orangeportal');
     }
+    if ($oldversion < 2026111601) {
+        // Actionable unread-critical reading filters replace the overview card. No schema changes.
+        upgrade_plugin_savepoint(true, 2026111601, 'local', 'orangeportal');
+    }
+    if ($oldversion < 2026111602) {
+        // Automatic announcement/incident filters and reset controls at the top. No schema changes.
+        upgrade_plugin_savepoint(true, 2026111602, 'local', 'orangeportal');
+    }
     return true;
 }

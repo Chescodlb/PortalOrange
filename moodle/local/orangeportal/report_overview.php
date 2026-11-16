@@ -4,7 +4,6 @@ use local_orangeportal\reading_report;
 use local_orangeportal\report_scope;
 use local_orangeportal\training_report;
 $stats = reading_report::user_stats($since);
-$critical = reading_report::critical_pending();
 $totals = ['incidents' => [0, 0], 'notifications' => [0, 0]];
 foreach ($stats as $row) {
     foreach ($totals as $kind => &$values) { $values[0] += (int)$row->{$kind . '_total'}; $values[1] += (int)$row->{$kind . '_read'}; }
@@ -19,10 +18,6 @@ foreach ($totals as $kind => [$total, $read]) {
         html_writer::tag('p', get_string('reportreadcount', 'local_orangeportal') . ': ' . reading_report::ratio($read, $total)) .
         html_writer::link($reporturl(['section' => $kind]), get_string('view'), ['class' => 'btn btn-primary']), 'orange-tracking-card');
 }
-$pending = array_sum(array_map(fn($r) => (int)$r->pending, $critical));
-echo html_writer::div(html_writer::tag('h4', get_string('reportcriticalunread', 'local_orangeportal')) .
-    html_writer::tag('p', (string)$pending) . html_writer::tag('p', get_string('reportcriticalexplanation', 'local_orangeportal')),
-    'orange-tracking-card');
 echo html_writer::div(html_writer::tag('h4', get_string('reportusers', 'local_orangeportal')) .
     html_writer::tag('p', (string)count(report_scope::users())) .
     html_writer::link($reporturl(['section' => 'users']), get_string('view'), ['class' => 'btn btn-primary']), 'orange-tracking-card');

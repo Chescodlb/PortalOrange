@@ -15,7 +15,9 @@ if ($type === 'users') {
 } else if ($type === 'readings') {
     $kind = optional_param('kind', '', PARAM_ALPHA);
     $data = \local_orangeportal\reading_report::data($kind, optional_param('noticeid', 0, PARAM_INT),
-        optional_param('userid', 0, PARAM_INT), optional_param('reading', '', PARAM_ALPHA), 0, 0, \local_orangeportal\reading_report::since(optional_param('period', 'month', PARAM_ALPHA)));
+        optional_param('userid', 0, PARAM_INT), optional_param('reading', '', PARAM_ALPHA), 0, 0,
+        \local_orangeportal\reading_report::since(optional_param('period', 'month', PARAM_ALPHA)),
+        (bool)optional_param('criticalunread', 0, PARAM_BOOL));
     $columns = ['publication' => get_string('publication', 'local_orangeportal'), 'user' => get_string('fullnameuser'), 'collectives' => get_string('orangecollectives', 'local_orangeportal'),
         'received' => get_string('received', 'local_orangeportal'), 'read' => get_string('read', 'local_orangeportal')];
     $date = fn($v) => $v ? userdate($v, '%Y-%m-%d %H:%M') : '';

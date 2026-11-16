@@ -19,6 +19,7 @@ foreach (['incidents', 'notifications'] as $kind) {
         $reportparams[$kind . '_' . $key] = optional_param($kind . '_' . $key, 0, PARAM_INT);
     }
     $reportparams[$kind . '_reading'] = optional_param($kind . '_reading', '', PARAM_ALPHA);
+    $reportparams[$kind . '_criticalunread'] = optional_param($kind . '_criticalunread', 0, PARAM_BOOL);
 }
 // Keep existing links to a publication report working.
 if ($legacyid = optional_param('noticeid', 0, PARAM_INT)) {
@@ -29,6 +30,10 @@ $section = optional_param('section', $courseid ? 'courses' : 'overview', PARAM_A
 if (!empty($legacy)) { $section = $legacy->kind; }
 if (!in_array($section, ['overview', 'library', 'incidents', 'notifications', 'courses', 'users'], true)) { throw new invalid_parameter_exception('Unknown report section'); }
 $reportparams['section'] = $section;
+if (in_array($section, ['incidents', 'notifications'], true)) {
+    $PAGE->requires->js(new moodle_url('/local/orangeportal/notice_filters.js',
+        ['v' => filemtime(__DIR__ . '/notice_filters.js')]));
+}
 foreach (['library_document', 'library_page'] as $key) { $reportparams[$key] = optional_param($key, 0, PARAM_INT); }
 foreach (['library_search', 'library_usersearch', 'library_reading'] as $key) { $reportparams[$key] = optional_param($key, '', PARAM_TEXT); }
 foreach (['training_tab' => 'summary', 'training_search' => '', 'training_modality' => ''] as $key => $default) {
@@ -70,9 +75,9 @@ $filterform = static function(string $kind, string $fields) use (&$reportparams)
         if (str_starts_with($key, $kind . '_')) { continue; }
         $hidden .= html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $key, 'value' => $value]);
     }
-    $button = html_writer::tag('button', get_string('filter'), ['class' => 'btn btn-primary', 'type' => 'submit']);
-    return html_writer::tag('form', $hidden . $fields . $button, ['method' => 'get',
-        'action' => orange_link('reports.php')->out(false) . '#report-' . $kind, 'class' => 'orange-report-filters']);
+    return html_writer::tag('form', $hidden . $fields, ['method' => 'get',
+        'action' => orange_link('reports.php')->out(false) . '#report-' . $kind, 'class' => 'orange-report-filters',
+        'data-orange-auto-filter' => '1']);
 };
 $date = static fn($value) => $value ? userdate($value) : get_string('pending', 'local_orangeportal');
 $canexport = has_capability('local/orangeportal:exportreports', context_system::instance());
@@ -88,6 +93,11 @@ foreach (['overview', 'library', 'incidents', 'notifications', 'courses', 'users
 }
 echo html_writer::tag('nav', $tabs, ['class' => 'orange-category-tabs',
     'aria-label' => get_string('reportsection', 'local_orangeportal')]);
+if (in_array($section, ['incidents', 'notifications'], true)) {
+    echo html_writer::div(html_writer::link(orange_link('reports.php', ['section' => $section]),
+        get_string('incidentclearfilters', 'local_orangeportal'), ['class' => 'btn btn-outline-secondary']),
+        'orange-report-reset');
+}
 {
     $periodfields = html_writer::tag('label', get_string('reportperiod', 'local_orangeportal'), ['for' => 'report-period']) .
         html_writer::select(['week' => get_string('reportweek', 'local_orangeportal'),
@@ -110,8 +120,10 @@ echo html_writer::tag('nav', $tabs, ['class' => 'orange-category-tabs',
             $periodhidden .= html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $key, 'value' => $value]);
         }
     }
-    echo html_writer::tag('form', $periodhidden . $periodfields . html_writer::tag('button', get_string('filter'),
-        ['class' => 'btn btn-primary']), ['method' => 'get', 'class' => 'orange-report-filters']);
+    $periodbutton = in_array($section, ['incidents', 'notifications'], true) ? '' :
+        html_writer::tag('button', get_string('filter'), ['class' => 'btn btn-primary', 'type' => 'submit']);
+    echo html_writer::tag('form', $periodhidden . $periodfields . $periodbutton, ['method' => 'get', 'class' => 'orange-report-filters',
+        'data-orange-auto-filter' => in_array($section, ['incidents', 'notifications'], true) ? '1' : null]);
     echo html_writer::tag('p', get_string($section === 'library' ? 'libraryreporthelp' : 'reportperiodexplanation', 'local_orangeportal'), ['class' => 'text-muted']);
 }
 if ($section === 'library') { require(__DIR__ . '/report_library.php'); echo $OUTPUT->footer(); exit; }
@@ -124,17 +136,37 @@ if ($section === 'users') {
 if ($section === 'courses') { require(__DIR__ . '/report_training.php'); echo $OUTPUT->footer(); exit; }
 $kind = $section;
 $selectedid = $reportparams[$kind . '_notice'];
+$criticalunread = (bool)$reportparams[$kind . '_criticalunread'];
+if ($criticalunread) { $reportparams[$kind . '_reading'] = 'unread'; }
+$modeparams = [$kind . '_notice' => 0, $kind . '_user' => 0, $kind . '_page' => 0,
+    $kind . '_summary_page' => 0, $kind . '_history_page' => 0, $kind . '_revision' => 0];
+$modes = '';
+foreach ([0 => 'reportallpublications', 1 => 'reportcriticalpending'] as $value => $label) {
+    $active = $criticalunread === (bool)$value;
+    $attrs = ['class' => 'btn ' . ($active ? 'btn-primary' : 'btn-outline-secondary')];
+    if ($active) { $attrs['aria-current'] = 'true'; }
+    $modes .= html_writer::link($reporturl($modeparams + [$kind . '_criticalunread' => $value,
+        $kind . '_reading' => $value ? 'unread' : '']), get_string($label, 'local_orangeportal'), $attrs);
+}
+echo html_writer::tag('nav', $modes, ['class' => 'orange-report-filters orange-reading-modes',
+    'aria-label' => get_string('reportpublicationfilter', 'local_orangeportal')]);
+if ($criticalunread) {
+    echo html_writer::tag('p', get_string('reportcriticalpendinghelp', 'local_orangeportal'), ['class' => 'text-muted']);
+}
 if (!$selectedid) {
-    $data = reading_report::summary($kind, $reportparams[$kind . '_summary_page'], $perpage, 0, $since);
+    $data = reading_report::summary($kind, $reportparams[$kind . '_summary_page'], $perpage, 0, $since, $criticalunread);
     $table = new html_table();
     $table->attributes['class'] = 'generaltable orange-reading-summary';
-    $table->head = [get_string('publication', 'local_orangeportal'), get_string('reportdate', 'local_orangeportal'),
+    $table->head = [get_string('publication', 'local_orangeportal'), get_string('incidentcolumnimpact', 'local_orangeportal'),
+        get_string('reportdate', 'local_orangeportal'),
         get_string('reportrecipients', 'local_orangeportal'), get_string('reportunreadcount', 'local_orangeportal'),
         get_string('reportreadcount', 'local_orangeportal')];
     foreach ($data['rows'] as $notice) {
-        $url = $reporturl([$kind . '_notice' => $notice->id, $kind . '_user' => 0, $kind . '_reading' => '',
+        $url = $reporturl([$kind . '_notice' => $notice->id, $kind . '_user' => 0, $kind . '_reading' => $criticalunread ? 'unread' : '',
             $kind . '_page' => 0, $kind . '_history_page' => 0]);
-        $table->data[] = [html_writer::link($url, s($notice->title)), userdate($notice->publicationdate, get_string('strftimedatetime', 'langconfig')),
+        $table->data[] = [html_writer::link($url, s($notice->title)),
+            s(\local_orangeportal\service::impacts()[$notice->impact] ?? $notice->impact),
+            userdate($notice->publicationdate, get_string('strftimedatetime', 'langconfig')),
             $notice->recipients, reading_report::ratio($notice->unreadcount, $notice->recipients),
             reading_report::ratio($notice->readcount, $notice->recipients)];
     }
@@ -146,7 +178,13 @@ if (!$selectedid) {
     echo $OUTPUT->footer();
     exit;
 }
-$summary = reading_report::summary($kind, 0, $perpage, $selectedid);
+$summary = reading_report::summary($kind, 0, $perpage, $selectedid, $criticalunread ? $since : 0, $criticalunread);
+if (!$summary['rows'] && $criticalunread) {
+    echo html_writer::link($reporturl([$kind . '_notice' => 0]), get_string('backtolist', 'local_orangeportal'));
+    echo html_writer::tag('p', get_string('reportnoresults', 'local_orangeportal'));
+    echo $OUTPUT->footer();
+    exit;
+}
 if (!$summary['rows']) { throw new invalid_parameter_exception(get_string('reportnoresults', 'local_orangeportal')); }
 $selectednotice = reset($summary['rows']);
 echo html_writer::link($reporturl([$kind . '_notice' => 0]), get_string('backtolist', 'local_orangeportal'));
@@ -171,13 +209,16 @@ $users = \local_orangeportal\report_scope::users();
         'reading' => [get_string('updates_reading', 'local_orangeportal'), [
             '' => get_string('updates_allreading', 'local_orangeportal'), 'read' => get_string('read', 'local_orangeportal'),
             'unread' => get_string('updates_unread', 'local_orangeportal')], $reading]];
+    if ($criticalunread) { $choices['reading'][1] = ['unread' => get_string('updates_unread', 'local_orangeportal')]; }
+    $fields .= html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $kind . '_criticalunread', 'value' => (int)$criticalunread]);
     foreach ($choices as $key => [$label, $fieldchoices, $value]) {
         $name = $kind . '_' . $key;
         $fields .= html_writer::div(html_writer::tag('label', s($label), ['for' => $name]) .
             html_writer::select($fieldchoices, $name, $value, false, ['id' => $name, 'class' => 'custom-select']), 'orange-filter-field');
     }
     $content = $filterform($kind, $fields);
-    $data = reading_report::data($kind, $selectedid, $selecteduser, $reading, $reportparams[$kind . '_page'], $perpage);
+    $data = reading_report::data($kind, $selectedid, $selecteduser, $reading, $reportparams[$kind . '_page'],
+        $perpage, $criticalunread ? $since : 0, $criticalunread);
     $table = new html_table();
     $table->attributes['class'] = 'generaltable orange-reading-report';
     $table->head = [get_string('currentrecipient', 'local_orangeportal'),
@@ -191,12 +232,10 @@ $users = \local_orangeportal\report_scope::users();
     $content .= $OUTPUT->paging_bar($data['total'], $data['page'], $perpage, $reporturl([], 'report-' . $kind), $kind . '_page');
     if ($canexport) {
         $content .= html_writer::link(orange_link('export.php', ['type' => 'readings', 'kind' => $kind,
-            'noticeid' => $selectedid, 'userid' => $selecteduser, 'reading' => $reading] + \local_orangeportal\report_period::params()),
+            'noticeid' => $selectedid, 'userid' => $selecteduser, 'reading' => $reading,
+            'criticalunread' => (int)$criticalunread] + \local_orangeportal\report_period::params()),
             get_string('orangereadingexport', 'local_orangeportal'), ['class' => 'btn btn-outline-secondary']);
     }
-    $reset = [$kind . '_notice' => $selectedid, $kind . '_user' => 0, $kind . '_reading' => '',
-        $kind . '_page' => 0, $kind . '_history_page' => 0, $kind . '_revision' => 0];
-    $content .= html_writer::link($reporturl($reset, 'report-' . $kind), get_string('reportclearfilters', 'local_orangeportal'), ['class' => 'ml-3']);
     if ($selectedid && isset($notices[$selectedid])) {
         $notice = $notices[$selectedid];
         $conditions = ['noticeid' => $selectedid];
@@ -222,6 +261,7 @@ $users = \local_orangeportal\report_scope::users();
         foreach ($versions as $version) { $versionchoices[$version->revision] = get_string('version', 'local_orangeportal') . ' ' . $version->revision; }
         $versionnumber = $reportparams[$kind . '_revision'] ?: (int)$notice->revision;
         $versionfields = html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $kind . '_notice', 'value' => $selectedid]) .
+            html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $kind . '_criticalunread', 'value' => (int)$criticalunread]) .
             html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $kind . '_user', 'value' => $selecteduser]) .
             html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $kind . '_reading', 'value' => $reading]) .
             html_writer::tag('label', get_string('version', 'local_orangeportal'), ['for' => $kind . '_revision']) .
