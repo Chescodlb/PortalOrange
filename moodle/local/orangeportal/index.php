@@ -226,10 +226,15 @@ if (in_array($section, ['library', 'courses'])) {
                 $section === 'incidents' ? 'orange-incident-heading' : 'orange-notification-heading');
         }
         $cells = html_writer::tag('td', $titlecontent);
-        $cells .= html_writer::tag('td', orange_category_label((int)$notice->categoryid, $cats));
-        $cells .= html_writer::tag('td', s(userdate($notice->timecreated, '%d/%m/%Y')));
+        $values = [
+            'category' => orange_category_label((int)$notice->categoryid, $cats),
+            'date' => s(userdate($notice->timecreated, '%d/%m/%Y')),
+            'impact' => s(service::impacts()[$notice->impact]),
+        ];
+        foreach ($section === 'notifications' ? ['impact', 'date', 'category'] : ['category', 'date', 'impact'] as $column) {
+            $cells .= html_writer::tag('td', $values[$column]);
+        }
         if ($section === 'incidents') {
-            $cells .= html_writer::tag('td', s(service::impacts()[$notice->impact]));
             $cells .= html_writer::tag('td', html_writer::span(s(service::states()[$notice->state]),
                 'orange-status orange-status-' . $notice->state));
         }
@@ -239,7 +244,7 @@ if (in_array($section, ['library', 'courses'])) {
 if ($rows) {
     $headers = '';
     $columns = $section === 'incidents' ? ['title', 'category', 'date', 'impact', 'state', 'reading'] :
-        ['title', 'category', 'date'];
+        ['title', 'impact', 'date', 'category'];
     foreach ($columns as $column) {
         $key = $section === 'notifications' && $column === 'title' ? 'communicationcolumntitle' : 'incidentcolumn' . $column;
         $headers .= html_writer::tag('th', get_string($key, 'local_orangeportal'), ['scope' => 'col']);

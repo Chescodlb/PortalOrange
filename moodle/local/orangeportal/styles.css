@@ -169,9 +169,9 @@ body .navbar .orange-update{position:relative;display:flex;align-items:center;ju
 body .navbar .orange-update:hover,body .navbar .orange-update:focus-visible{background:#333;outline:2px solid #ff7900;outline-offset:-2px}
 @media(max-width:767px){.orange-personal-updates{gap:1px;padding:0 2px}.navbar .orange-personal-updates .orange-update{width:27px;height:42px}.orange-update svg{width:19px;height:19px}.orange-update-count{font-size:9px;min-width:14px;padding:0 3px;right:-1px}}
 
-/* Communications: reading is conveyed by the envelope, with three content columns. */
-.orange-notifications-table td:first-child{width:60%}
-.orange-notifications-table td:last-child{white-space:nowrap}
+/* Communications: title/description, impact, date and category; reading uses the envelope. */
+.orange-notifications-table td:first-child{width:50%}
+.orange-notifications-table td:nth-child(2),.orange-notifications-table td:nth-child(3){white-space:nowrap}
 
 /* Incident detail: title, one metadata table, description last. */
 .orange-incident-detail{margin-top:24px;min-width:0}

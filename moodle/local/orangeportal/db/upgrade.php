@@ -193,5 +193,9 @@ function xmldb_local_orangeportal_upgrade($oldversion): bool {
         \local_orangeportal\work_profiles::install();
         upgrade_plugin_savepoint(true, 2026111100, 'local', 'orangeportal');
     }
+    if ($oldversion < 2026111600) {
+        // Announcement listing includes impact; no schema or permission changes.
+        upgrade_plugin_savepoint(true, 2026111600, 'local', 'orangeportal');
+    }
     return true;
 }
