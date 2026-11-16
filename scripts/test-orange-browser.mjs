@@ -352,6 +352,38 @@ try {
       check(await evaluate(`!document.querySelector('.orange-personal-updates')&&fetch('/local/orangeportal/updates.php',{method:'POST',body:new URLSearchParams({sesskey:M.cfg.sesskey})}).then(r=>r.status===403)`),'Usuario externo conserva su portal y no accede a los contadores Orange');
       console.log('Verificaciones de actualización automática completas: '+results.length);
     } finally { console.log(fixtureCommand('cleanup').trim()); }
+  } else if (process.argv.includes('--notice-opening-profiles-only')) {
+    const fixtureCommand=(action,token='')=>execFileSync('docker',['compose','exec','-T','web','php',
+      'local/orangeportal/cli/native_content_browser_fixture.php',action,token],{encoding:'utf8'});
+    const fixture=JSON.parse(fixtureCommand('create'));
+    const moduleid=fixture.modules[fixture.course];
+    const resources='/local/orangeportal/resources.php?notice='+fixture.notice;
+    const view='/local/orangeportal/view.php?id='+fixture.notice;
+    const configure=async value=>{
+      await navigate(resources);
+      await wait(`!!document.querySelector('select[name="openactivity"]')`);
+      await evaluate(`document.querySelector('select[name="openactivity"]').value=${JSON.stringify(String(value))};document.querySelector('[name="submitbutton"]').click()`);
+      await wait(`!!document.querySelector('.alert-success')&&document.readyState!=='loading'`);
+    };
+    try {
+      await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
+      await configure(moduleid);
+      await logout();
+      for (const username of ['formador.orange','admin.orange','agente.orange']) {
+        await login(username,env.ORANGE_DEMO_PASSWORD);
+        await navigate(view);
+        await wait(`location.pathname==='/mod/page/view.php'&&new URLSearchParams(location.search).get('id')==='${moduleid}'`);
+        check(await evaluate(`!document.querySelector('.orange-notice-content')&&document.body.textContent.includes('ORANGE-NATIVE-')`), username+': abre la actividad sin ficha intermedia');
+        await navigate(view+'&detail=1');
+        check(await evaluate(`!!document.querySelector('.orange-notice-resources')`), username+': Ver ficha conserva acceso explícito');
+        await logout();
+      }
+      await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
+      await configure(0);
+      await navigate(view);
+      check(await evaluate(`location.pathname==='/local/orangeportal/view.php'&&!!document.querySelector('.orange-notice-resources')`), 'Sin actividad seleccionada abre la ficha');
+    } finally { console.log(fixtureCommand('cleanup',fixture.token).trim()); }
+    console.log('Verificaciones de apertura por perfil: '+results.length);
   } else if (process.argv.includes('--notice-opening-only')) {
     const fixture=JSON.parse(await readFile('backups/previews/native-content-fixture.json','utf8'));
     const moduleid=fixture.modules[fixture.course];
@@ -373,7 +405,8 @@ try {
     check(await evaluate(`!document.querySelector('select[name="openactivity"]')`),'El formulario inicial no pide recursos todavía inexistentes');
     await configure(moduleid);
     await navigate(view);
-    check(await evaluate(`location.pathname==='/local/orangeportal/view.php'&&!!document.querySelector('.orange-notice-resources')`),'Formador siempre abre la ficha aunque el agente abra un recurso');
+    await wait(`location.pathname==='/mod/page/view.php'&&new URLSearchParams(location.search).get('id')==='${moduleid}'`);
+    check(true,'Formador también abre la actividad configurada sin ficha intermedia');
     await navigate(resources);
     await evaluate(`document.querySelector('button.section-modchooser-link').click()`);
     await wait(`!!document.querySelector('.modal.show .modchooser [data-internal="url"] a[data-action="add-chooser-option"]')`);

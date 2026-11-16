@@ -205,5 +205,9 @@ function xmldb_local_orangeportal_upgrade($oldversion): bool {
         // Automatic announcement/incident filters and reset controls at the top. No schema changes.
         upgrade_plugin_savepoint(true, 2026111602, 'local', 'orangeportal');
     }
+    if ($oldversion < 2026111603) {
+        // Respect the configured opening activity for staff as well as recipients. No schema changes.
+        upgrade_plugin_savepoint(true, 2026111603, 'local', 'orangeportal');
+    }
     return true;
 }

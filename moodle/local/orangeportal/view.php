@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else { throw new invalid_parameter_exception(get_string('unknownaction', 'local_orangeportal')); }
     redirect($url, get_string('changessaved', 'local_orangeportal'), null, \core\output\notification::NOTIFY_SUCCESS);
 }
-if (!service::manager() && !is_siteadmin() && !optional_param('detail', 0, PARAM_BOOL) &&
+if (!optional_param('detail', 0, PARAM_BOOL) &&
         ($activity = \local_orangeportal\native_content::opening_activity($notice))) {
     service::receipt($notice, 'readtime');
     redirect(orange_link('activity.php', ['id' => $activity->id, 'direct' => 1, 'sesskey' => sesskey()]));
