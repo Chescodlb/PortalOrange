@@ -164,6 +164,14 @@ body .orange-incidents-table td:nth-child(2){width:34%;min-width:240px}
 .orange-unread-switch input:checked+.orange-unread-switch-track{background:#ff7900;border-color:#ff7900}
 .orange-unread-switch input:checked+.orange-unread-switch-track::after{transform:translateX(20px);background:#111}
 .orange-unread-switch input:focus-visible+.orange-unread-switch-track{outline:3px solid #fff;outline-offset:3px}
+.orange-priority-badge{display:inline-block;padding:5px 9px;border-radius:5px;background:#ff7900;color:#111;font-weight:700;white-space:nowrap}
+.mform .fitem.orange-priority-control .form-check{align-items:center;padding-left:0;gap:10px;min-height:28px}
+.mform .fitem.orange-priority-control .form-check>label{margin:0;line-height:1.5}
+body input.orange-priority-control[type="checkbox"]{appearance:none;-webkit-appearance:none;position:relative;display:inline-block;flex:0 0 48px;float:none;width:48px;height:28px;min-width:48px;margin:0;border:2px solid #626a72;border-radius:16px;background:#626a72;vertical-align:middle;cursor:pointer;box-shadow:none}
+body input.orange-priority-control[type="checkbox"]::after{content:'';position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff}
+body input.orange-priority-control[type="checkbox"]:checked{background:#ff7900;border-color:#ff7900}
+body input.orange-priority-control[type="checkbox"]:checked::after{transform:translateX(20px);background:#111}
+body input.orange-priority-control[type="checkbox"]:focus-visible{outline:3px solid #005a9c;outline-offset:3px}
 .orange-incidents-filters form>.orange-incident-reset{grid-column:1/-1}
 .orange-communications-filter-form .form-control,.orange-communications-filter-form .custom-select{width:100%;min-width:0;max-width:100%;font-size:.82rem}
 

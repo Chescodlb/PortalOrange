@@ -25,12 +25,18 @@ class notice extends \moodleform {
         $m->setType('body', PARAM_RAW);
         $m->addElement('static', 'resourcenote', '', get_string('nativenoticeinstructions', 'local_orangeportal'));
         $current = $this->_customdata['current'] ?? null;
-        $impact = $current->impact ?? \local_orangeportal\notice_options::default_code('impacts');
+        $impact = $current->impact ?? ($kind === 'notifications' ? 'normal' : \local_orangeportal\notice_options::default_code('impacts'));
         $state = $current->state ?? \local_orangeportal\notice_options::default_code('states');
-        $m->addElement('select', 'impact', get_string('incidentcolumnimpact', 'local_orangeportal'), \local_orangeportal\service::impacts(true, $impact));
+        if ($kind === 'notifications') {
+            $m->addElement('advcheckbox', 'priority', get_string('noticepriority', 'local_orangeportal'), '',
+                ['class' => 'orange-priority-control', 'role' => 'switch']);
+            $m->setDefault('priority', $impact === 'critical' ? 1 : 0);
+        } else {
+            $m->addElement('select', 'impact', get_string('incidentcolumnimpact', 'local_orangeportal'), \local_orangeportal\service::impacts(true, $impact));
+            $m->setDefault('impact', $impact);
+        }
         $m->addElement('select', 'state', get_string('sharedstate', 'local_orangeportal'), \local_orangeportal\service::states(true, $state));
         // Frozen selects export their configured value, not the first option.
-        $m->setDefault('impact', $impact);
         $m->setDefault('state', $state);
         if ($kind === 'notifications') {
             // Read-only values must override stale or altered hidden POST fields.

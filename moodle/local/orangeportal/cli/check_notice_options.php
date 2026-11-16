@@ -2,9 +2,11 @@
 /** Catalogue regression checks: all temporary data and settings are restored. */
 define('CLI_SCRIPT', true);
 require(__DIR__ . '/../../../config.php');
+require_once($CFG->libdir . '/clilib.php');
 use local_orangeportal\notice_options as options;
 use local_orangeportal\service;
 if (!str_starts_with($CFG->wwwroot, 'http://localhost:')) { cli_error('Prueba limitada a local.'); }
+\cache_helper::purge_by_definition('core', 'config');
 $original = [];
 foreach (['states', 'impacts'] as $type) { $original[$type] = get_config('local_orangeportal', 'notice_' . $type); }
 $tx = $DB->start_delegated_transaction();
@@ -24,12 +26,16 @@ $failure = null;
 try {
     $editor = $DB->get_record('user', ['username' => 'editor.orange'], '*', MUST_EXIST);
     $coordinator = $DB->get_record('user', ['username' => 'coordinador.orange'], '*', MUST_EXIST);
+    $optionsadmin = $DB->get_record('user', ['username' => 'admin.orange'], '*', MUST_EXIST);
     $agent = $DB->get_record('user', ['username' => 'agente.orange'], '*', MUST_EXIST);
-    foreach ([$editor, $coordinator] as $user) {
+    foreach ([$editor, $optionsadmin] as $user) {
         \core\session\manager::set_user($user);
         option_check(has_capability('local/orangeportal:manageoptions', context_system::instance()), 'Acceso de ' . $user->username);
     }
+    \core\session\manager::set_user($coordinator);
     option_check(!has_capability('local/orangeportal:manage', context_system::instance()), 'Coordinador no recibe publicación');
+    option_denied(fn() => options::save('impacts', '', 'Sin permiso', true, null, true), 'nopermissions', 'Coordinador de seguimiento no configura alertas');
+    \core\session\manager::set_user($optionsadmin);
     $state = options::save('states', '', 'Estado de prueba', true);
     $impact = options::save('impacts', '', 'Impacto de prueba', true);
     option_check(isset(service::states()[$state]) && isset(service::impacts()[$impact]), 'Crear estado e impacto');
@@ -57,10 +63,10 @@ try {
     option_check($DB->get_field('local_orange_notice', 'state', ['id' => $id]) === $state, 'Guardar aviso conserva opción inactiva actual');
     $newnotice = clone $notice; unset($newnotice->id, $newnotice->revision);
     option_denied(fn() => service::save_notice($newnotice, $targets), 'inactiveoptionselection', 'Nuevo aviso no acepta opción inactiva');
-    \core\session\manager::set_user($agent);
+    \core\session\manager::set_user($editor);
     service::change_state($notice, 'open');
     option_denied(fn() => service::change_state($notice, $state), 'inactiveoptionselection', 'No reasigna estado inactivo usando aviso antiguo');
-    \core\session\manager::set_user($coordinator);
+    \core\session\manager::set_user($optionsadmin);
     option_denied(fn() => options::delete('states', $state), 'optioninuse', 'Estado solo presente en histórico queda protegido');
     $unused = options::save('states', '', 'Opción sin uso', true);
     options::delete('states', $unused);
@@ -68,7 +74,7 @@ try {
     foreach (options::records('states') as $key => $record) {
         if ($key !== 'open') { options::save('states', $key, $record['name'], false); }
     }
-    option_denied(fn() => options::save('states', 'open', 'Abierta', false), 'lastactiveoption', 'No desactiva la última opción activa');
+    option_denied(fn() => options::save('states', 'open', 'Abierta', false), 'incidentneedopenstate', 'No desactiva el último estado abierto activo');
     $last = options::save('impacts', '', 'Último impacto de prueba', true);
     foreach (options::records('impacts') as $key => $record) {
         if ($key !== $last) { options::save('impacts', $key, $record['name'], false); }
@@ -87,4 +93,5 @@ foreach ($original as $type => $value) {
     if ($value === false) { unset_config('notice_' . $type, 'local_orangeportal'); }
     else { set_config('notice_' . $type, $value, 'local_orangeportal'); }
 }
+\cache_helper::purge_by_definition('core', 'config');
 if ($failure) { cli_error($failure->getMessage()); }

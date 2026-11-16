@@ -423,12 +423,12 @@ $string['reportincidentunread'] = 'Unread incidents';
 $string['reportincidentread'] = 'Read incidents';
 $string['reportnotificationunread'] = 'Unread announcements';
 $string['reportnotificationread'] = 'Read announcements';
-$string['reportcriticalunread'] = 'Unread critical · all time';
+$string['reportcriticalunread'] = 'Unread critical incidents and priority announcements · all time';
 $string['reportallpublications'] = 'All publications';
 $string['reportcriticalpending'] = 'Unread critical';
 $string['reportpublicationfilter'] = 'Filter publications';
 $string['reportcriticalpendinghelp'] = 'Critical publications with recipients still to read them within the selected period and collective. Closed incidents are excluded. Select All time to review older publications.';
-$string['reportcriticalexplanation'] = 'Pending critical items across all currently published history; closed incidents are excluded. Pending order uses the selected period.';
+$string['reportcriticalexplanation'] = 'Pending critical incidents and priority announcements across all currently published history; closed incidents are excluded. Pending order uses the selected period.';
 $string['reporttrainingfinished'] = 'Completed training';
 $string['reporttrainingrestricted'] = 'No training authorised for tracking';
 $string['reportfinished'] = 'Completed';
@@ -685,3 +685,12 @@ $string['workprofileinvalid'] = 'The profile or its scope is invalid.';
 $string['workprofilerolemissing'] = 'Role {$a} is missing. Complete the Orange Portal plugin upgrade before assigning profiles.';
 $string['workprofilecustomrole'] = 'The permissions of role {$a} differ from the expected definition. The site administrator must review it before it can be assigned through Orange.';
 $string['workprofileconflict'] = 'The change was not saved: other roles or overrides still grant {$a}. The site administrator must review those assignments before switching this account to consultation. Profiles managed through Orange are replaced automatically.';
+
+// Independent incident alerts and binary announcement priority.
+$string['noticepriority'] = 'Priority';
+$string['noticeprioritynormal'] = 'Normal';
+$string['impactcriticalalert'] = 'Enable critical alert';
+$string['impactcriticalalerthelp'] = 'Applies to incidents. Enables the red indicator, counters and unread critical filter for this impact regardless of its name. Does not reset readings or send notifications.';
+$string['updates_prioritysummary'] = 'Unread priority announcements: {$a->critical}. Total unread: {$a->total}';
+$string['reportprioritypending'] = 'Unread priority announcements';
+$string['reportprioritypendinghelp'] = 'Priority announcements with unread recipients in the selected period and cohort. Select All history to review older announcements.';

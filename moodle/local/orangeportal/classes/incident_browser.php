@@ -88,7 +88,7 @@ class incident_browser {
         $rows = ''; $count = 0;
         foreach ($scope as $n) {
             if ($personal && !personal_updates::recipient($n)) { continue; }
-            if (($priority === 'critical' && $n->impact !== 'critical') || ($priority === 'normal' && $n->impact === 'critical')) { continue; }
+            if (($priority === 'critical' && !service::priority($n)) || ($priority === 'normal' && service::priority($n))) { continue; }
             if ($error) { continue; }
             $closed = notice_options::is_closed($n->state);
             if (($state === 'openonly' && $closed) || ($state === 'closedonly' && !$closed) ||

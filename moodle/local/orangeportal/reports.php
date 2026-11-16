@@ -146,12 +146,12 @@ foreach ([0 => 'reportallpublications', 1 => 'reportcriticalpending'] as $value 
     $attrs = ['class' => 'btn ' . ($active ? 'btn-primary' : 'btn-outline-secondary')];
     if ($active) { $attrs['aria-current'] = 'true'; }
     $modes .= html_writer::link($reporturl($modeparams + [$kind . '_criticalunread' => $value,
-        $kind . '_reading' => $value ? 'unread' : '']), get_string($label, 'local_orangeportal'), $attrs);
+        $kind . '_reading' => $value ? 'unread' : '']), get_string($kind === 'notifications' && $value ? 'reportprioritypending' : $label, 'local_orangeportal'), $attrs);
 }
 echo html_writer::tag('nav', $modes, ['class' => 'orange-report-filters orange-reading-modes',
     'aria-label' => get_string('reportpublicationfilter', 'local_orangeportal')]);
 if ($criticalunread) {
-    echo html_writer::tag('p', get_string('reportcriticalpendinghelp', 'local_orangeportal'), ['class' => 'text-muted']);
+    echo html_writer::tag('p', get_string($kind === 'notifications' ? 'reportprioritypendinghelp' : 'reportcriticalpendinghelp', 'local_orangeportal'), ['class' => 'text-muted']);
 }
 if (!$selectedid) {
     $data = reading_report::summary($kind, $reportparams[$kind . '_summary_page'], $perpage, 0, $since, $criticalunread);
@@ -165,7 +165,7 @@ if (!$selectedid) {
         $url = $reporturl([$kind . '_notice' => $notice->id, $kind . '_user' => 0, $kind . '_reading' => $criticalunread ? 'unread' : '',
             $kind . '_page' => 0, $kind . '_history_page' => 0]);
         $table->data[] = [html_writer::link($url, s($notice->title)),
-            s(\local_orangeportal\service::impacts()[$notice->impact] ?? $notice->impact),
+            s(\local_orangeportal\service::impact_label((object)['kind' => $kind, 'impact' => $notice->impact], true)),
             userdate($notice->publicationdate, get_string('strftimedatetime', 'langconfig')),
             $notice->recipients, reading_report::ratio($notice->unreadcount, $notice->recipients),
             reading_report::ratio($notice->readcount, $notice->recipients)];

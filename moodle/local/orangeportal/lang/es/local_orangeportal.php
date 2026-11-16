@@ -423,12 +423,12 @@ $string['reportincidentunread'] = 'Incidencias sin leer';
 $string['reportincidentread'] = 'Incidencias leídas';
 $string['reportnotificationunread'] = 'Comunicados sin leer';
 $string['reportnotificationread'] = 'Comunicados leídos';
-$string['reportcriticalunread'] = 'Críticas sin leer · histórico';
+$string['reportcriticalunread'] = 'Críticas y prioritarios sin leer · histórico';
 $string['reportallpublications'] = 'Todas las publicaciones';
 $string['reportcriticalpending'] = 'Críticas sin leer';
 $string['reportpublicationfilter'] = 'Filtrar publicaciones';
 $string['reportcriticalpendinghelp'] = 'Publicaciones críticas con destinatarios pendientes de lectura dentro del período y colectivo seleccionados. Las incidencias cerradas quedan excluidas. Para revisar las anteriores, selecciona Todo el histórico.';
-$string['reportcriticalexplanation'] = 'Críticas pendientes de todo el histórico vigente; excluye incidencias cerradas. El orden por pendientes usa el periodo seleccionado.';
+$string['reportcriticalexplanation'] = 'Incidencias críticas y comunicados prioritarios pendientes de todo el histórico vigente; excluye incidencias cerradas. El orden por pendientes usa el periodo seleccionado.';
 $string['reporttrainingfinished'] = 'Formaciones finalizadas';
 $string['reporttrainingrestricted'] = 'Sin formaciones autorizadas para seguimiento';
 $string['reportfinished'] = 'Finalizada';
@@ -685,3 +685,12 @@ $string['workprofileinvalid'] = 'El perfil o su ámbito no son válidos.';
 $string['workprofilerolemissing'] = 'Falta el rol {$a}. Completa la actualización del plugin Portal Orange antes de asignar perfiles.';
 $string['workprofilecustomrole'] = 'Los permisos del rol {$a} difieren de los previstos. El administrador general debe revisar su definición antes de asignarlo desde Orange.';
 $string['workprofileconflict'] = 'No se ha guardado el cambio: la cuenta conserva otros roles o excepciones que conceden {$a}. El administrador general debe revisar esas asignaciones antes de convertirla en un perfil de consulta. Los perfiles gestionados desde Orange sí se sustituyen automáticamente.';
+
+// Independent incident alerts and binary announcement priority.
+$string['noticepriority'] = 'Prioritario';
+$string['noticeprioritynormal'] = 'Normal';
+$string['impactcriticalalert'] = 'Activar alerta crítica';
+$string['impactcriticalalerthelp'] = 'Se aplica a Incidencias. Activa el indicador rojo, los contadores y el filtro de críticas sin leer para este impacto, independientemente de su nombre. No reinicia lecturas ni envía avisos.';
+$string['updates_prioritysummary'] = 'Prioritarios sin leer: {$a->critical}. Total sin leer: {$a->total}';
+$string['reportprioritypending'] = 'Prioritarios sin leer';
+$string['reportprioritypendinghelp'] = 'Comunicados prioritarios con destinatarios pendientes de lectura dentro del período y colectivo seleccionados. Para revisar los anteriores, selecciona Todo el histórico.';

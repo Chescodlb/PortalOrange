@@ -637,6 +637,63 @@ try {
     check(await evaluate(`!document.querySelector('.orange-user-summary')&&!document.querySelector('.orange-user-tabs')`),'Agente no accede al seguimiento de otras personas');
     await writeFile('backups/previews/user-report-checks.json',JSON.stringify({date:new Date().toISOString(),results},null,2));
     console.log('Verificaciones de seguimiento individual: '+results.length);
+  } else if (process.argv.includes('--priority-impacts-only')) {
+    const fixtureCommand=(action,token='')=>execFileSync('docker',['compose','exec','-T','web','php',
+      'local/orangeportal/cli/priority_browser_fixture.php',action,token],{encoding:'utf8'});
+    const fixture=JSON.parse(fixtureCommand('create'));
+    try {
+      await login('admin.orange',env.ORANGE_DEMO_PASSWORD);
+      for (const language of ['es','en']) {
+        await navigate('/local/orangeportal/manage.php?kind=notifications&id='+fixture.notices.priority+'&lang='+language);
+        await wait(`!!document.querySelector('input[name="priority"][type="checkbox"]')`);
+        check(await evaluate(`document.querySelector('input[name="priority"][type="checkbox"]').checked&&!document.querySelector('select[name="impact"]')&&!document.body.innerText.includes('[[')`), language+': comunicado prioritario usa interruptor y conserva selección al editar');
+        await navigate('/local/orangeportal/manage.php?kind=notifications&id='+fixture.notices.normal+'&lang='+language);
+        check(await evaluate(`!document.querySelector('input[name="priority"][type="checkbox"]').checked`),language+': comunicado normal tiene interruptor desactivado');
+        await navigate('/local/orangeportal/options.php?type=impacts&code='+fixture.impact+'&lang='+language);
+        check(await evaluate(`!!document.querySelector('input[name="critical"][role="switch"]')&&!document.body.innerText.includes('[[')`),language+': catálogo permite clasificar alerta crítica');
+      }
+      await navigate('/local/orangeportal/manage.php?kind=notifications&id='+fixture.notices.normal+'&lang=es');
+      await evaluate(`document.querySelector('input[name="priority"][type="checkbox"]').click();document.querySelector('[name="submitbutton"]').click()`);
+      await wait(`location.pathname==='/local/orangeportal/manage.php'&&!!document.querySelector('.alert-success')`);
+      await navigate('/local/orangeportal/manage.php?kind=notifications&id='+fixture.notices.normal);
+      check(await evaluate(`document.querySelector('input[name="priority"][type="checkbox"]').checked`),'Guardar comunicado convierte el interruptor en prioridad persistente');
+      await evaluate(`document.querySelector('input[name="priority"][type="checkbox"]').click();document.querySelector('[name="submitbutton"]').click()`);
+      await wait(`location.pathname==='/local/orangeportal/manage.php'&&!!document.querySelector('.alert-success')`);
+      await navigate('/local/orangeportal/options.php?type=impacts&code='+fixture.impact);
+      await evaluate(`document.querySelector('input[name="critical"][type="checkbox"]').click();document.querySelector('[name="submitbutton"]').click()`);
+      await wait(`!!document.querySelector('.alert-success')`);
+      await navigate('/local/orangeportal/options.php?type=impacts&code='+fixture.impact);
+      check(await evaluate(`document.querySelector('input[name="critical"][type="checkbox"]').checked`),'Alfa conserva alerta crítica al guardar');
+      await screenshot('impacto-alerta-configurable');
+      await logout();
+      await login('agente.orange',env.ORANGE_DEMO_PASSWORD);
+      await navigate('/local/orangeportal/index.php?section=notifications&unread=0&q='+fixture.token);
+      await wait(`document.querySelectorAll('.orange-notifications-table tbody tr').length===2`);
+      check(await evaluate(`Array.from(document.querySelectorAll('.orange-notifications-table tbody tr')).every(r=>r.cells[1].textContent.trim()===(r.textContent.includes('priority')&&!r.textContent.includes('normal')?'Prioritario':''))`),'Tabla distingue Prioritario con etiqueta y deja Normal vacío');
+      check(await evaluate(`document.querySelector('.orange-priority-badge')?.textContent==='Prioritario'&&Array.from(document.querySelectorAll('select[name="impact"] option')).map(o=>o.value).join(',')===',normal,critical'`),'Comunicados solo permite filtrar normal o prioritario');
+      check(await evaluate(`document.querySelector('[data-update="notifications"]').classList.contains('is-critical')&&document.querySelector('[data-update="notifications"]').title.includes('Prioritarios sin leer')`),'Campana roja y texto de prioritarios sin leer');
+      await screenshot('comunicados-prioridad-tabla');
+      await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+      check(await evaluate(`document.documentElement.scrollWidth<=innerWidth`),'Etiqueta prioritaria y filtros sin desbordamiento móvil');
+      await send('Emulation.clearDeviceMetricsOverride');
+      await navigate('/local/orangeportal/index.php?section=incidents&priority=critical&q='+fixture.token);
+      check(await evaluate(`!!document.querySelector('a.orange-incident-title[href*="id=${fixture.notices.alpha}"]')&&document.querySelector('[data-update="incidents"]').classList.contains('is-critical')`),'Impacto Alfa activa icono rojo y aparece en el filtro de críticas');
+      await wait(`document.querySelector('.orange-personal-updates').dataset.liveUpdates==='1'`);
+      const beforeAlert=await evaluate(`({critical:Number(document.querySelector('[data-update="incidents"]').dataset.critical),total:Number(document.querySelector('[data-update="incidents"]').dataset.total),priority:Number(document.querySelector('[data-update="notifications"]').dataset.critical)})`);
+      fixtureCommand('disable',fixture.token);
+      await evaluate(`window.dispatchEvent(new Event('focus'))`);
+      await wait(`Number(document.querySelector('[data-update="incidents"]').dataset.critical)===${beforeAlert.critical-1}`);
+      check(await evaluate(`Number(document.querySelector('[data-update="incidents"]').dataset.total)===${beforeAlert.total}&&Number(document.querySelector('[data-update="notifications"]').dataset.critical)===${beforeAlert.priority}`),
+        'Refresco automático aplica la nueva clasificación sin perder pendientes ni afectar Comunicados');
+      fixtureCommand('enable',fixture.token);
+      await logout();
+      await login('admin.orange',env.ORANGE_DEMO_PASSWORD);
+      await navigate('/local/orangeportal/reports.php?section=notifications&period=all&lang=es');
+      check(await evaluate(`document.querySelector('.orange-reading-modes').textContent.includes('Prioritarios sin leer')`),'Seguimiento de Comunicados usa Prioritarios sin leer');
+      await navigate('/local/orangeportal/reports.php?section=incidents&period=all&incidents_criticalunread=1');
+      check(await evaluate(`!!document.querySelector('.orange-reading-summary a[href*="incidents_notice=${fixture.notices.alpha}"]')`),'Seguimiento incluye Alfa por su clasificación configurable');
+    } finally { console.log(fixtureCommand('cleanup',fixture.token).trim()); }
+    console.log('Verificaciones de prioridad e impactos: '+results.length);
   } else if (process.argv.includes('--auto-notice-filters-only')) {
     await login('formador.orange', env.ORANGE_DEMO_PASSWORD);
     for (const section of ['notifications', 'incidents']) {

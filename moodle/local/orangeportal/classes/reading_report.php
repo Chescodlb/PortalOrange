@@ -98,7 +98,14 @@ class reading_report {
     /** Shared by the actionable list, its recipient detail, exports and historical user statistics. */
     private static function critical_unread_where(string $readtime, array &$params): string {
         global $DB;
-        $where = " AND n.impact='critical' AND ($readtime)=0";
+        $codes = notice_options::critical_codes();
+        $incidentcritical = '1=0';
+        if ($codes) {
+            [$sql, $extra] = $DB->get_in_or_equal($codes, SQL_PARAMS_NAMED, 'alertimpact');
+            $incidentcritical = "n.impact $sql";
+            $params += $extra;
+        }
+        $where = " AND ((n.kind='notifications' AND n.impact='critical') OR (n.kind='incidents' AND $incidentcritical)) AND ($readtime)=0";
         $closed = array_keys(array_filter(notice_options::records('states'), static fn($r, $code) =>
             notice_options::is_closed($code), ARRAY_FILTER_USE_BOTH));
         if ($closed) {

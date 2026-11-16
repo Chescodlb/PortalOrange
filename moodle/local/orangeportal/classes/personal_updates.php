@@ -46,7 +46,7 @@ class personal_updates {
                 $r = service::get_receipt($notice, (int)$USER->id);
                 if ($r && ($r->readtime || $r->confirmed)) { continue; }
                 $counts[$kind]++;
-                if ($notice->impact === 'critical') { $counts[$kind . 'critical']++; }
+                if (service::priority($notice)) { $counts[$kind . 'critical']++; }
             }
         }
         $joined = self::joined();
@@ -79,7 +79,7 @@ class personal_updates {
             $label = get_string('updates_' . $key, 'local_orangeportal');
             $description = $label . ': ' . $total;
             if ($critical) {
-                $description .= '. ' . get_string('updates_criticalsummary', 'local_orangeportal',
+                $description .= '. ' . get_string($key === 'notifications' ? 'updates_prioritysummary' : 'updates_criticalsummary', 'local_orangeportal',
                     (object)['critical' => $critical, 'total' => $total]);
             }
             $indicators[] = ['key' => $key, 'count' => $count, 'total' => $total, 'critical' => $critical,

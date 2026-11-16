@@ -40,7 +40,8 @@ if ($id || $new || $_SERVER['REQUEST_METHOD'] === 'POST') {
         $record = (object)['id' => $data->id, 'revision' => $data->revision, 'kind' => $data->kind, 'categoryid' => $data->categoryid,
             'title' => $data->title, 'content' => format_text($data->body['text'], $data->body['format'],
                 ['context' => context_system::instance(), 'filter' => false]),
-            'impact' => $data->impact, 'state' => $data->state, 'published' => (int)$data->published, 'orangenotifyteams' => !empty($data->orangenotifyteams)];
+            'impact' => $kind === 'notifications' ? (!empty($data->priority) ? 'critical' : 'normal') : $data->impact,
+            'state' => $data->state, 'published' => (int)$data->published, 'orangenotifyteams' => !empty($data->orangenotifyteams)];
         if ($kind === 'incidents') { $record->client = $data->client; $record->product = $data->product; }
         $savedid = service::save_notice($record, ['user' => $data->users ?? [], 'cohort' => $data->cohorts ?? [], 'group' => $data->groups ?? []]);
         if (!empty($data->saveandresources)) {
@@ -52,6 +53,7 @@ if ($id || $new || $_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($id) {
         $record = $DB->get_record('local_orange_notice', ['id' => $id, 'kind' => $kind], '*', MUST_EXIST);
         $record->body = ['text' => $record->content, 'format' => FORMAT_HTML];
+        if ($kind === 'notifications') { $record->priority = $record->impact === 'critical' ? 1 : 0; }
         $record->users = []; $record->cohorts = []; $record->groups = [];
         foreach ($DB->get_records('local_orange_audience', ['noticeid' => $id]) as $a) {
             $field = ['user' => 'users', 'cohort' => 'cohorts', 'group' => 'groups'][$a->targettype];

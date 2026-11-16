@@ -34,6 +34,25 @@ class notice_options {
     public static function is_closed(string $state): bool {
         return (bool)(self::records('states')[$state]['closed'] ?? ($state === 'closed'));
     }
+    /** Classification is independent of the editable impact name and includes inactive impacts still in use. */
+    public static function is_critical(string $impact): bool {
+        return (bool)(self::records('impacts')[$impact]['critical'] ?? ($impact === 'critical'));
+    }
+    public static function critical_codes(): array {
+        return array_keys(array_filter(self::records('impacts'),
+            static fn($record, $code) => self::is_critical($code), ARRAY_FILTER_USE_BOTH));
+    }
+    /** Idempotent upgrade: preserve all publication/reading metadata and existing alert choices. */
+    public static function migrate_priorities(): void {
+        global $DB;
+        $records = self::records('impacts');
+        foreach ($records as $code => &$record) {
+            if (!array_key_exists('critical', $record)) { $record['critical'] = $code === 'critical'; }
+        }
+        unset($record);
+        set_config('notice_impacts', json_encode($records, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), 'local_orangeportal');
+        $DB->execute("UPDATE {local_orange_notice} SET impact='normal' WHERE kind='notifications' AND impact<>'critical' AND impact<>'normal'");
+    }
     public static function with_lock(callable $action) {
         $lock = \core\lock\lock_config::get_lock_factory('local_orangeportal')->get_lock('notice_options', 10);
         if (!$lock) { throw new \moodle_exception('locktimeout'); }
@@ -46,14 +65,17 @@ class notice_options {
     public static function used(string $type, string $code): bool {
         global $DB;
         self::check_type($type);
+        // Announcement priority is binary and does not reference the incident impact catalogue.
+        if ($type === 'impacts') { return $DB->record_exists('local_orange_notice', ['kind' => 'incidents', 'impact' => $code]); }
         $field = $type === 'states' ? 'state' : 'impact';
         return $DB->record_exists('local_orange_notice', [$field => $code]) ||
             ($type === 'states' && $DB->record_exists_select('local_orange_state_log',
                 'oldstate = ? OR newstate = ?', [$code, $code]));
     }
-    public static function save(string $type, string $code, string $name, bool $active, ?bool $closed = null): string {
+    public static function save(string $type, string $code, string $name, bool $active, ?bool $closed = null,
+            ?bool $critical = null): string {
         require_capability('local/orangeportal:manageoptions', \context_system::instance());
-        return self::with_lock(function() use ($type, $code, $name, $active, $closed) {
+        return self::with_lock(function() use ($type, $code, $name, $active, $closed, $critical) {
             $records = self::records($type);
             if ($code !== '' && !isset($records[$code])) { throw new \invalid_parameter_exception('Unknown option'); }
             $name = trim(clean_param($name, PARAM_TEXT));
@@ -68,6 +90,9 @@ class notice_options {
             // Alphabetic immutable identifiers fit existing fields and PARAM_ALPHA inputs.
             if ($code === '') { $code = 'custom' . strtr(bin2hex(random_bytes(6)), '0123456789', 'ghijklmnop'); }
             $record = ['name' => $name, 'active' => $active];
+            if ($type === 'impacts') {
+                $record['critical'] = $critical ?? (bool)($records[$code]['critical'] ?? ($code === 'critical'));
+            }
             if ($type === 'states') {
                 $oldclosed = (bool)($records[$code]['closed'] ?? ($code === 'closed'));
                 $record['closed'] = $closed ?? $oldclosed;

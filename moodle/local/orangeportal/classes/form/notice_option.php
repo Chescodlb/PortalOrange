@@ -16,6 +16,9 @@ class notice_option extends \moodleform {
         if ($this->_customdata['type'] === 'states') {
             $m->addElement('advcheckbox', 'closed', get_string('incidentclosingstate', 'local_orangeportal'));
             $m->addElement('static', 'closedhelp', '', get_string('incidentclosingstatehelp', 'local_orangeportal'));
+        } else {
+            $m->addElement('advcheckbox', 'critical', get_string('impactcriticalalert', 'local_orangeportal'), '', ['role' => 'switch', 'class' => 'orange-priority-control']);
+            $m->addElement('static', 'criticalhelp', '', get_string('impactcriticalalerthelp', 'local_orangeportal'));
         }
         $this->add_action_buttons(true, get_string('savechanges'));
     }

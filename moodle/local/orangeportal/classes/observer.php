@@ -34,7 +34,7 @@ class observer {
         $content = \html_writer::tag('p', s($text)) . \html_writer::link($url, 'Abrir ' . s($course->fullname));
         $tx = $DB->start_delegated_transaction();
         $id = $DB->insert_record('local_orange_notice', (object)['kind' => 'notifications', 'categoryid' => $category->id,
-            'title' => $title, 'content' => $content, 'impact' => notice_options::default_code('impacts'),
+            'title' => $title, 'content' => $content, 'impact' => 'normal',
             'state' => notice_options::default_code('states'),
             'published' => 1, 'revision' => 1, 'authorid' => 0, 'timecreated' => time(), 'timemodified' => time()]);
         $DB->insert_record('local_orange_audience', (object)['noticeid' => $id, 'targettype' => 'user', 'targetid' => $userid]);

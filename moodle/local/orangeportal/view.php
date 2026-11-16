@@ -37,7 +37,7 @@ echo html_writer::link(orange_link('index.php', ['section' => $notice->kind]), g
 echo orange_intro($category->name, $notice->title, get_string('noticeversiondate', 'local_orangeportal', (object)['version' => $notice->revision,
     'date' => userdate($notice->timecreated, '%d/%m/%Y')]));
 echo html_writer::div(s(get_string('incidentcolumnimpact', 'local_orangeportal') . ': ' .
-    service::impacts()[$notice->impact]), 'orange-notice-impact');
+    service::impact_label($notice)), 'orange-notice-impact');
 echo html_writer::div(format_text($notice->content, FORMAT_HTML, ['context' => context_system::instance()]), 'orange-notice-content');
 echo \local_orangeportal\native_content::notice_html($notice);
 if ($receipt && service::can_view($notice, (int)$USER->id, false)) {

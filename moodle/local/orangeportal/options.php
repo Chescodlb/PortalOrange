@@ -39,14 +39,16 @@ if ($form->is_cancelled()) { redirect($url); }
 if ($data = $form->get_data()) {
     if ($data->type !== $type || $data->code !== $code) { throw new invalid_parameter_exception('Invalid option'); }
     try {
-        notice_options::save($type, $code, $data->name, (bool)$data->active, $type === 'states' ? (bool)$data->closed : null);
+        notice_options::save($type, $code, $data->name, (bool)$data->active, $type === 'states' ? (bool)$data->closed : null,
+            $type === 'impacts' ? (bool)$data->critical : null);
     } catch (moodle_exception $e) {
         redirect($url, $e->getMessage(), null, \core\output\notification::NOTIFY_ERROR);
     }
     redirect($url, get_string('optionsaved', 'local_orangeportal'), null, \core\output\notification::NOTIFY_SUCCESS);
 }
 if ($code !== '') { $form->set_data(['name' => $records[$code]['name'], 'active' => (int)$records[$code]['active'],
-    'closed' => $type === 'states' && notice_options::is_closed($code) ? 1 : 0]); }
+    'closed' => $type === 'states' && notice_options::is_closed($code) ? 1 : 0,
+    'critical' => $type === 'impacts' && notice_options::is_critical($code) ? 1 : 0]); }
 echo $OUTPUT->header();
 echo orange_admin_intro(get_string('manageoptions', 'local_orangeportal'), get_string('optionsdescription', 'local_orangeportal'));
 echo orange_admin_navigation('options');
@@ -61,6 +63,7 @@ $form->display();
 $table = new html_table();
 $table->head = [get_string('optionname', 'local_orangeportal'), get_string('optionavailability', 'local_orangeportal')];
 if ($type === 'states') { $table->head[] = get_string('incidentstatekind', 'local_orangeportal'); }
+if ($type === 'impacts') { $table->head[] = get_string('impactcriticalalert', 'local_orangeportal'); }
 $table->head[] = get_string('actions');
 foreach ($records as $key => $record) {
     $actions = html_writer::link(orange_link('options.php', ['type' => $type, 'code' => $key]), get_string('edit')) . ' · ' .
@@ -68,6 +71,7 @@ foreach ($records as $key => $record) {
             ['aria-label' => get_string('deleteoptionnamed', 'local_orangeportal', $record['name'])]);
     $row = [s($record['name']), get_string($record['active'] ? 'optionactive' : 'optioninactive', 'local_orangeportal')];
     if ($type === 'states') { $row[] = get_string(notice_options::is_closed($key) ? 'incidentclosed' : 'incidentopen', 'local_orangeportal'); }
+    if ($type === 'impacts') { $row[] = get_string(notice_options::is_critical($key) ? 'yes' : 'no'); }
     $row[] = $actions;
     $table->data[] = $row;
 }

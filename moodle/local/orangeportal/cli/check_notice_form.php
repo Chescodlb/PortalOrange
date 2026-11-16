@@ -29,7 +29,7 @@ function save_notice_form(stdClass $data): int {
     return service::save_notice((object)['id' => $data->id, 'revision' => $data->revision, 'kind' => $data->kind,
         'categoryid' => $data->categoryid, 'title' => $data->title,
         'content' => format_text($data->body['text'], $data->body['format'], ['context' => context_system::instance(), 'filter' => false]),
-        'state' => $data->state, 'impact' => $data->impact, 'published' => (int)$data->published],
+        'state' => $data->state, 'impact' => $data->kind === 'notifications' ? (!empty($data->priority) ? 'critical' : 'normal') : $data->impact, 'published' => (int)$data->published],
         ['user' => $data->users ?? [], 'cohort' => $data->cohorts ?? [], 'group' => $data->groups ?? []]);
 }
 try {
@@ -50,7 +50,7 @@ try {
         $data = submit_notice_form($kind, $values);
         form_check($data !== null, 'Formulario valida: ' . $kind);
         form_check($data->state === ($kind === 'notifications' ? $defaultstate : $teststate) &&
-            $data->impact === ($kind === 'notifications' ? $defaultimpact : $testimpact), 'Estado e impacto válidos: ' . $kind);
+            ($kind === 'notifications' ? empty($data->priority) : $data->impact === $testimpact), 'Estado e impacto válidos: ' . $kind);
         $id = save_notice_form($data);
         $saved = $DB->get_record('local_orange_notice', ['id' => $id], '*', MUST_EXIST);
         form_check($saved->kind === $kind && $saved->published && service::can_view($saved, (int)$agent->id, false),
@@ -71,10 +71,10 @@ try {
         foreach ($DB->get_records('local_orange_category', ['kind' => 'notifications'], 'id') as $category) {
             $values = ['id' => 0, 'revision' => 1, 'kind' => 'notifications', 'title' => 'Pruebas nueva Notificación',
                 'categoryid' => $category->id, 'body' => ['text' => '<p>Prueba del título indicado</p>', 'format' => FORMAT_HTML, 'itemid' => 0],
-                'users' => [$agent->id], 'published' => 1, 'state' => $postedstate, 'impact' => $postedstate === '' ? $defaultimpact : $criticalimpact];
+                'users' => [$agent->id], 'published' => 1, 'state' => $postedstate, 'priority' => $postedstate === '' ? 0 : 1, 'impact' => 'tampered'];
             $data = submit_notice_form('notifications', $values);
-            form_check($data && $data->state === $defaultstate && $data->impact === ($postedstate === '' ? $defaultimpact : $criticalimpact),
-                'Estado protegido e impacto editable: ' . $label . ' / ' . $category->name);
+            form_check($data && $data->state === $defaultstate && (bool)$data->priority === ($postedstate !== ''),
+                'Estado protegido y prioridad binaria: ' . $label . ' / ' . $category->name);
             $id = save_notice_form($data);
             form_check($DB->get_field('local_orange_notice', 'title', ['id' => $id]) === 'Pruebas nueva Notificación',
                 'Título con tilde guardado: ' . $label . ' / ' . $category->name);
@@ -83,7 +83,11 @@ try {
     $values['kind'] = 'notifications';
     $values['categoryid'] = $DB->get_field('local_orange_category', 'id', ['kind' => 'notifications', 'name' => 'Comunicado']);
     $values['published'] = 1; $values['users'] = []; $values['cohorts'] = [];
-    form_check(submit_notice_form('notifications', $values) === null, 'Falta de destinatarios se muestra como validación del formulario');
+    if (get_config('local_orangeportal', 'audiencecohort')) {
+        form_check(submit_notice_form('notifications', $values) !== null, 'Sin destinatarios explícitos permite usar la cohorte Orange predeterminada');
+    } else {
+        form_check(submit_notice_form('notifications', $values) === null, 'Sin cohorte predeterminada exige destinatarios');
+    }
     echo 'Comprobaciones: ' . $checks . '. Se revierten todas las publicaciones de prueba.' . PHP_EOL;
     $tx->rollback(new RuntimeException('orange_form_test_rollback'));
 } catch (Throwable $e) {

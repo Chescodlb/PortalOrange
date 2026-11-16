@@ -147,8 +147,21 @@ class service {
     public static function states(bool $activeonly = false, ?string $current = null): array {
         return notice_options::choices('states', $activeonly, $current);
     }
-    public static function impacts(bool $activeonly = false, ?string $current = null): array {
+    public static function impacts(bool $activeonly = false, ?string $current = null, string $kind = 'incidents'): array {
+        if ($kind === 'notifications') {
+            return ['normal' => get_string('noticeprioritynormal', 'local_orangeportal'),
+                'critical' => get_string('noticepriority', 'local_orangeportal')];
+        }
         return notice_options::choices('impacts', $activeonly, $current);
+    }
+    public static function priority(\stdClass $notice): bool {
+        return $notice->kind === 'notifications' ? $notice->impact === 'critical' : notice_options::is_critical($notice->impact);
+    }
+    public static function impact_label(\stdClass $notice, bool $blanknormal = false): string {
+        if ($notice->kind === 'notifications' && $notice->impact !== 'critical') {
+            return $blanknormal ? '' : get_string('noticeprioritynormal', 'local_orangeportal');
+        }
+        return self::impacts(false, null, $notice->kind)[$notice->impact] ?? $notice->impact;
     }
     public static function category_descendants(int $id, array $categories): array {
         $ids = [$id];
@@ -246,7 +259,13 @@ class service {
         }
         incident_workflow::change_metadata($data, $existing);
         notice_options::validate_selection('states', $data->state, $existing->state ?? null);
-        notice_options::validate_selection('impacts', $data->impact, $existing->impact ?? null);
+        if ($data->kind === 'notifications') {
+            if (!array_key_exists($data->impact, self::impacts(false, null, 'notifications'))) {
+                throw new \moodle_exception('inactiveoptionselection', 'local_orangeportal');
+            }
+        } else {
+            notice_options::validate_selection('impacts', $data->impact, $existing->impact ?? null);
+        }
         $tx = $DB->start_delegated_transaction();
         $data->timemodified = time();
         if (empty($data->id)) {

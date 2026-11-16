@@ -125,7 +125,7 @@ if ($section == 'incidents') {
 }
 if (in_array($section, ['incidents', 'notifications'])) {
     $search .= $filterfield('orange-impact', get_string('incidentcolumnimpact', 'local_orangeportal'),
-        html_writer::select(['' => get_string('allimpacts', 'local_orangeportal')] + service::impacts(),
+        html_writer::select(['' => get_string('allimpacts', 'local_orangeportal')] + service::impacts(false, null, $section),
             'impact', $impact, false, ['id' => 'orange-impact', 'class' => 'custom-select']));
 }
 if (in_array($section, ['incidents', 'notifications'])) {
@@ -240,7 +240,7 @@ if (in_array($section, ['library', 'courses'])) {
         $values = [
             'category' => orange_category_label((int)$notice->categoryid, $cats),
             'date' => s(userdate($notice->timecreated, '%d/%m/%Y')),
-            'impact' => s(service::impacts()[$notice->impact]),
+            'impact' => ($notice->impact === 'critical' ? html_writer::span(s(service::impact_label($notice)), 'orange-priority-badge') : ''),
         ];
         foreach ($section === 'notifications' ? ['impact', 'date', 'category'] : ['category', 'date', 'impact'] as $column) {
             $cells .= html_writer::tag('td', $values[$column]);

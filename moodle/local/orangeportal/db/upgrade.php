@@ -209,5 +209,10 @@ function xmldb_local_orangeportal_upgrade($oldversion): bool {
         // Respect the configured opening activity for staff as well as recipients. No schema changes.
         upgrade_plugin_savepoint(true, 2026111603, 'local', 'orangeportal');
     }
+    if ($oldversion < 2026111604) {
+        // Classification metadata does not edit publications or recreate reading/Teams evidence.
+        \local_orangeportal\notice_options::migrate_priorities();
+        upgrade_plugin_savepoint(true, 2026111604, 'local', 'orangeportal');
+    }
     return true;
 }
