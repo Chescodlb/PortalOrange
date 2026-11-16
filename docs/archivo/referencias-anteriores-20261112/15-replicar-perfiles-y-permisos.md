@@ -1,5 +1,7 @@
 # Replicar perfiles y permisos Orange paso a paso
 
+**Alternativa desde el portal, versión 2026111100:** la actualización del plugin crea los seis roles de trabajo que falten. Después, Administración Orange puede crear cuentas y seleccionar sus perfiles y cursos desde **Usuarios Orange**, sin asignaciones manuales en Moodle. Seguir [Asignar perfiles desde Orange](11-administrador-orange.md#asignar-perfiles-desde-orange-2026111100). Los pasos siguientes conservan la alternativa de administración general y la referencia de permisos; el alta de administradores continúa requiriendo administración general.
+
 Guía para administración y despliegues, revisada el **22 de octubre de 2026**, con Moodle **4.5.1** y el código actual del portal. Permite configurar desarrollo, preproducción y producción desde la web, aunque las personas y sus nombres de usuario sean distintos. La configuración la realiza un administrador general de Moodle; después Administración Orange mantiene sus usuarios y colectivos desde el portal.
 
 **Para empezar:** instalar los componentes y configurar las dos raíces y la cohorte según [Despliegue a preproducción](13-despliegue-preproduccion.md). Después seguir los pasos 1 a 7 de esta guía. No ejecutar inicializadores de la demo en el campus.
@@ -89,7 +91,7 @@ Un rol sin pertenencia a Usuarios Orange no habilita el portal. La pertenencia a
 
 ## Paso 2 Crear o importar las definiciones de roles
 
-La réplica se puede realizar **sin ejecutar código**. Se incluyen [nueve XML exportados por Moodle](roles/) y una [matriz de permisos permitidos](roles/permisos-permitidos.csv). Corresponden a la configuración local revisada, no a todos los permisos efectivos de cada persona: esos dependen también de sus otras asignaciones y excepciones.
+La réplica se puede realizar **sin ejecutar código**. Se incluyen [nueve XML exportados por Moodle](../../roles) y una [matriz de permisos permitidos](../../roles/permisos-permitidos.csv). Corresponden a la configuración local revisada, no a todos los permisos efectivos de cada persona: esos dependen también de sus otras asignaciones y excepciones.
 
 ### Importar un rol que todavía no existe
 
@@ -224,9 +226,9 @@ Para actualizar permisos en el futuro: editar el rol Orange desde Definir roles,
 
 ## Archivos y alcance de esta referencia
 
-- [Definiciones XML nativas](roles/) de los nueve roles Orange.
-- [CSV de permisos explícitamente permitidos](roles/permisos-permitidos.csv), con nombre corto, capacidad y contextos asignables. Es una referencia de definiciones, no el resultado efectivo por persona.
-- [Manifiesto de integridad](roles/SHA256SUMS.txt) de esos archivos.
+- [Definiciones XML nativas](../../roles) de los nueve roles Orange.
+- [CSV de permisos explícitamente permitidos](../../roles/permisos-permitidos.csv), con nombre corto, capacidad y contextos asignables. Es una referencia de definiciones, no el resultado efectivo por persona.
+- [Manifiesto de integridad](../../roles/SHA256SUMS.txt) de esos archivos.
 - [Perfiles de consulta](14-perfiles-consulta.md), [Administración Orange](11-administrador-orange.md) y [Seguimiento](09-informes.md) amplían los procedimientos concretos.
 
 Los permisos y asignaciones viven en la base de datos de cada Moodle; subir carpetas de código no replica las asignaciones de personas. El código define las capacidades y las comprobaciones, mientras Moodle conserva roles, contextos, cohortes y matrículas. Instalar el plugin crea sus tres roles auxiliares/delegados; los inicializadores `configure_demo.php` y `configure_consultation_demo.php` son solo para localhost y pueden reaplicar permisos de demo. No utilizarlos para mantener perfiles reales.

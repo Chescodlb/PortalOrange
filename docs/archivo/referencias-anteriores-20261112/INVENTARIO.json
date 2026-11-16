@@ -1,0 +1,102 @@
+[
+  {
+    "archivo": "03-usuarios-y-permisos.md",
+    "sha256_original": "eafd3491e2764251d333313f31728c40cfd7fc32c81f9af9475941daba2c6d2e",
+    "sha256_en_archivo": "eafd3491e2764251d333313f31728c40cfd7fc32c81f9af9475941daba2c6d2e"
+  },
+  {
+    "archivo": "11-administrador-orange.md",
+    "sha256_original": "56338b2bfb4d692d75f66c8e481ab17b128f01f593fd4838f27a558e348dadeb",
+    "sha256_en_archivo": "8dd3000a449e9406dd5560ec167b65743b890766ffa68154a903eed3518933ba"
+  },
+  {
+    "archivo": "15-replicar-perfiles-y-permisos.md",
+    "sha256_original": "c935bb06a0de18d71857087d1b8bc0b8ab9cf6da3464dd241d887847e826f8fb",
+    "sha256_en_archivo": "ef6a9bdcb4e5eed7362648394a660b3172cb6a8ccd0b728a01f6b5c6aba31cf3"
+  },
+  {
+    "archivo": "06-incidencias.md",
+    "sha256_original": "663d4db7558bab46513c217fc45429814055975d915c8ada0803bfabba2b21d3",
+    "sha256_en_archivo": "663d4db7558bab46513c217fc45429814055975d915c8ada0803bfabba2b21d3"
+  },
+  {
+    "archivo": "10-indicadores-personales.md",
+    "sha256_original": "9c444bf98a542079dd063155db6afba05339d633289a5e6faf613c7b8d4a9fcf",
+    "sha256_en_archivo": "9c444bf98a542079dd063155db6afba05339d633289a5e6faf613c7b8d4a9fcf"
+  },
+  {
+    "archivo": "04-biblioteca.md",
+    "sha256_original": "ae3919da1046cdf21f50d8a3d05df81ac8f07056d4640999501667e8b2e424b0",
+    "sha256_en_archivo": "ae3919da1046cdf21f50d8a3d05df81ac8f07056d4640999501667e8b2e424b0"
+  },
+  {
+    "archivo": "17-configuracion-automatica.md",
+    "sha256_original": "15f365b3239d9a68d2459641bfa306aff75f30f1fb587256daddc67bf6fe054a",
+    "sha256_en_archivo": "99f24082e94e4e9cc85272b0adaac37513a982b9d4c83b1dc199e8aa1e5a8a15"
+  },
+  {
+    "archivo": "09-informes.md",
+    "sha256_original": "f23da1304a6d7fd5569c413215bdfa7e3ef1532ef32935856c183de209dcbcec",
+    "sha256_en_archivo": "f23da1304a6d7fd5569c413215bdfa7e3ef1532ef32935856c183de209dcbcec"
+  },
+  {
+    "archivo": "12-plan-desarrollo-entregas.md",
+    "sha256_original": "401ff8c6faf98e74d9c1bf06407c715ed9f9a5a9ec38fc378e13a8e6b18d81ae",
+    "sha256_en_archivo": "401ff8c6faf98e74d9c1bf06407c715ed9f9a5a9ec38fc378e13a8e6b18d81ae"
+  },
+  {
+    "archivo": "05-cursos-y-encuestas.md",
+    "sha256_original": "7139f95cdc42119b659d9439d4c8e2c5ce24dabdf2ab3d67fa52c0605ddfc997",
+    "sha256_en_archivo": "7139f95cdc42119b659d9439d4c8e2c5ce24dabdf2ab3d67fa52c0605ddfc997"
+  },
+  {
+    "archivo": "10-integracion-teams.md",
+    "sha256_original": "c25a466552b9324e5e7e2448f95267f5fcb250ca4946ad4145596ecdcaba1168",
+    "sha256_en_archivo": "c25a466552b9324e5e7e2448f95267f5fcb250ca4946ad4145596ecdcaba1168"
+  },
+  {
+    "archivo": "08-pruebas-y-revision.md",
+    "sha256_original": "47627471042b4b3eedf94af65b381ec04d43c68eeae64e7a0d4ceb3b9f3f3771",
+    "sha256_en_archivo": "47627471042b4b3eedf94af65b381ec04d43c68eeae64e7a0d4ceb3b9f3f3771"
+  },
+  {
+    "archivo": "07-notificaciones.md",
+    "sha256_original": "0357b8b478a3a9912e63ba5094d9346f49013b02fd0045875d42e6f945c6348c",
+    "sha256_en_archivo": "0357b8b478a3a9912e63ba5094d9346f49013b02fd0045875d42e6f945c6348c"
+  },
+  {
+    "archivo": "02-navegacion.md",
+    "sha256_original": "119274ada04c83fa66ebd28c6fbafc4c8bf8cc23c4d3bf7d5865acee81814a3b",
+    "sha256_en_archivo": "119274ada04c83fa66ebd28c6fbafc4c8bf8cc23c4d3bf7d5865acee81814a3b"
+  },
+  {
+    "archivo": "16-actividades-recursos-y-colecciones.md",
+    "sha256_original": "36d93869d1575d93317436ce9120f4d4bbb14b094571540f34edc96544c04527",
+    "sha256_en_archivo": "36d93869d1575d93317436ce9120f4d4bbb14b094571540f34edc96544c04527"
+  },
+  {
+    "archivo": "git.md",
+    "sha256_original": "a0cb167ded9735de4930eaf8993e0857b7bf82be0d0e688bafc4c8a7079aaee0",
+    "sha256_en_archivo": "a0cb167ded9735de4930eaf8993e0857b7bf82be0d0e688bafc4c8a7079aaee0"
+  },
+  {
+    "archivo": "14-perfiles-consulta.md",
+    "sha256_original": "f76dd38b88acc06b71793e614e6dd1f1bffa45ca30ddecaaea4290d3f8ab11d3",
+    "sha256_en_archivo": "f76dd38b88acc06b71793e614e6dd1f1bffa45ca30ddecaaea4290d3f8ab11d3"
+  },
+  {
+    "archivo": "01-marca.md",
+    "sha256_original": "ea470c046b34eb4fead003e58c319060195044ddc16466ffe443b2e9ee2352de",
+    "sha256_en_archivo": "ea470c046b34eb4fead003e58c319060195044ddc16466ffe443b2e9ee2352de"
+  },
+  {
+    "archivo": "13-despliegue-preproduccion.md",
+    "sha256_original": "4252ab6f5b65fcdb3b63ed6378c22d3cc8d6469a38d48368ebd18084792ae763",
+    "sha256_en_archivo": "4252ab6f5b65fcdb3b63ed6378c22d3cc8d6469a38d48368ebd18084792ae763"
+  },
+  {
+    "archivo": "implementacion.md",
+    "sha256_original": "a1c62ef4611dbea190fcb9499c19080a778d3b062034f9998540efb54f0ac6aa",
+    "sha256_en_archivo": "a1c62ef4611dbea190fcb9499c19080a778d3b062034f9998540efb54f0ac6aa"
+  }
+]

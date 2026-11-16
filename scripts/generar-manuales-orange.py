@@ -11,7 +11,7 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / 'docs/manuales/20261106'
+OUT = ROOT / 'docs/archivo/manuales-hasta-20261111/20261106'
 SOURCE = OUT / 'fuentes/contenido_manuales.py'
 spec = importlib.util.spec_from_file_location('orange_manual_content', SOURCE)
 module = importlib.util.module_from_spec(spec)

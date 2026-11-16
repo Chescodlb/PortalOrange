@@ -1,0 +1,27 @@
+{
+  "version_manual": "1.2",
+  "ambito": "Servidores de preproducción y producción",
+  "plugin": "2026111006",
+  "revision": "9ea45bb",
+  "fecha": "2026-11-10",
+  "paginas_pdf": 12,
+  "capitulos": 11,
+  "fragmentos_verificados_por_formato": 206,
+  "archivos": [
+    {
+      "archivo": "Manual_configuracion_y_revision_Teams_Orange.pdf",
+      "bytes": 316175,
+      "sha256": "df27db325d55e8700fe3da9117dbe300eb38460a494c70300ec71ed2e50e82b6"
+    },
+    {
+      "archivo": "Manual_configuracion_y_revision_Teams_Orange.docx",
+      "bytes": 46068,
+      "sha256": "cd9eb3293194de180ea73ef96d3670ce8a8e4ff4a0a3fdba99ada8f8fbb78b99"
+    },
+    {
+      "archivo": "Manual_configuracion_y_revision_Teams_Orange.doc",
+      "bytes": 68608,
+      "sha256": "dfd3c504d5abd36179bcf4aa92942724af37652bfbc12591274abbff058d378c"
+    }
+  ]
+}

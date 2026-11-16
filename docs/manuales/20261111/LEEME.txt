@@ -1,0 +1,16 @@
+MANUALES ORANGE PARA PRE - 11 de noviembre de 2026
+
+01_Usuarios_y_roles: alta, cohortes, colectivos, importación de XML y asignación de roles.
+02_Agente: navegación, documentos, comunicados, incidencias y formación personal.
+03_Formador: publicación, documentos, formación, estados y seguimiento.
+04_Coordinador: consulta de incidencias y seguimiento de equipos y cursos autorizados.
+
+Cada manual incluye PDF y Word editable con el mismo contenido.
+Los manuales corresponden a PRE actual: roles desde Moodle, sin el selector Perfil Orange.
+Las imágenes son capturas REALES del entorno LOCAL de demostración, no del servidor PRE.
+Los nombres y cifras son ejemplos. Se han filtrado cuentas ficticias y encuadrado pantallas para excluir datos personales.
+No se incluyen contraseñas.
+
+Si los roles ya existen en PRE, no volver a importar los XML de apoyo.
+Los manuales anteriores se conservan fuera de este paquete en docs/archivo/manuales-hasta-20261111.
+Fuentes: fuentes/contenido.py y HTML. Capturas: imagenes. Verificación: fuentes/validacion.json.

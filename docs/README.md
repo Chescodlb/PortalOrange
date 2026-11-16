@@ -1,50 +1,24 @@
-# Gestión del portal Orange desde Moodle
+# Documentación vigente de Orange
 
-El cliente puede gestionar la marca, los documentos, la formación y los destinatarios desde la administración de Moodle. Las incidencias y comunicaciones utilizan páginas del plugin local integradas en esa misma administración.
+Estos son los cinco manuales actuales. Los cuatro manuales de usuarios corresponden al PRE documentado el 11/11/2026; el de instalación explica el despliegue de Portal Orange 2026111100, preparado el 12/11/2026.
 
-El portal local está en http://localhost:8080. Los usuarios ficticios y la revisión visual se describen en [Pruebas y revisión](08-pruebas-y-revision.md). Los cambios posteriores al commit inicial quedan pendientes de aprobación; no se harán commits ni push automáticamente.
-
-| Caso | Guía | Cómo se gestiona |
+| Manual | PDF | Word editable |
 | --- | --- | --- |
-| Logo, colores y tipografía | [Marca](01-marca.md) | Tema hijo Orange y ajustes nativos de tema/cohorte |
-| Menú y sección de entrada | [Navegación](02-navegacion.md) | Configuración Moodle y hooks del plugin |
-| Roles, permisos y colectivos | [Usuarios y permisos](03-usuarios-y-permisos.md) | Usuarios, roles, cohortes y grupos nativos |
-| Árbol RPV/CENTREX y documentos | [Biblioteca](04-biblioteca.md) | Categorías, cursos y recursos nativos |
-| Cursos, evaluaciones y encuestas | [Formación](05-cursos-y-encuestas.md) | Actividades y libro de calificaciones nativos |
-| Categorías, asignación y estado | [Incidencias](06-incidencias.md) | Portal Orange dentro de administración |
-| Noticias, Registro y Comunicado | [Notificaciones](07-notificaciones.md) | Portal Orange y mensajería nativa |
-| Lecturas y resultados | [Informes](09-informes.md) | Informes nativos y panel de trazabilidad |
-| Avisos externos de contenido | [Integración con Teams](10-integracion-teams.md) | Power Automate configurable y envíos mediante la cola de Moodle |
+| Usuarios, cohortes y roles | [PDF](manuales/20261111/01_Usuarios_y_roles.pdf) | [Word](manuales/20261111/01_Usuarios_y_roles.docx) |
+| Agente | [PDF](manuales/20261111/02_Agente.pdf) | [Word](manuales/20261111/02_Agente.docx) |
+| Formador | [PDF](manuales/20261111/03_Formador.pdf) | [Word](manuales/20261111/03_Formador.docx) |
+| Coordinador | [PDF](manuales/20261111/04_Coordinador.pdf) | [Word](manuales/20261111/04_Coordinador.docx) |
+| Primera instalación del portal | [PDF](manuales/20261112/instalacion/05_Instalacion_Portal_Orange.pdf) | [Word](manuales/20261112/instalacion/05_Instalacion_Portal_Orange.docx) |
 
-La [decisión de implementación](implementacion.md) explica qué necesita código y por qué. Ningún archivo original de Moodle o Moove se ha modificado.
+## Paquetes y apoyo
 
-- [Indicadores personales, contadores y fecha de incorporación](10-indicadores-personales.md).
+- [Cuatro manuales de usuarios y su material de apoyo](manuales/20261111/Manuales_Orange_PRE_20261111.zip).
+- [Instalación: manual, código y configuración](manuales/20261112/instalacion/Instalacion_Orange_20261112.zip).
+- [Comandos de instalación en TXT](manuales/20261112/instalacion/Comandos_instalacion_Orange.txt).
+- [Detalle de los manuales de usuarios](manuales/20261111/README.md) y [del paquete de instalación](manuales/20261112/instalacion/README.md).
 
-- [Administrador de Orange: cuentas, colectivos, contenidos y exportación](11-administrador-orange.md).
+Se conservan las fuentes y las capturas de estos manuales para poder revisarlos. Los [XML de roles](roles/) y [ejemplos de configuración](ejemplos/) siguen disponibles como recursos operativos.
 
-- [Revisión de la reunión y plan de desarrollo y entregas](12-plan-desarrollo-entregas.md).
-- [Despliegue a preproducción, carga de estructura y configuración por la web](13-despliegue-preproduccion.md).
+## Histórico
 
-- [Perfiles de consulta de Coordinación y Calidad y configuración desde Moodle](14-perfiles-consulta.md).
-
-- [Replicar perfiles y permisos Orange paso a paso, matriz y XML](15-replicar-perfiles-y-permisos.md).
-
-- Manual para operadores: [Usuarios, permisos y colectivos en PDF](manuales/Guia_usuarios_permisos_y_colectivos_Orange.pdf) y [Word editable](manuales/Guia_usuarios_permisos_y_colectivos_Orange.docx).
-
-- Primera instalación en producción e incidencias: [PDF](manuales/Guia_despliegue_produccion_Orange.pdf), [Word editable](manuales/Guia_despliegue_produccion_Orange.docx) y [comandos en una línea](manuales/Comandos_despliegue_Orange.txt).
-
-- [Actividades y recursos por categoría/publicación, colecciones formativas y actualización](16-actividades-recursos-y-colecciones.md).
-
-
-## Manuales por perfil — 6 de noviembre de 2026
-
-Entrega basada en Portal Orange `2026110601`, revisión `48461c2`. Cada manual está disponible en DOC, DOCX y PDF; incluye procedimientos diarios, permisos y resolución de dudas. El manual general cubre la configuración completa en un ambiente nuevo y la actualización de uno existente.
-
-- [Descargar los cinco manuales y material de apoyo](manuales/20261106/Manuales_Orange_20261106.zip).
-- Agentes Orange: [DOC](manuales/20261106/01_Agentes_Orange.doc), [DOCX](manuales/20261106/01_Agentes_Orange.docx), [PDF](manuales/20261106/01_Agentes_Orange.pdf).
-- Coordinadores Orange: [DOC](manuales/20261106/02_Coordinadores_Orange.doc), [DOCX](manuales/20261106/02_Coordinadores_Orange.docx), [PDF](manuales/20261106/02_Coordinadores_Orange.pdf).
-- Formadores Orange: [DOC](manuales/20261106/03_Formadores_Orange.doc), [DOCX](manuales/20261106/03_Formadores_Orange.docx), [PDF](manuales/20261106/03_Formadores_Orange.pdf).
-- Administradores Orange: [DOC](manuales/20261106/04_Administradores_Orange.doc), [DOCX](manuales/20261106/04_Administradores_Orange.docx), [PDF](manuales/20261106/04_Administradores_Orange.pdf).
-- Administradores generales de Moodle: [DOC](manuales/20261106/05_Administradores_Generales_Moodle.doc), [DOCX](manuales/20261106/05_Administradores_Generales_Moodle.docx), [PDF](manuales/20261106/05_Administradores_Generales_Moodle.pdf).
-
-El contenido fuente está en `manuales/20261106/fuentes/contenido_manuales.py`. Los generadores y el validador están en `scripts/generar-manuales-orange.py`, `scripts/generar-manuales-pdf-orange.mjs` y `scripts/validar-manuales-orange.py`. Son herramientas documentales locales, no scripts de Moodle ni de despliegue.
+La documentación anterior se ha apartado del índice de uso diario y se conserva en [archivo](archivo/README.md). Incluye los manuales previos y las antiguas guías técnicas, con copias originales e inventarios de integridad.

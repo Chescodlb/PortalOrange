@@ -1,0 +1,24 @@
+PRIMERA INSTALACION DE PORTAL ORANGE - 12/11/2026
+
+1. Lee 05_Instalacion_Portal_Orange.pdf o su Word editable.
+2. Parte de Moodle operativo. Confirma versión real, PHP CLI, usuario de servicio y respaldo.
+3. Adapta las rutas y valores de ejemplo. Elige configuración A (JSON) o B (web).
+4. Sigue los comandos por capítulos. Comandos_instalacion_Orange.txt NO es un script ejecutable completo.
+5. Termina usuarios, roles, contenidos, matrículas, cron y pruebas. Teams es opcional.
+
+Incluye plugin Orange 2026111100 y tema Orange 2026102900 completos.
+Incluye Moove 4.5.1 como dependencia OPCIONAL de referencia: no sustituir un Moove existente sin validación.
+Comprueba los archivos con SHA256SUMS.txt después de extraer.
+
+Los componentes son una instantánea del código de trabajo del 12/11/2026, con madurez alfa declarada.
+No representan un despliegue ejecutado ni una certificación de producción.
+El catálogo incluido es una referencia que debe aprobarse antes de cargarlo; no es una sincronización de datos.
+Los seis XML son referencia: la instalación limpia de esta versión crea esos roles automáticamente.
+No se incluyen credenciales, base de datos, moodledata ni config.php de otro ambiente.
+
+Capturas reales del entorno local, no de PRE ni producción. URL Teams enmascarada.
+Pruebas del configurador y la carga inicial realizadas localmente con cambios revertidos.
+El verificador de compatibilidad no sustituye las pruebas funcionales del campus real.
+
+No ejecutar inicializadores de demo, fixtures ni pruebas localhost en el campus.
+El check_theme_compatibility.php documentado sí es el verificador preparado para el campus.

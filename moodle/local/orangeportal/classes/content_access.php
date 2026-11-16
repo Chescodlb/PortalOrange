@@ -325,6 +325,12 @@ class content_access {
         foreach ($DB->get_records('role_assignments', ['roleid' => $roleid, 'component' => 'local_orangeportal']) as $assignment) {
             if (!experience::member((int)$assignment->userid)) { self::sync_catalogue_user((int)$assignment->userid); }
         }
+        $enrolrole = $DB->get_field('role', 'id', ['shortname' => 'orange_matriculador']);
+        if ($enrolrole) {
+            foreach ($DB->get_records('role_assignments', ['roleid' => $enrolrole, 'component' => 'local_orangeportal']) as $assignment) {
+                self::sync_enrol_user((int)$assignment->userid);
+            }
+        }
     }
     private static function sync_catalogue_user(int $userid): void {
         global $DB;

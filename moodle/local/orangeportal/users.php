@@ -44,6 +44,10 @@ if ($target || $action === 'new') {
             if (!$target) { $id = admin::create_user($data); }
             else if ($editable) { admin::update_user($id, $data); }
             admin::set_cohorts($id, $data->cohorts ?? []);
+            $profile = $data->workprofile ?? 'keep';
+            \local_orangeportal\work_profiles::save($id, $profile,
+                in_array($profile, ['trainer', 'readonly', 'coordinator'], true) ? ($data->profilecourses ?? []) : [],
+                $profile === 'trainer' ? ($data->profilecategories ?? []) : []);
             $tx->allow_commit();
         } catch (moodle_exception $e) { $tx->rollback($e); }
         redirect($url, get_string('changessaved', 'local_orangeportal'));
@@ -52,6 +56,7 @@ if ($target || $action === 'new') {
         $data = clone $target;
         $data->cohorts = array_values(array_intersect(array_keys(scope::cohorts()),
             $DB->get_fieldset_select('cohort_members', 'cohortid', 'userid = ?', [$id])));
+        foreach (\local_orangeportal\work_profiles::state($id) as $key => $value) { $data->$key = $value; }
         $form->set_data($data);
     }
 }
@@ -73,7 +78,8 @@ if ($form) {
         html_writer::tag('button', get_string('search'), ['class' => 'btn btn-primary']),
         ['method' => 'get', 'class' => 'orange-search', 'action' => $url->out(false)]);
     $table = new html_table();
-    $table->head = [get_string('fullnameuser'), get_string('username'), get_string('email'), get_string('orangecollectives', 'local_orangeportal'), get_string('actions')];
+    $table->head = [get_string('fullnameuser'), get_string('username'), get_string('email'),
+        get_string('workprofile', 'local_orangeportal'), get_string('orangecollectives', 'local_orangeportal'), get_string('actions')];
     foreach (scope::users() as $u) {
         if ($q !== '' && core_text::strpos(core_text::strtolower(fullname($u) . ' ' . $u->username . ' ' . $u->email), core_text::strtolower($q)) === false) { continue; }
         if ($cohortid && !$DB->record_exists('cohort_members', ['cohortid' => $cohortid, 'userid' => $u->id])) { continue; }
@@ -85,7 +91,9 @@ if ($form) {
         $actions = $protected ? get_string('orangeprotected', 'local_orangeportal') :
             html_writer::link(orange_link('users.php', ['id' => $u->id]), get_string('edit')) . ' · ' .
             html_writer::link(orange_link('users.php', ['id' => $u->id, 'action' => 'remove']), get_string('orangerevoke', 'local_orangeportal'));
-        $table->data[] = [s(fullname($u)), s($u->username), s($u->email), s(implode(', ', $cohorts)), $actions];
+        $profile = $protected ? get_string('orangeprotected', 'local_orangeportal') :
+            (\local_orangeportal\work_profiles::options()[get_user_preferences('local_orangeportal_workprofile', 'keep', $u->id)] ?? '—');
+        $table->data[] = [s(fullname($u)), s($u->username), s($u->email), s($profile), s(implode(', ', $cohorts)), $actions];
     }
     echo html_writer::div(html_writer::table($table), 'orange-table-scroll');
 }

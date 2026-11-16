@@ -1,0 +1,125 @@
+COMANDOS DE REFERENCIA POR CAPITULO - NO EJECUTAR COMO SCRIPT COMPLETO
+Sustituir rutas, usuarios, URL e IDs. Elegir vía A o vía B. Los bloques JSON y crontab no son órdenes de consola.
+
+# 03 Identificar servidor, rutas y usuario de servicio
+
+command -v php
+/usr/bin/php -v
+/usr/bin/php -r 'echo PHP_SAPI, PHP_EOL;'
+
+ORANGE_MOODLE_ROOT='/var/www/moodle'
+ORANGE_PHP_BIN='/usr/bin/php'
+ORANGE_SERVICE_USER='www-data'
+ORANGE_SERVICE_GROUP='www-data'
+ORANGE_SETUP_DIR='/srv/Instalacion_Orange_20261112'
+
+# 04 Qué archivos incluye el paquete
+
+cd "$ORANGE_SETUP_DIR"
+sha256sum -c SHA256SUMS.txt
+
+# 05 Respaldo y entrada en mantenimiento
+
+sudo -u "$ORANGE_SERVICE_USER" "$ORANGE_PHP_BIN" \
+  "$ORANGE_MOODLE_ROOT/admin/cli/maintenance.php" --enable
+
+# 06 Copiar los componentes: primera instalación
+
+sudo mkdir -p "$ORANGE_SETUP_DIR/descomprimido"
+sudo unzip "$ORANGE_SETUP_DIR/material/componentes/orangeportal-2026111100.zip" \
+  -d "$ORANGE_SETUP_DIR/descomprimido"
+sudo unzip "$ORANGE_SETUP_DIR/material/componentes/orange-2026102900.zip" \
+  -d "$ORANGE_SETUP_DIR/descomprimido"
+
+sudo cp -R "$ORANGE_SETUP_DIR/descomprimido/orangeportal" \
+  "$ORANGE_MOODLE_ROOT/local/"
+sudo cp -R "$ORANGE_SETUP_DIR/descomprimido/orange" \
+  "$ORANGE_MOODLE_ROOT/theme/"
+
+# 07 Actualizar Moodle y comprobar compatibilidad
+
+sudo -u "$ORANGE_SERVICE_USER" "$ORANGE_PHP_BIN" \
+  "$ORANGE_MOODLE_ROOT/admin/cli/upgrade.php" --non-interactive
+sudo -u "$ORANGE_SERVICE_USER" "$ORANGE_PHP_BIN" \
+  "$ORANGE_MOODLE_ROOT/admin/cli/purge_caches.php"
+sudo -u "$ORANGE_SERVICE_USER" "$ORANGE_PHP_BIN" \
+  "$ORANGE_MOODLE_ROOT/local/orangeportal/cli/check_theme_compatibility.php"
+
+# 08 Vía A: preparar la configuración privada
+
+sudo install -d -m 0750 -o "$ORANGE_SERVICE_USER" \
+  -g "$ORANGE_SERVICE_GROUP" "$ORANGE_SETUP_DIR/privado"
+sudo install -m 0600 -o "$ORANGE_SERVICE_USER" \
+  -g "$ORANGE_SERVICE_GROUP" \
+  "$ORANGE_SETUP_DIR/material/configuracion/configuracion-orange.ejemplo.json" \
+  "$ORANGE_SETUP_DIR/privado/configuracion-orange.json"
+
+# 09 Vía A: validar y aplicar el JSON
+
+sudo -u "$ORANGE_SERVICE_USER" "$ORANGE_PHP_BIN" \
+  "$ORANGE_MOODLE_ROOT/local/orangeportal/cli/configure.php" \
+  --file="$ORANGE_SETUP_DIR/privado/configuracion-orange.json"
+
+sudo -u "$ORANGE_SERVICE_USER" "$ORANGE_PHP_BIN" \
+  "$ORANGE_MOODLE_ROOT/local/orangeportal/cli/configure.php" \
+  --file="$ORANGE_SETUP_DIR/privado/configuracion-orange.json" --apply
+sudo -u "$ORANGE_SERVICE_USER" "$ORANGE_PHP_BIN" \
+  "$ORANGE_MOODLE_ROOT/admin/cli/purge_caches.php"
+
+# 11 Catálogo de referencia: elegir e importar una sola vez
+
+sudo -u "$ORANGE_SERVICE_USER" "$ORANGE_PHP_BIN" \
+  "$ORANGE_MOODLE_ROOT/local/orangeportal/cli/import_preproduction.php" \
+  --file="$ORANGE_SETUP_DIR/material/catalogo_referencia/catalogos-orange.json" \
+  --library-root-id=ID_REAL_BIBLIOTECA \
+  --training-root-id=ID_REAL_FORMACIONES
+
+# 14 Abrir el portal y comprobar su aislamiento
+
+sudo -u "$ORANGE_SERVICE_USER" "$ORANGE_PHP_BIN" \
+  "$ORANGE_MOODLE_ROOT/admin/cli/purge_caches.php"
+sudo -u "$ORANGE_SERVICE_USER" "$ORANGE_PHP_BIN" \
+  "$ORANGE_MOODLE_ROOT/admin/cli/maintenance.php" --disable
+
+# 20 Configurar PHP CLI y el cron del campus
+
+sudo -u "$ORANGE_SERVICE_USER" crontab -l
+
+* * * * * /usr/bin/php /var/www/moodle/admin/cli/cron.php --keep-alive=0
+
+# 21 Instalar cron con el script de ayuda, si falta
+
+sudo install -d -m 0750 -o "$ORANGE_SERVICE_USER" \
+  -g "$ORANGE_SERVICE_GROUP" "$ORANGE_SETUP_DIR/logs"
+sudo -u "$ORANGE_SERVICE_USER" bash \
+  "$ORANGE_SETUP_DIR/material/cron/activar-cron-orange.sh" \
+  --moodle "$ORANGE_MOODLE_ROOT" --php "$ORANGE_PHP_BIN" \
+  --log "$ORANGE_SETUP_DIR/logs/cron.log" --dry-run
+
+sudo -u "$ORANGE_SERVICE_USER" bash \
+  "$ORANGE_SETUP_DIR/material/cron/activar-cron-orange.sh" \
+  --moodle "$ORANGE_MOODLE_ROOT" --php "$ORANGE_PHP_BIN" \
+  --log "$ORANGE_SETUP_DIR/logs/cron.log"
+sudo -u "$ORANGE_SERVICE_USER" crontab -l
+
+# 23 Contrato Teams y primera prueba de envío
+
+{
+  "titulo": "Nuevo comunicado: Aviso de prueba",
+  "fechaPublicacion": "2026-11-12T10:00:00",
+  "servicioAfectado": "Servicio de ejemplo",
+  "contenido": "Descripción de la publicación de prueba.",
+  "url": "https://campus.example.invalid/local/orangeportal/view.php?id=123"
+}
+
+# 25 Actualizar un Orange existente
+
+sudo -u "$ORANGE_SERVICE_USER" "$ORANGE_PHP_BIN" \
+  "$ORANGE_MOODLE_ROOT/admin/cli/cfg.php" \
+  --component=local_orangeportal --name=librarycategory
+sudo -u "$ORANGE_SERVICE_USER" "$ORANGE_PHP_BIN" \
+  "$ORANGE_MOODLE_ROOT/admin/cli/cfg.php" \
+  --component=local_orangeportal --name=coursescategory
+sudo -u "$ORANGE_SERVICE_USER" "$ORANGE_PHP_BIN" \
+  "$ORANGE_MOODLE_ROOT/admin/cli/cfg.php" \
+  --component=local_orangeportal --name=audiencecohort

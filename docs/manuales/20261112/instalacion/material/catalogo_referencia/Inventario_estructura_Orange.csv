@@ -1,0 +1,172 @@
+﻿Area;Ruta_completa;Nombre;Padre_origen;ID_origen_solo_referencia;Numero_ID_exportado;Visible
+Biblioteca;Biblioteca;Biblioteca;0;2;orange_b718f1354f7247312eca086d9a024afe;1
+Biblioteca;Biblioteca > RPV;RPV;2;3;orange_1847b5b6c419ceef50d4276125c8d4b9;1
+Biblioteca;Biblioteca > CENTREX;CENTREX;2;174;;1
+Biblioteca;Biblioteca > RPV > QUIENES SOMOS;QUIENES SOMOS;3;5;orange_a81400e4767df8b547ada0094b0b93d2;1
+Biblioteca;Biblioteca > RPV > ORANGE;ORANGE;3;10;orange_6e6831720b47e9136c0f216582a1f5ae;1
+Biblioteca;Biblioteca > RPV > ALTA;ALTA;3;13;orange_bf10e996d943309c7db2c9e866951aa7;1
+Biblioteca;Biblioteca > RPV > PORTABILIDAD;PORTABILIDAD;3;26;orange_55daa527420885d71bb5bc68958b3e1d;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS;POSTVENTA DE SERVICIOS;3;41;orange_f89417d02d829ac2e5ce9f4b626ead52;1
+Biblioteca;Biblioteca > RPV > POSTVENTAS ADMINISTRATIVAS;POSTVENTAS ADMINISTRATIVAS;3;70;orange_96a6ab9510945c155bd6d5e4fa214859;1
+Biblioteca;Biblioteca > RPV > GESTIÓN DE PEDIDOS;GESTIÓN DE PEDIDOS;3;82;orange_351f0dad6075c237a320e6ac2c3622dc;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE TERMINALES;POSTVENTA DE TERMINALES;3;96;orange_8ab504e660a261860235fc8ccb45cec1;1
+Biblioteca;Biblioteca > RPV > BAJAS, SUSPENSIONES, PENALIZACIONES;BAJAS, SUSPENSIONES, PENALIZACIONES;3;100;orange_80adb8f6b5ad8567a3223cadf49eda29;1
+Biblioteca;Biblioteca > RPV > FACTURACION/COBROS;FACTURACION/COBROS;3;105;orange_b6e88e0e55ade6f448c584930b92b247;1
+Biblioteca;Biblioteca > RPV > GESTIÓN DE INCIDENCIAS;GESTIÓN DE INCIDENCIAS;3;110;orange_7ce8933f05993c7bd7c0412dd6e463a6;1
+Biblioteca;Biblioteca > RPV > LOCALIZACIÓN DE DATOS;LOCALIZACIÓN DE DATOS;3;117;orange_38de4db9d125b28328fee057aad80967;1
+Biblioteca;Biblioteca > RPV > INFORMES (Procedimiento);INFORMES (Procedimiento);3;133;orange_38044623b2170efdf878817e6c080dad;1
+Biblioteca;Biblioteca > RPV > Procedimientos operativos;Procedimientos operativos;3;141;orange_a49d03047b4cc69f6e8f15c72027cff4;1
+Biblioteca;Biblioteca > RPV > PORTALES DE AUTOGESTIÓN;PORTALES DE AUTOGESTIÓN;3;153;orange_8c1b92d6f0027f10babeffba6e7feda4;1
+Biblioteca;Biblioteca > RPV > QUIENES SOMOS > Presentación Abai / Orange (Servicio Primera Línea, Funciones/Roles, Matriz de escalado…);Presentación Abai / Orange (Servicio Primera Línea, Funciones/Roles, Matriz de escalado…);5;6;orange_19a078b94f072ded7e04f6ccb52f3a00;1
+Biblioteca;Biblioteca > RPV > QUIENES SOMOS > Decálogo del gestor / OC;Decálogo del gestor / OC;5;7;orange_7eb69d9dd9dff8e44675bf6dfe8a1d53;1
+Biblioteca;Biblioteca > RPV > QUIENES SOMOS > Gestor Personal;Gestor Personal;5;8;orange_33819e4d63ff88403e0d934035b9b0cc;1
+Biblioteca;Biblioteca > RPV > QUIENES SOMOS > Funciones agentes GP / OC;Funciones agentes GP / OC;5;9;orange_89f3215e0af231c07283dded86b10ce0;1
+Biblioteca;Biblioteca > RPV > ORANGE > Servicios Orange;Servicios Orange;10;11;orange_239c5cccfd595d883e907c6222272a76;1
+Biblioteca;Biblioteca > RPV > ORANGE > Oferta comercial;Oferta comercial;10;12;orange_8b2e32f2ed03a7e501b8181b7f74a75d;1
+Biblioteca;Biblioteca > RPV > ALTA > Alta con terminal;Alta con terminal;13;14;orange_4226313eb03bd252e6b05f5d13253ba7;1
+Biblioteca;Biblioteca > RPV > ALTA > Alta sin terminal;Alta sin terminal;13;19;orange_387349227a5ae793c42ef31801310dc2;1
+Biblioteca;Biblioteca > RPV > ALTA > Alta Comunica SMS;Alta Comunica SMS;13;24;orange_d50cf77429b60616331f01f6000cc397;1
+Biblioteca;Biblioteca > RPV > PORTABILIDAD > Preportabilidad / OC;Preportabilidad / OC;26;27;orange_f224f32818182b0f97e8d8702a01524d;1
+Biblioteca;Biblioteca > RPV > PORTABILIDAD > Portabilidad entrante con terminal;Portabilidad entrante con terminal;26;29;orange_b01d1e957715fb917aeabd4e76b727fa;1
+Biblioteca;Biblioteca > RPV > PORTABILIDAD > Portabilidad entrante sin terminal;Portabilidad entrante sin terminal;26;34;orange_2f5063e59107dd21e00bc94b18a6b56c;1
+Biblioteca;Biblioteca > RPV > PORTABILIDAD > Portabiliad Saliente;Portabiliad Saliente;26;39;orange_70d3e4b833e06011671e8bc2a672e0a7;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Cambios de tarifa;Cambios de tarifa;41;42;orange_1e3028f6ccc7775bfb38e5764cda0cc6;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación Roaming;Activación/desactivación Roaming;41;44;orange_e513220094f56064a9482cd3893a0efd;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación buzón de voz;Activación/desactivación buzón de voz;41;46;orange_e6276be8c0444a27422e7657a573142c;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación Superbono;Activación/desactivación Superbono;41;48;orange_8a34c8ba1c0a43b2f7325da510be73af;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Alta/Cambio APN privado o público;Alta/Cambio APN privado o público;41;50;orange_30db0d705d29914704d860e533043a90;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación llamadas especiales;Activación/desactivación llamadas especiales;41;52;orange_0ac8f3ad8cff0541cb9bdbda6b441dd4;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación Desvío de llamadas;Activación/desactivación Desvío de llamadas;41;54;orange_b724b004c391526baffd8cf3abed0c6c;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación Bonos de datos individuales (1.5GB, 6GB);Activación/desactivación Bonos de datos individuales (1.5GB, 6GB);41;56;orange_f97a4d15b28f7721abcfbd9944c10b57;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación Bonos compartidos;Activación/desactivación Bonos compartidos;41;58;orange_d9b512f23fd59b8c1f4201fab5b3da8a;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación TDR;Activación/desactivación TDR;41;60;orange_16dc397c7d14c128c37f205a81f45089;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación MMS;Activación/desactivación MMS;41;62;orange_47c9d96b6ba1b4aa9846c085cafe3ead;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación Servicios Fijo;Activación/desactivación Servicios Fijo;41;64;orange_091ccbf7fdd3331c2d0f462426e782ad;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación/modificación Servicios 90X;Activación/desactivación/modificación Servicios 90X;41;66;orange_fb7134fa75df188b5f819dcfe04233b1;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Servicio de Branded Calls;Servicio de Branded Calls;41;68;orange_cfd58f85fa49017d8f8b7d5b5ef75670;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > CBT 2.0;CBT 2.0;41;69;orange_00cdc3d685c0fbd17a3c2bda431877f6;1
+Biblioteca;Biblioteca > RPV > POSTVENTAS ADMINISTRATIVAS > Cambio de titular;Cambio de titular;70;71;orange_804e4303811c0d2262f85a0580f1fd3c;1
+Biblioteca;Biblioteca > RPV > POSTVENTAS ADMINISTRATIVAS > Cambio de dominación social manteniendo el CIF;Cambio de dominación social manteniendo el CIF;70;72;orange_9da166e97b9872289a71d97448fe3c27;1
+Biblioteca;Biblioteca > RPV > POSTVENTAS ADMINISTRATIVAS > Modificación numeración principal;Modificación numeración principal;70;74;orange_2c81244eb5f84edaaf2e65ef0562a6fd;1
+Biblioteca;Biblioteca > RPV > POSTVENTAS ADMINISTRATIVAS > Cambio de cuenta bancaria,cambio de dirección,cambio de forma de pago;Cambio de cuenta bancaria,cambio de dirección,cambio de forma de pago;70;76;orange_dafbb29ab2fcb913c082223982ace53f;1
+Biblioteca;Biblioteca > RPV > POSTVENTAS ADMINISTRATIVAS > Takeover (grupo mismo CIF). A tener en cuenta si tiene superbono (activación/desactivación superbono);Takeover (grupo mismo CIF). A tener en cuenta si tiene superbono (activación/desactivación superbono);70;78;orange_de89044f925a4bd994eb63b54eee51fc;1
+Biblioteca;Biblioteca > RPV > POSTVENTAS ADMINISTRATIVAS > Clientes Mixtos;Clientes Mixtos;70;80;orange_6cac0a2985cf8cbabced4336b5aaefbf;1
+Biblioteca;Biblioteca > RPV > GESTIÓN DE PEDIDOS > Gestión de SIM (no envío);Gestión de SIM (no envío);82;83;orange_b56d1ffcb24bf1f15b1a1ceb73746e87;1
+Biblioteca;Biblioteca > RPV > GESTIÓN DE PEDIDOS > Gestión de terminales;Gestión de terminales;82;91;orange_6a1ee5dce73c9cbe7a422d402644880e;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE TERMINALES > Reparaciones;Reparaciones;96;97;orange_341996b3ab4097cc81577d612b796d64;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE TERMINALES > Sustituciones;Sustituciones;96;98;orange_ce5e833544c6aa37fa322e9ca2712b0f;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE TERMINALES > Postventa especial (bolsa especial fuera de garantía);Postventa especial (bolsa especial fuera de garantía);96;99;orange_e5dc79a66ad8b92743b591572fd9b147;1
+Biblioteca;Biblioteca > RPV > BAJAS, SUSPENSIONES, PENALIZACIONES > Bajas (total, con fecha futura,;Bajas (total, con fecha futura,;100;101;orange_8e8659800c0716dc22374b2bd01e6a76;1
+Biblioteca;Biblioteca > RPV > BAJAS, SUSPENSIONES, PENALIZACIONES > Suspensiones (temporal, por impago);Suspensiones (temporal, por impago);100;102;orange_fea99e92658af8bea27bbd9943e1b4ed;1
+Biblioteca;Biblioteca > RPV > BAJAS, SUSPENSIONES, PENALIZACIONES > Penalizaciones (por permanencia, por incumplimiento contractual);Penalizaciones (por permanencia, por incumplimiento contractual);100;103;orange_39ab7e9d6214b10c7d355d67be4dcdd8;1
+Biblioteca;Biblioteca > RPV > BAJAS, SUSPENSIONES, PENALIZACIONES > Reactivaciones;Reactivaciones;100;104;orange_f88d52ff2846b9f971229d8a10c6ce12;1
+Biblioteca;Biblioteca > RPV > FACTURACION/COBROS > Facturación (consultas al equipo de facturación (Dynamics), peticiones al BO de facturación (Siebel);Facturación (consultas al equipo de facturación (Dynamics), peticiones al BO de facturación (Siebel);105;106;orange_de6d1a9ed021adbfc16be1919a221a96;1
+Biblioteca;Biblioteca > RPV > FACTURACION/COBROS > Refacturación (abonos, ajustes…);Refacturación (abonos, ajustes…);105;107;orange_948e71508f988836891c287eb7afa6b3;1
+Biblioteca;Biblioteca > RPV > FACTURACION/COBROS > Inclusión Bill Review;Inclusión Bill Review;105;108;orange_f0f24f52430b0174ce93b56aabcc0a2f;1
+Biblioteca;Biblioteca > RPV > FACTURACION/COBROS > Cobros (Dynamics, deuda);Cobros (Dynamics, deuda);105;109;orange_34a502f4eb314a59562d18b8146bccd7;1
+Biblioteca;Biblioteca > RPV > GESTIÓN DE INCIDENCIAS > Gestión incidencias Redes (Móvil);Gestión incidencias Redes (Móvil);110;111;orange_d7dfda6fe4b057ae291c09051e41db68;1
+Biblioteca;Biblioteca > RPV > GESTIÓN DE INCIDENCIAS > Gestión Sistemas (Móvil);Gestión Sistemas (Móvil);110;112;orange_dc05b4a869bbc2c78524513fe45cdb67;1
+Biblioteca;Biblioteca > RPV > GESTIÓN DE INCIDENCIAS > Gestión incidencias Fijo;Gestión incidencias Fijo;110;113;orange_7c74d60ba25ecc6e5324e62a8620faed;1
+Biblioteca;Biblioteca > RPV > GESTIÓN DE INCIDENCIAS > Gestión incidencias Centrex;Gestión incidencias Centrex;110;114;orange_04eefb154a17459df69ffa115f4c65b8;1
+Biblioteca;Biblioteca > RPV > GESTIÓN DE INCIDENCIAS > Consulta de incidencias;Consulta de incidencias;110;115;orange_cfe736e4725c1b25e690395bf4f3a452;1
+Biblioteca;Biblioteca > RPV > GESTIÓN DE INCIDENCIAS > Matriz de escalado / KRT;Matriz de escalado / KRT;110;116;orange_f7b6bafea4c741aaa8ea6cae09b0e250;1
+Biblioteca;Biblioteca > RPV > LOCALIZACIÓN DE DATOS > BSCS (Cliente, tipo de cliente, tarifas, productos, custcode);BSCS (Cliente, tipo de cliente, tarifas, productos, custcode);117;118;orange_13e100d355246174da34b5037935fe24;1
+Biblioteca;Biblioteca > RPV > LOCALIZACIÓN DE DATOS > Siebel (Cliente, tipo de cliente, tarifas, productos, estado…);Siebel (Cliente, tipo de cliente, tarifas, productos, estado…);117;119;orange_5bc24d69ce361e61cd8a6f97dc083ebb;1
+Biblioteca;Biblioteca > RPV > LOCALIZACIÓN DE DATOS > ALCE;ALCE;117;120;orange_e2fae69b2ea222c785a85eadd914e244;1
+Biblioteca;Biblioteca > RPV > LOCALIZACIÓN DE DATOS > CONSOLA DE ACTIVACIONES;CONSOLA DE ACTIVACIONES;117;121;orange_d4c44a923be38d437b4cf6e0cd7b3e95;1
+Biblioteca;Biblioteca > RPV > LOCALIZACIÓN DE DATOS > GED (FILENET);GED (FILENET);117;122;orange_2cff774a8fcc2113f36a792f4d476135;1
+Biblioteca;Biblioteca > RPV > LOCALIZACIÓN DE DATOS > OCEANE;OCEANE;117;123;orange_ed18da7c2590a59b1cd1547e65fb6060;1
+Biblioteca;Biblioteca > RPV > LOCALIZACIÓN DE DATOS > SGF;SGF;117;124;orange_b544f5eeebb9893422511771f6633fb4;1
+Biblioteca;Biblioteca > RPV > LOCALIZACIÓN DE DATOS > ADMIN SMS;ADMIN SMS;117;125;orange_06c9a4c36c39c8c9094d1efdd7b04f4c;1
+Biblioteca;Biblioteca > RPV > LOCALIZACIÓN DE DATOS > ICP;ICP;117;126;orange_c9181a800e861a0b6d95802e6b9156b2;1
+Biblioteca;Biblioteca > RPV > LOCALIZACIÓN DE DATOS > Eunomia;Eunomia;117;127;orange_c962b04502f73349c0a769dab93f9516;1
+Biblioteca;Biblioteca > RPV > LOCALIZACIÓN DE DATOS > Elena;Elena;117;128;orange_fb2905b4b63d6134e729fcbca6298d5b;1
+Biblioteca;Biblioteca > RPV > LOCALIZACIÓN DE DATOS > SGP;SGP;117;129;orange_1c090e0d65740ee884bb293d3768546d;1
+Biblioteca;Biblioteca > RPV > LOCALIZACIÓN DE DATOS > SGRT (bloqueo/desbloqueo imei);SGRT (bloqueo/desbloqueo imei);117;130;orange_831e018f15b42e9786c26f177c3418cd;1
+Biblioteca;Biblioteca > RPV > LOCALIZACIÓN DE DATOS > CNOR;CNOR;117;131;orange_f02847460158016db8d494f06fafdc2f;1
+Biblioteca;Biblioteca > RPV > LOCALIZACIÓN DE DATOS > BO (Business Object);BO (Business Object);117;132;orange_87e95e35cb5247d110f59560d8ba87e3;1
+Biblioteca;Biblioteca > RPV > INFORMES (Procedimiento) > Estadísticas 90X;Estadísticas 90X;133;134;orange_a168d6f7d43d498a40fb0e38755e46d6;1
+Biblioteca;Biblioteca > RPV > INFORMES (Procedimiento) > Call Analytics;Call Analytics;133;135;orange_53e2d9ca7a4a6873f36091ce76ff253b;1
+Biblioteca;Biblioteca > RPV > INFORMES (Procedimiento) > Lineas Activadas, consumo de líneas (QLIKVIEW, Business Objects) /;Lineas Activadas, consumo de líneas (QLIKVIEW, Business Objects) /;133;136;orange_88ae1573db86e88e18d0d37c4aeb4081;1
+Biblioteca;Biblioteca > RPV > INFORMES (Procedimiento) > Gestión bolsa de terminales;Gestión bolsa de terminales;133;137;orange_80145dc5adb45c12075a39d11ae62800;1
+Biblioteca;Biblioteca > RPV > INFORMES (Procedimiento) > Informe de penalizaciones;Informe de penalizaciones;133;138;orange_3aeb221d1cd7e8e37ebeb685a5499200;1
+Biblioteca;Biblioteca > RPV > INFORMES (Procedimiento) > Gestión bolsa de reparaciones (POSTVENTA ESPECIAL);Gestión bolsa de reparaciones (POSTVENTA ESPECIAL);133;139;orange_f076d592c53f429214e7dd6b842f4b43;1
+Biblioteca;Biblioteca > RPV > INFORMES (Procedimiento) > Informe de Cotizaciones solicitadas por el KAM;Informe de Cotizaciones solicitadas por el KAM;133;140;orange_03e8c2b367c55bf6297b3866fef8b80c;1
+Biblioteca;Biblioteca > RPV > Procedimientos operativos > Procedimiento Elena;Procedimiento Elena;141;142;orange_62bddee55850b95df34f580b8cf056ba;1
+Biblioteca;Biblioteca > RPV > Procedimientos operativos > Procedimiento Dashboard facturación;Procedimiento Dashboard facturación;141;143;orange_4a7c3fe24d442e18f7c3bababea84de9;1
+Biblioteca;Biblioteca > RPV > Procedimientos operativos > Procedimiento Liberación SIM;Procedimiento Liberación SIM;141;144;orange_8a883dc6aece5f48c1ea924c00eadb99;1
+Biblioteca;Biblioteca > RPV > Procedimientos operativos > Procedimiento gestión de usuarios;Procedimiento gestión de usuarios;141;145;orange_78aaadd5189694352863454da43185b1;1
+Biblioteca;Biblioteca > RPV > Procedimientos operativos > Proceso Colombo Banco Santander;Proceso Colombo Banco Santander;141;146;orange_d61c5fe10cb745d23b9c9bb1de7000a7;1
+Biblioteca;Biblioteca > RPV > Procedimientos operativos > Canal Ajuntaments;Canal Ajuntaments;141;147;orange_1d7f234391fac5d98ce3fca5350de803;1
+Biblioteca;Biblioteca > RPV > Procedimientos operativos > Procedimiento BO Facturación;Procedimiento BO Facturación;141;148;orange_f1308709740ae321febd2e9e98c3f23f;1
+Biblioteca;Biblioteca > RPV > Procedimientos operativos > Procedimiento BO Jaén Gestión de pedidos;Procedimiento BO Jaén Gestión de pedidos;141;149;orange_29e70b8d30973c160ff757878088c5d5;1
+Biblioteca;Biblioteca > RPV > Procedimientos operativos > BO informes;BO informes;141;150;orange_e9e952853452852169db0bc5ddbd96e7;1
+Biblioteca;Biblioteca > RPV > Procedimientos operativos > BO Infancia;BO Infancia;141;151;orange_85234dbc531412bf7d73e018da133438;1
+Biblioteca;Biblioteca > RPV > Procedimientos operativos > ITACA;ITACA;141;152;orange_ff672ccf05a2e27cf5af36b5d3b071f6;1
+Biblioteca;Biblioteca > RPV > PORTALES DE AUTOGESTIÓN > Paco;Paco;153;154;orange_12a7b618708086cb702b1c61acb16dc0;1
+Biblioteca;Biblioteca > RPV > PORTALES DE AUTOGESTIÓN > Egeo;Egeo;153;158;orange_75cf3ad245ac6d08daabf4ecf0a0a8b8;1
+Biblioteca;Biblioteca > RPV > ALTA > Alta con terminal > SIM Física;SIM Física;14;15;orange_349a25e172cc1fbda9b3e54c1d215620;1
+Biblioteca;Biblioteca > RPV > ALTA > Alta con terminal > Sim física + multisim;Sim física + multisim;14;16;orange_71b625b042333defbc6e4aeed739ca41;1
+Biblioteca;Biblioteca > RPV > ALTA > Alta con terminal > Sim virtual (Esim);Sim virtual (Esim);14;17;orange_a9c7a76a9b0c2553442ae75a598ca5b3;1
+Biblioteca;Biblioteca > RPV > ALTA > Alta con terminal > SIM Virtual (esim) + multisim;SIM Virtual (esim) + multisim;14;18;orange_d7803f988c1198efbc7d92c0089b2eec;1
+Biblioteca;Biblioteca > RPV > ALTA > Alta sin terminal > SIM Física;SIM Física;19;20;orange_01b4c969e609014822ab0ab1e4a61e26;1
+Biblioteca;Biblioteca > RPV > ALTA > Alta sin terminal > Sim física + multisim;Sim física + multisim;19;21;orange_e278534771fc4559db454738436411fe;1
+Biblioteca;Biblioteca > RPV > ALTA > Alta sin terminal > SIM Virtual (esim);SIM Virtual (esim);19;22;orange_7d3e7f6746ebf49e78d1d916a5ef8c6b;1
+Biblioteca;Biblioteca > RPV > ALTA > Alta sin terminal > SIM Virtual (esim) + multisim;SIM Virtual (esim) + multisim;19;23;orange_ddb59f62b6dce100f971c4f3e3d9fdd8;1
+Biblioteca;Biblioteca > RPV > ALTA > Alta Comunica SMS > Alta comunica SMS;Alta comunica SMS;24;25;orange_e375684e6f93ad3d0d54dba1049bf9df;1
+Biblioteca;Biblioteca > RPV > PORTABILIDAD > Preportabilidad / OC > Preportabilidad / OC;Preportabilidad / OC;27;28;orange_23d07d98a4bd85f44c5d00e203f2efe6;1
+Biblioteca;Biblioteca > RPV > PORTABILIDAD > Portabilidad entrante con terminal > SIM Física;SIM Física;29;30;orange_36fed0a31a287abe9ce1edf095ce5b18;1
+Biblioteca;Biblioteca > RPV > PORTABILIDAD > Portabilidad entrante con terminal > Sim física + multisim;Sim física + multisim;29;31;orange_a1f72e2ebbad7da9f0b4b31348001372;1
+Biblioteca;Biblioteca > RPV > PORTABILIDAD > Portabilidad entrante con terminal > SIM Virtual (esim);SIM Virtual (esim);29;32;orange_d17881c84cd7215a602153b235e0e0d9;1
+Biblioteca;Biblioteca > RPV > PORTABILIDAD > Portabilidad entrante con terminal > SIM Virtual (esim) + multisim;SIM Virtual (esim) + multisim;29;33;orange_c334f3922bbae0b53eaf66576b472c3f;1
+Biblioteca;Biblioteca > RPV > PORTABILIDAD > Portabilidad entrante sin terminal > SIM Física;SIM Física;34;35;orange_dd11d599d03a741f7a793ce6d15617a4;1
+Biblioteca;Biblioteca > RPV > PORTABILIDAD > Portabilidad entrante sin terminal > Sim física + multisim;Sim física + multisim;34;36;orange_619478d6e50caace07207b6d6300473e;1
+Biblioteca;Biblioteca > RPV > PORTABILIDAD > Portabilidad entrante sin terminal > SIM Virtual (esim);SIM Virtual (esim);34;37;orange_8a5ff81856806725e5fa01d51c37c828;1
+Biblioteca;Biblioteca > RPV > PORTABILIDAD > Portabilidad entrante sin terminal > SIM Virtual (esim) + multisim;SIM Virtual (esim) + multisim;34;38;orange_f64e2315c84188225419865706f750d8;1
+Biblioteca;Biblioteca > RPV > PORTABILIDAD > Portabiliad Saliente > Reseller (proceso portabilidad saliente);Reseller (proceso portabilidad saliente);39;40;orange_53715211139b4e772f7acc49eb59e8b5;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Cambios de tarifa > Tarifas GGCC;Tarifas GGCC;42;43;orange_79ce02ac3fcb7f874feec269386fbedd;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación Roaming > Roaming;Roaming;44;45;orange_273bed7e027df1b3a2b1619e34bd0948;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación buzón de voz > Buzón de voz;Buzón de voz;46;47;orange_0b5cd17c4aee5a952aad7dd13d8bf1c6;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación Superbono > Superbono;Superbono;48;49;orange_273ab49cf6642bd4504affcbb23cd6f3;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Alta/Cambio APN privado o público > APN privado o público;APN privado o público;50;51;orange_f3642f820b4d960de29cf714bb98383b;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación llamadas especiales > Llamadas especiales;Llamadas especiales;52;53;orange_c11e262a9c7fea0fff1c2ebb1e164edb;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación Desvío de llamadas > Desvió de llamadas;Desvió de llamadas;54;55;orange_08afd18bafe93471eb058523f9c3473f;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación Bonos de datos individuales (1.5GB, 6GB) > Bonos de datos individuales (1.5GB, 6GB);Bonos de datos individuales (1.5GB, 6GB);56;57;orange_8c5a3b354d81e3a52eeaec1faa95c8f3;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación Bonos compartidos > Bonos compartidos;Bonos compartidos;58;59;orange_a3b0c7a50d73dbc2a1666312bd05e775;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación TDR > TDR;TDR;60;61;orange_0a62f68f788de18de7132a9cd3018a7a;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación MMS > MMS;MMS;62;63;orange_1b4626ed8b8aab9ff09800278e736d33;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación Servicios Fijo > Servicios Fijo;Servicios Fijo;64;65;orange_2f3fef0ad98fd93f3965ce42d801294c;1
+Biblioteca;Biblioteca > RPV > POSTVENTA DE SERVICIOS > Activación/desactivación/modificación Servicios 90X > Activación/desactivación Proceso Modificaciones Servicios 90X;Activación/desactivación Proceso Modificaciones Servicios 90X;66;67;orange_1c59bbe5f3e6658e65be5c0e7258a904;1
+Biblioteca;Biblioteca > RPV > POSTVENTAS ADMINISTRATIVAS > Cambio de dominación social manteniendo el CIF > Cambio de denominación;Cambio de denominación;72;73;orange_6bfa0081afba96e7a5463281d9c02052;1
+Biblioteca;Biblioteca > RPV > POSTVENTAS ADMINISTRATIVAS > Modificación numeración principal > Númeración principal;Númeración principal;74;75;orange_b23007dc6f95fbc4114667694329463b;1
+Biblioteca;Biblioteca > RPV > POSTVENTAS ADMINISTRATIVAS > Cambio de cuenta bancaria,cambio de dirección,cambio de forma de pago > Cambios;Cambios;76;77;orange_3e8a874deec85e23a91dbe170fa5b4d2;1
+Biblioteca;Biblioteca > RPV > POSTVENTAS ADMINISTRATIVAS > Takeover (grupo mismo CIF). A tener en cuenta si tiene superbono (activación/desactivación superbono) > Takeover;Takeover;78;79;orange_9ed3915774339e956a36d399e744a5bd;1
+Biblioteca;Biblioteca > RPV > POSTVENTAS ADMINISTRATIVAS > Clientes Mixtos > Clientes mixtos;Clientes mixtos;80;81;orange_6ba2b326d93a9aca7a8354ad58c8a13b;1
+Biblioteca;Biblioteca > RPV > GESTIÓN DE PEDIDOS > Gestión de SIM (no envío) > Activación/desactivación SIM Física;Activación/desactivación SIM Física;83;84;orange_a813cdac92b79639948e5d6e860336af;1
+Biblioteca;Biblioteca > RPV > GESTIÓN DE PEDIDOS > Gestión de SIM (no envío) > Activación/desactivación SIM Virtual (esim);Activación/desactivación SIM Virtual (esim);83;85;orange_9fbed0360fc3ecb45fc625b245a7a385;1
+Biblioteca;Biblioteca > RPV > GESTIÓN DE PEDIDOS > Gestión de SIM (no envío) > Activación/desactivación Multisim con Sim física/Esim;Activación/desactivación Multisim con Sim física/Esim;83;86;orange_f4d010361c934421c8009ebcb629acd8;1
+Biblioteca;Biblioteca > RPV > GESTIÓN DE PEDIDOS > Gestión de SIM (no envío) > Activación/desactivación SIM/MultiSIM de eSIM para SmartWatch;Activación/desactivación SIM/MultiSIM de eSIM para SmartWatch;83;87;orange_733045791fedd6ee5374f9b1cb2712d4;1
+Biblioteca;Biblioteca > RPV > GESTIÓN DE PEDIDOS > Gestión de SIM (no envío) > Duplicado de SIM física;Duplicado de SIM física;83;88;orange_4c3e399b53bbd7b06797ceebbce62eff;1
+Biblioteca;Biblioteca > RPV > GESTIÓN DE PEDIDOS > Gestión de SIM (no envío) > Duplicado de Sim virtual (eSIM);Duplicado de Sim virtual (eSIM);83;89;orange_e4ea6beba9b11aa56a55c83026e276ec;1
+Biblioteca;Biblioteca > RPV > GESTIÓN DE PEDIDOS > Gestión de SIM (no envío) > Duplicado multisim;Duplicado multisim;83;90;orange_de3a2a0da0586b0e99d869a747a7b0c3;1
+Biblioteca;Biblioteca > RPV > GESTIÓN DE PEDIDOS > Gestión de terminales > SRC (alta/renove);SRC (alta/renove);91;92;orange_86de29a534235dff0fb7986e5adfc1c7;1
+Biblioteca;Biblioteca > RPV > GESTIÓN DE PEDIDOS > Gestión de terminales > VdH (alta/renove);VdH (alta/renove);91;93;orange_fceb674ece47e867d4fd4473e1b96c04;1
+Biblioteca;Biblioteca > RPV > GESTIÓN DE PEDIDOS > Gestión de terminales > VAP;VAP;91;94;orange_ce8a68484f59427c471ffea9ebd669a3;1
+Biblioteca;Biblioteca > RPV > GESTIÓN DE PEDIDOS > Gestión de terminales > Proceso Colombo ***;Proceso Colombo ***;91;95;orange_628050a49a166db5aab8840ba696e799;1
+Biblioteca;Biblioteca > RPV > PORTALES DE AUTOGESTIÓN > Paco > Manual Agente;Manual Agente;154;155;orange_b046e42f0d8907de6cb16f589d75ed8c;1
+Biblioteca;Biblioteca > RPV > PORTALES DE AUTOGESTIÓN > Paco > Manual Cliente;Manual Cliente;154;156;orange_9d4aa11c418bdade3ffdebbd4139229f;1
+Biblioteca;Biblioteca > RPV > PORTALES DE AUTOGESTIÓN > Paco > Infografía;Infografía;154;157;orange_bb8e538ea5b16137dd6ea5e753977360;1
+Biblioteca;Biblioteca > RPV > PORTALES DE AUTOGESTIÓN > Egeo > Manual EGEO Agente;Manual EGEO Agente;158;159;orange_3d132f7059dff49c6de331bd35bc8b39;1
+Biblioteca;Biblioteca > RPV > PORTALES DE AUTOGESTIÓN > Egeo > Manual EGEO Cliente;Manual EGEO Cliente;158;160;orange_e4df10a66a3f1bb18d1455fd6ea74b30;1
+Biblioteca;Biblioteca > RPV > PORTALES DE AUTOGESTIÓN > Egeo > Manual Autorizado Digital;Manual Autorizado Digital;158;161;orange_c3fe114bb6b008f5975d181116a723d4;1
+Biblioteca;Biblioteca > RPV > PORTALES DE AUTOGESTIÓN > Egeo > Manual Acceso Cliente 2FA;Manual Acceso Cliente 2FA;158;162;orange_44460f60f40e5d6c7524dfe60485e3c8;1
+Biblioteca;Biblioteca > RPV > PORTALES DE AUTOGESTIÓN > Egeo > Manual Gestión de SIM;Manual Gestión de SIM;158;163;orange_6453358303a81141f953d27fc152b934;1
+Biblioteca;Biblioteca > RPV > PORTALES DE AUTOGESTIÓN > Egeo > Manual Superbono;Manual Superbono;158;164;orange_173a1a40eca740548a7062125d5be6a1;1
+Biblioteca;Biblioteca > RPV > PORTALES DE AUTOGESTIÓN > Egeo > Manual Bonos Travel Data;Manual Bonos Travel Data;158;165;orange_6d27e9b44eb52abbbef08500b2367306;1
+Biblioteca;Biblioteca > RPV > PORTALES DE AUTOGESTIÓN > Egeo > Manual Infovista Código Wom;Manual Infovista Código Wom;158;166;orange_722d7ae29efcc7bd7d21b9aa56207a59;1
+Biblioteca;Biblioteca > RPV > PORTALES DE AUTOGESTIÓN > Egeo > Infografía;Infografía;158;167;orange_81cdb8716ec6b742ae56cc561bb8a48b;1
+Biblioteca;Biblioteca > RPV > PORTALES DE AUTOGESTIÓN > Egeo > Manual (slide) Marca/ Idioma en Dynamics;Manual (slide) Marca/ Idioma en Dynamics;158;168;orange_c34e79c663ee60de9762243f216d7cd5;1
+Biblioteca;Biblioteca > RPV > PORTALES DE AUTOGESTIÓN > Egeo > Gestión de incidencias - Infografía;Gestión de incidencias - Infografía;158;169;orange_c59ed625bada339b37da6558393a18d3;1
+Formaciones;Cursos;Cursos;0;4;orange_c2fb788c7deedbeaa296e424d4c2921b;1
+Formaciones;Cursos > Formación inicial;Formación inicial;4;193;orange_training_initial;1
+Formaciones;Cursos > Formación continua;Formación continua;4;194;orange_training_continuous;1

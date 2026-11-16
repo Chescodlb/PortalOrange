@@ -1,0 +1,7 @@
+{
+  "titulo": "Nuevo comunicado: Aviso de prueba",
+  "fechaPublicacion": "2026-11-12T10:00:00",
+  "servicioAfectado": "Servicio de ejemplo",
+  "contenido": "Descripción de la publicación de prueba.",
+  "url": "https://campus.example.invalid/local/orangeportal/view.php?id=123"
+}

@@ -185,5 +185,13 @@ function xmldb_local_orangeportal_upgrade($oldversion): bool {
         // Detailed, credential-redacted delivery logs; no schema changes.
         upgrade_plugin_savepoint(true, 2026111006, 'local', 'orangeportal');
     }
+    if ($oldversion < 2026111007) {
+        // Repeatable CLI configuration; no schema changes.
+        upgrade_plugin_savepoint(true, 2026111007, 'local', 'orangeportal');
+    }
+    if ($oldversion < 2026111100) {
+        \local_orangeportal\work_profiles::install();
+        upgrade_plugin_savepoint(true, 2026111100, 'local', 'orangeportal');
+    }
     return true;
 }

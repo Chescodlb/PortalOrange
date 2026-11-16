@@ -1,0 +1,7 @@
+Archivos de apoyo para el Manual de Usuarios y roles.
+Si los seis roles ya existen en PRE, NO volver a importarlos.
+Moodle importa un XML por cada rol. Importar no asigna personas.
+Formador: publicador (Sistema), gestor de categorías y creador de contenidos (categorías autorizadas).
+Coordinador y Formador sin edición: seguimiento (Sistema) y consulta formativa (cursos autorizados).
+Calidad: calidad (Sistema). Agente: Estudiante nativo; no necesita XML propio.
+No usar Profesor sin edición estándar como equivalente de consulta estricta: permite calificar.

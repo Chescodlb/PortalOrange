@@ -63,7 +63,64 @@ try {
   };
   const nav = () => evaluate(`Array.from(document.querySelectorAll('.primary-navigation .nav-link')).filter(x=>x.textContent.trim()!=='').map(x=>x.textContent.trim()).filter(x=>!['Más','More'].includes(x))`);
   await send('Page.enable'); await send('Runtime.enable');
-  if (process.argv.includes('--content-flow-only')) {
+  if (process.argv.includes('--work-profiles-only')) {
+    const username = 'profileweb_' + Date.now();
+    const cleanup = `define('CLI_SCRIPT',true);require 'config.php';require_once $CFG->dirroot.'/user/lib.php';
+      if(!preg_match('~^http://(localhost|127\\.0\\.0\\.1):~',$CFG->wwwroot)){throw new Exception('Local only');}
+      $u=$DB->get_record('user',['username'=>$argv[1],'deleted'=>0]);
+      if($u&&str_starts_with($u->username,'profileweb_')&&\\local_orangeportal\\orange_administration::owned_account($u->id)){delete_user($u);}`;
+    try {
+      await login('admin.orange', env.ORANGE_DEMO_PASSWORD);
+      for (const lang of ['es', 'en']) {
+        await navigate('/local/orangeportal/users.php?action=new&lang=' + lang);
+        await wait(`!!document.querySelector('#id_workprofile')`);
+        check(await evaluate(`Array.from(document.querySelector('#id_workprofile').options).map(o=>o.value).join(',')==='agent,trainer,readonly,coordinator,quality'`),
+          lang + ': perfiles disponibles sin roles de administrador');
+        check(await evaluate(`!document.body.innerText.includes('[[')&&!document.querySelector('.alert-danger')`), lang + ': formulario traducido');
+      }
+      await navigate('/local/orangeportal/users.php?action=new&lang=es');
+      await wait(`!!document.querySelector('#id_workprofile')`);
+      await evaluate(`for(const [name,value] of Object.entries({username:${JSON.stringify(username)},password:${JSON.stringify(env.ORANGE_DEMO_PASSWORD)},firstname:'Prueba perfil',lastname:'Navegador',email:${JSON.stringify(username + '@localhost.invalid')}})){
+        document.querySelector('[name="'+name+'"]').value=value;
+      }
+      document.querySelector('#id_workprofile').value='readonly';
+      document.querySelector('#id_workprofile').dispatchEvent(new Event('change',{bubbles:true}));
+      document.querySelector('#id_submitbutton').click();`);
+      await wait(`!!document.querySelector('#id_error_profilecourses')`);
+      check(await evaluate(`document.querySelector('#id_error_profilecourses').textContent.includes('Selecciona al menos')`), 'Consulta exige seleccionar cursos antes de crear');
+      await evaluate(`document.querySelector('[name="password"]').value=${JSON.stringify(env.ORANGE_DEMO_PASSWORD)};
+        const select=document.querySelector('[name="profilecourses[]"]');
+        select.options[0].selected=true;select.dispatchEvent(new Event('change',{bubbles:true}));
+        document.querySelector('#id_submitbutton').click();`);
+      await wait(`location.pathname==='/local/orangeportal/users.php'&&!location.search&&document.body?.innerText?.includes(${JSON.stringify(username)})`);
+      check(await evaluate(`Array.from(document.querySelectorAll('tbody tr')).some(r=>r.innerText.includes(${JSON.stringify(username)})&&r.innerText.includes('Formador sin edición'))`),
+        'Crear desde Orange guarda el perfil sin edición');
+      const edit = await evaluate(`Array.from(document.querySelectorAll('tbody tr')).find(r=>r.innerText.includes(${JSON.stringify(username)})).querySelector('a[href*="users.php?id="]').href`);
+      await navigate(edit);
+      await wait(`!!document.querySelector('#id_workprofile')`);
+      check(await evaluate(`document.querySelector('#id_workprofile').value==='readonly'&&document.querySelector('[name="profilecourses[]"]').selectedOptions.length===1`),
+        'Editar conserva perfil y curso autorizado');
+      await screenshot('perfiles-orange-desktop');
+      await send('Emulation.setDeviceMetricsOverride', {width:390,height:844,deviceScaleFactor:1,mobile:true});
+      check(await evaluate(`document.documentElement.scrollWidth<=innerWidth`), 'Formulario de perfiles usable en móvil');
+      await screenshot('perfiles-orange-mobile');
+      await send('Emulation.clearDeviceMetricsOverride');
+      for (const profile of ['trainer', 'readonly', 'coordinator', 'quality', 'agent']) {
+        await navigate(edit);
+        await wait(`!!document.querySelector('#id_workprofile')`);
+        await evaluate(`document.querySelector('#id_workprofile').value=${JSON.stringify(profile)};
+          document.querySelector('#id_workprofile').dispatchEvent(new Event('change',{bubbles:true}));
+          document.querySelector('#id_submitbutton').click();`);
+        await wait(`location.pathname==='/local/orangeportal/users.php'&&!location.search&&document.body?.innerText?.includes(${JSON.stringify(username)})`);
+        await navigate(edit);
+        await wait(`!!document.querySelector('#id_workprofile')`);
+        check(await evaluate(`document.querySelector('#id_workprofile').value===${JSON.stringify(profile)}`), 'Cambio de perfil desde Orange: ' + profile);
+      }
+      console.log('PASS ' + results.length + ' browser checks for work profiles');
+    } finally {
+      execFileSync('docker', ['compose','exec','-T','web','php','-r',cleanup,username], {stdio:'pipe'});
+    }
+  } else if (process.argv.includes('--content-flow-only')) {
     try {
       await login('formador.orange',env.ORANGE_DEMO_PASSWORD);
       await navigate('/local/orangeportal/index.php?section=courses');
@@ -870,7 +927,8 @@ try {
   await screenshot('aislamiento-orange-biblioteca');
   for(const section of ['courses','incidents','notifications']){
     await navigate('/local/orangeportal/index.php?section='+section);
-    check(await evaluate(`!!document.querySelector('.orange-intro')&&!document.querySelector('.alert-danger')`),'Orange: '+section+' disponible');
+    const sectionroot=section==='courses'?'.orange-intro':'.orange-incidents-layout';
+    check(await evaluate(`!!document.querySelector(${JSON.stringify(sectionroot)})&&!document.querySelector('.alert-danger')`),'Orange: '+section+' disponible');
   }
   await navigate('/user/preferences.php');
   check((await themename()).includes('/orange/')&&await evaluate(`document.body.innerText.includes('Mi cuenta')`),'Orange conserva apariencia y breadcrumb personal');

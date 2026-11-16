@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "properties": {
+    "titulo": {
+      "type": "string"
+    },
+    "fechaPublicacion": {
+      "type": "string"
+    },
+    "servicioAfectado": {
+      "type": "string"
+    },
+    "contenido": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "titulo",
+    "fechaPublicacion",
+    "servicioAfectado",
+    "contenido",
+    "url"
+  ],
+  "additionalProperties": false
+}

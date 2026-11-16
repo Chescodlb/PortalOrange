@@ -1,6 +1,31 @@
 # Administrador delegado de Orange · 20/10/2026
 
-Administración mantiene usuarios y colectivos; Formación publica contenido y matricula usuarios existentes. Crear usuarios no se concede al Formador. El perfil **Administrador de Orange** no es administrador del sitio ni Gestor global de Moodle.
+Administración mantiene usuarios, perfiles de trabajo y colectivos; Formación publica contenido y matricula usuarios existentes. Crear usuarios no se concede al Formador. El perfil **Administrador de Orange** no es administrador del sitio ni Gestor global de Moodle.
+
+## Asignar perfiles desde Orange (2026111100)
+
+Actualizar todo `local_orangeportal` y completar la actualización desde **Administración del sitio > Notificaciones**. La actualización crea los seis roles de trabajo que falten, sin sobrescribir definiciones existentes ni asignar personas. Purgar cachés después. Esta preparación inicial requiere administración general; el mantenimiento posterior se hace dentro de Orange.
+
+1. Entrar con **Administrador de Orange** y abrir **Administración > Usuarios Orange**.
+2. Pulsar **Crear usuario Orange** o **Editar** en una cuenta existente.
+3. Completar los datos disponibles y seleccionar los colectivos. Para seguimiento, incluir los mismos colectivos que las personas supervisadas.
+4. Elegir **Perfil Orange**:
+   - **Agente**: participante, sin seguimiento ajeno. El acceso formativo procede de sus matrículas/colectivos.
+   - **Formador**: publicaciones, estados e impactos; edición de los cursos/colecciones seleccionados.
+   - **Formador sin edición**: consulta de seguimiento y resultados de los cursos seleccionados, sin edición ni calificación.
+   - **Coordinación**: mismo alcance técnico de consulta que Formador sin edición.
+   - **Calidad**: consulta de lecturas e histórico, sin notas ajenas.
+5. Para Formador sin edición y Coordinación, seleccionar al menos un **Curso o colección autorizado**. Para Formador, seleccionar los que podrá editar.
+6. Solo para Formador, seleccionar opcionalmente las raíces en **Categorías donde podrá crear contenidos**. Concede creación y gestión de categorías en esas ramas y descendientes; no equivale a edición general de sus cursos existentes.
+7. Guardar y probar con la cuenta. El listado muestra el perfil asignado desde Orange.
+
+Los permisos utilizan roles nativos. Las asignaciones de curso de estos perfiles permiten acceso mediante `moodle/course:view`; no crean matrículas como Estudiante. Las matrículas de participación se gestionan por los mecanismos habituales.
+
+Al cambiar el perfil, se sustituyen las asignaciones creadas por este flujo y se retiran los permisos de autor derivados. No se eliminan roles manuales, matrículas ni permisos de otros proyectos. Si un rol externo al flujo sigue concediendo escritura/exportación o consulta de notas fuera del ámbito elegido, se rechaza la conversión a consulta y se revierte el guardado completo. El mensaje identifica la capacidad que debe revisar el administrador general. **Conservar los permisos actuales** permite mantener una cuenta configurada fuera del flujo.
+
+Las cuentas de administradores siguen protegidas. El selector no permite conceder Administrador de Orange, Gestor ni Administrador del sitio. Las definiciones de roles personalizadas con permisos adicionales tampoco se delegan: requieren revisión general. Retirar acceso Orange elimina los perfiles asignados por este flujo, conservando la cuenta global.
+
+Verificación local reversible: `docker compose exec -T web php local/orangeportal/cli/check_work_profiles.php`.
 
 ## Por qué hay una pantalla propia
 
@@ -21,7 +46,7 @@ Los permisos se suman con los demás roles de Moodle: asignar este perfil a un a
 
 **Administración > Usuarios Orange > Crear usuario Orange** permite introducir usuario, nombre, apellidos, correo, contraseña inicial y colectivos. El nombre de usuario y correo deben estar disponibles; la contraseña cumple la política nativa. La nueva cuenta utiliza autenticación manual y debe cambiar la contraseña al iniciar sesión por primera vez. No se envía correo automático con la contraseña.
 
-La cuenta se añade a Usuarios Orange. Pertenecer al portal y pertenecer a sus colectivos son decisiones distintas; las matrículas dependen de los métodos de cada formación/colección. Los nuevos usuarios no reciben permisos de Formador ni de Administración. Los perfiles privilegiados siguen asignándose por administración general desde Moodle.
+La cuenta se añade a Usuarios Orange. Pertenecer al portal y pertenecer a sus colectivos son decisiones distintas; las matrículas dependen de los métodos de cada formación/colección. El perfil predeterminado es Agente; Administración Orange puede seleccionar los perfiles descritos arriba. El perfil Administrador de Orange sigue asignándose por administración general desde Moodle.
 
 En el listado se pueden buscar usuarios y abrir **Editar** para cambiar colectivos. Solo las cuentas creadas desde este flujo, y que no se hayan reutilizado fuera de Orange, permiten actualizar nombre, apellidos y correo desde el portal. Las cuentas preexistentes/compartidas conservan sus datos y credenciales globales. La contraseña se recupera por los mecanismos nativos o desde administración general; el portal no cambia autenticación ni nombres de usuario de cuentas existentes.
 
@@ -43,9 +68,9 @@ Disponible en **Administración > Usuarios Orange > Importar agentes desde CSV**
 8. Corrige los errores en el CSV y vuelve a subirlo. Si está correcto, pulsa **Confirmar creación de agentes**. Se crean en lotes de 20 con un indicador de progreso. No vuelvas a subir el mismo archivo si se interrumpe: recarga para comprobar y continuar.
 9. Comprueba una cuenta y su pertenencia a Orange/colectivos. Cada persona deberá cambiar su contraseña al entrar; no se envía correo automático. Las matrículas pueden provenir de las sincronizaciones de colectivos o de la columna `courses`, siempre como Estudiante dentro de Orange. Las matrículas directas son independientes: quitar un colectivo no elimina la matrícula manual. Para retirarla, usa Participantes de la formación con un usuario autorizado.
 
-Archivo de ejemplo: [agentes-orange-ejemplo.csv](ejemplos/agentes-orange-ejemplo.csv). Incluye una formación, varias formaciones y ninguna matrícula. Los nombres, correos, contraseñas, colectivos y nombres cortos son ejemplos: sustitúyelos por los del ambiente destino. La formación continua del ejemplo debe existir para importarla; no se crean cursos ni colectivos desde este archivo.
+Archivo de ejemplo: [agentes-orange-ejemplo.csv](../../ejemplos/agentes-orange-ejemplo.csv). Incluye una formación, varias formaciones y ninguna matrícula. Los nombres, correos, contraseñas, colectivos y nombres cortos son ejemplos: sustitúyelos por los del ambiente destino. La formación continua del ejemplo debe existir para importarla; no se crean cursos ni colectivos desde este archivo.
 
-Solo crea cuentas nuevas de agentes: no modifica usuarios existentes ni asigna roles de Formador, Coordinación, Calidad o Administración. Si un usuario/correo ya existe, lo rechaza. Los roles de gestión siguen asignándose desde Moodle general, y los permisos formativos en sus categorías/cursos. Los colectivos no conceden roles de gestión.
+Solo crea cuentas nuevas de agentes: no modifica usuarios existentes ni asigna roles de Formador, Coordinación, Calidad o Administración. Si un usuario/correo ya existe, lo rechaza. Después de importar, se puede cambiar el perfil desde Usuarios Orange. Los colectivos no conceden roles de gestión.
 
 **Cancelación y privacidad:** la vista previa caduca a los 30 minutos de inactividad. Cancelar antes de iniciar no crea nada; después conserva los lotes completados. Cada lote se confirma o revierte completo. Si caduca después de una carga parcial, prepara otro archivo solo con las cuentas restantes. Las contraseñas no se muestran ni se incluyen en resultados o registros propios del importador: el CSV temporal se retira del área de borradores después de validarlo y los datos pendientes quedan cifrados en la sesión nativa hasta finalizar/cancelar/caducar. Protege el archivo original y los accesos al servidor. El cifrado utiliza las claves nativas de Moodle en `moodledata/secret`, compartidas entre nodos cuando corresponda; no se añaden tablas ni configuración de roles.
 

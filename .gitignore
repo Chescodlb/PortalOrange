@@ -20,6 +20,8 @@ node_modules/
 test-results/
 .venv/
 *.log
+# Archivos temporales de documentos abiertos en Microsoft Office.
+~$*
 
 # Tema hijo propio; los temas originales siguen como dependencias.
 !moodle/theme/

@@ -4,8 +4,10 @@ import {readFile,writeFile,mkdtemp,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
-const out=resolve('docs/manuales/20261106');
-const manuals=JSON.parse(await readFile(join(out,'fuentes/manifest.json'),'utf8'));
+const out=resolve(process.argv[2] || 'docs/manuales/20261111');
+const selected=process.argv.find(arg=>arg.startsWith('--manual='))?.slice('--manual='.length);
+const manuals=JSON.parse(await readFile(join(out,'fuentes/manifest.json'),'utf8')).filter(m=>!selected||m.id===selected);
+if(!manuals.length)throw new Error('Manual desconocido: '+selected);
 const profile=await mkdtemp(join(tmpdir(),'orange-manual-print-'));
 const chrome=spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',[
  '--headless=new','--no-first-run','--no-default-browser-check','--disable-background-networking',
@@ -29,6 +31,8 @@ try {
   for(let i=0;i<100;i++){const r=await send('Runtime.evaluate',{expression:`document.readyState==='complete'&&document.querySelectorAll('.chapter').length===${manual.chapters}`,returnByValue:true});if(r.result.value){loaded=true;break;}await delay(100);}
   if(!loaded)throw new Error('Documento no cargado: '+manual.id);
   await send('Runtime.evaluate',{expression:'document.fonts.ready',awaitPromise:true});
+  const images=await send('Runtime.evaluate',{expression:'Array.from(document.images).every(i=>i.complete&&i.naturalWidth>0)',returnByValue:true});
+  if(!images.result.value)throw new Error('Imagen ausente o sin cargar: '+manual.id);
   const pdf=await send('Page.printToPDF',{
    printBackground:true,preferCSSPageSize:true,displayHeaderFooter:true,
    headerTemplate:'<div style="width:100%;margin:0 23mm;font:8px Arial;color:#a44200;font-weight:700">ORANGE / PORTAL DE CONOCIMIENTO</div>',

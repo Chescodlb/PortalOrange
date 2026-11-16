@@ -1,0 +1,21 @@
+{
+  "motivo": "Metadatos de Finder sin contenido documental retirados durante la limpieza solicitada. No se han eliminado manuales ni materiales de apoyo.",
+  "retirados": [
+    {
+      "ruta": ".DS_Store",
+      "sha256": "3d3c6ba843af25e355b99e9ecd0c09f9f74d8b37495261cebb85fe4daeac51c5",
+      "bytes": 12292
+    },
+    {
+      "ruta": "20261106/.DS_Store",
+      "sha256": "c1034ee52073d29ae14ae7e28c05ca5ee4e2e127763a05e9d6388398e40bf406",
+      "bytes": 8196
+    },
+    {
+      "ruta": "teams-20261110/.DS_Store",
+      "sha256": "0b85cb3c7a305a095fd807e5df560fe564640c600205fae302719452e002261d",
+      "bytes": 6148
+    }
+  ],
+  "archivos_documentales_conservados": 55
+}

@@ -65,6 +65,9 @@ class orange_administration {
     public static function membership_changed(\core\event\base $event): void {
         if ((int)$event->objectid === (int)get_config('local_orangeportal', 'audiencecohort')) {
             self::sync_areas((int)$event->relateduserid);
+            if (!experience::member((int)$event->relateduserid)) {
+                work_profiles::clear((int)$event->relateduserid);
+            }
         }
     }
     /** Existing shared accounts may have memberships managed, but never global credentials edited. */
@@ -90,7 +93,7 @@ class orange_administration {
         }
         $internalcourses = $DB->get_records_menu('local_orange_container', [], '', 'courseid, courseid');
         $owncontext = \context_user::instance($userid)->id;
-        $portalroles = $DB->get_records_list('role', 'shortname', ['orange_publicador', 'orange_seguimiento']);
+        $portalroles = $DB->get_records_list('role', 'shortname', ['orange_publicador', 'orange_seguimiento', 'orange_calidad']);
         foreach ($DB->get_records('role_assignments', ['userid' => $userid]) as $ra) {
             if ($ra->contextid == $owncontext) { continue; }
             $context = \context::instance_by_id($ra->contextid);

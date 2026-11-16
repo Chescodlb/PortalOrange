@@ -7,7 +7,7 @@ import importlib.util,re,subprocess,json,hashlib
 from zipfile import ZipFile
 from pypdf import PdfReader
 from docx import Document
-ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'docs/manuales/20261106'
+ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'docs/archivo/manuales-hasta-20261111/20261106'
 spec=importlib.util.spec_from_file_location('orange_manual_content',OUT/'fuentes/contenido_manuales.py')
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 def normalized(s):return re.sub(r'\s+','',s).replace('\u200b','')

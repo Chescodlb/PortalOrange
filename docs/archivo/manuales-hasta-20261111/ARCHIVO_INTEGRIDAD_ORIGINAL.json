@@ -1,0 +1,292 @@
+[
+  {
+    "ruta": "Guia_usuarios_permisos_y_colectivos_Orange.docx",
+    "sha256": "f2910d47c7a05adbec745158a99686e932b6ab9df3840a6d34a5290c87892728",
+    "bytes": 69943
+  },
+  {
+    "ruta": ".DS_Store",
+    "sha256": "3d3c6ba843af25e355b99e9ecd0c09f9f74d8b37495261cebb85fe4daeac51c5",
+    "bytes": 12292
+  },
+  {
+    "ruta": "Comandos_despliegue_Orange.txt",
+    "sha256": "09ebe1f1c4f81926f45a4469cf4cff2f4233dc0e742a97161f9a5c8ae37849ab",
+    "bytes": 3161
+  },
+  {
+    "ruta": "Guia_despliegue_produccion_Orange.docx",
+    "sha256": "c820392dfebcff94b337b4dafe2de8da6547b3bd53d3c34bfd4dd5ed01516df0",
+    "bytes": 74568
+  },
+  {
+    "ruta": "Guia_usuarios_permisos_y_colectivos_Orange.pdf",
+    "sha256": "37beaf8260af62cb3fe2fe54f068ebb3f78a89c3dc7c0220f246dd01c33772fb",
+    "bytes": 309810
+  },
+  {
+    "ruta": "Guia_despliegue_produccion_Orange.pdf",
+    "sha256": "cd8dce3c5c71a9c79ce399389048c096426fb6af165fba6c3fbc0ce0468c6df0",
+    "bytes": 387802
+  },
+  {
+    "ruta": "20261106/Plantilla_agentes_Orange.csv",
+    "sha256": "b75f390ffc3bc56485c4fa43413189a294f91c2fb8ebd0ccb9691ceb1a8af71c",
+    "bytes": 228
+  },
+  {
+    "ruta": "20261106/02_Coordinadores_Orange.doc",
+    "sha256": "a2e3a683baeee94acbb59b7bd2430cbc3b7f25da7455cc7becaaea62936c74f1",
+    "bytes": 54272
+  },
+  {
+    "ruta": "20261106/04_Administradores_Orange.pdf",
+    "sha256": "f64673622a4e0b92b36772c2d945b4ca78f7b9eb2acd1cbe63bf5b8f78d5bab3",
+    "bytes": 349206
+  },
+  {
+    "ruta": "20261106/MANIFEST.sha256",
+    "sha256": "262800d8277651bd9863d48057ec2d97d02c3ab9f62afc4599e74175ef8aa093",
+    "bytes": 3442
+  },
+  {
+    "ruta": "20261106/.DS_Store",
+    "sha256": "c1034ee52073d29ae14ae7e28c05ca5ee4e2e127763a05e9d6388398e40bf406",
+    "bytes": 8196
+  },
+  {
+    "ruta": "20261106/01_Agentes_Orange.doc",
+    "sha256": "5641fc816fae24dbcc11d2f6122675952a4efd1e4cb33ab8316487ef4a7cdea4",
+    "bytes": 44544
+  },
+  {
+    "ruta": "20261106/03_Formadores_Orange.doc",
+    "sha256": "c366f5c760e380bd6b4531a4e2dcc544a4a3dd8986d083caf10e3d3181f0bc34",
+    "bytes": 62976
+  },
+  {
+    "ruta": "20261106/LEEME.txt",
+    "sha256": "b46981372cc6c864b3e41f07f1cb16a5d02dbbae41885884b4b5377f71652afc",
+    "bytes": 2168
+  },
+  {
+    "ruta": "20261106/05_Administradores_Generales_Moodle.docx",
+    "sha256": "4115bf7aa3bd67326816d7e09961afdf93cbbaf4a3fa4a27c83a88442eae26e0",
+    "bytes": 49506
+  },
+  {
+    "ruta": "20261106/05_Administradores_Generales_Moodle.doc",
+    "sha256": "e5e7c75671f3686992d093651d4bb218c3609fb7a6bbaf7e511b9643732dbb55",
+    "bytes": 87552
+  },
+  {
+    "ruta": "20261106/02_Coordinadores_Orange.docx",
+    "sha256": "a0e07cc9b28fb2a13ee230f6aaba97acb27548e8b7a98d7ddd7d47290d4241ea",
+    "bytes": 44575
+  },
+  {
+    "ruta": "20261106/Manuales_Orange_20261106.zip",
+    "sha256": "d8498fe92a2254ec69b209707e4c7070cc0317ee5cbbf9aef532037821514eb4",
+    "bytes": 1628315
+  },
+  {
+    "ruta": "20261106/05_Administradores_Generales_Moodle.pdf",
+    "sha256": "88087584319767481f6d978ca6d89426d22939f07d26c043f4fc03436b5c7d21",
+    "bytes": 394997
+  },
+  {
+    "ruta": "20261106/04_Administradores_Orange.docx",
+    "sha256": "ca728cb0f2b06861620958b5b0d4940654b46a896410f89eeee07ff4e9e49653",
+    "bytes": 48786
+  },
+  {
+    "ruta": "20261106/01_Agentes_Orange.docx",
+    "sha256": "97a46d806376c0f13e7c1dc26c0f7d5c478fe5e5f713ee2856f9f6de4f58cecc",
+    "bytes": 43212
+  },
+  {
+    "ruta": "20261106/04_Administradores_Orange.doc",
+    "sha256": "3e2918439d5499887df579437f8961c17ad4eb1520b3a5426885e7b6dca902dd",
+    "bytes": 80384
+  },
+  {
+    "ruta": "20261106/02_Coordinadores_Orange.pdf",
+    "sha256": "1f720665753de13c607ffcfcb385a984cb211c6e03da8c4e391016742521b84b",
+    "bytes": 293148
+  },
+  {
+    "ruta": "20261106/03_Formadores_Orange.pdf",
+    "sha256": "3277128720dd8804fb5ca60e7ca12a92f96455d706f82638274fd3aee674ba1d",
+    "bytes": 304899
+  },
+  {
+    "ruta": "20261106/01_Agentes_Orange.pdf",
+    "sha256": "9402449b5f0d6eb542f22141ba93c7056eef680170ca73fc6302c47ad76166c2",
+    "bytes": 263941
+  },
+  {
+    "ruta": "20261106/03_Formadores_Orange.docx",
+    "sha256": "ef34b73d3e472921ce19d97de86702fcf3b36b68eca9e7c0fcb1b99d0fcf821a",
+    "bytes": 46315
+  },
+  {
+    "ruta": "20261106/roles/orange_administrador.xml",
+    "sha256": "5a3128d639a73dba86820816b2c0572da7efc182e95a22075c1e01419b5e6190",
+    "bytes": 34203
+  },
+  {
+    "ruta": "20261106/roles/orange_admin_area.xml",
+    "sha256": "8196542ba85ff250a64db12c1299976f80fe0898ee2cc6c3b0d1092ea82a67cc",
+    "bytes": 32448
+  },
+  {
+    "ruta": "20261106/roles/permisos-permitidos.csv",
+    "sha256": "0530f2cf3c8e7f29d675dd6832e284e5a8b529d63587c8f70a713070a4078ed4",
+    "bytes": 47151
+  },
+  {
+    "ruta": "20261106/roles/orange_cuenta.xml",
+    "sha256": "60061581450347495cec935aeb69eccdef88b723c554126f83f8f5af43fded59",
+    "bytes": 34189
+  },
+  {
+    "ruta": "20261106/roles/orange_calidad.xml",
+    "sha256": "70750ec98fdb38441600a23d8987995ee7c16ce63db3f420b0fc989ad6fb8f5e",
+    "bytes": 34164
+  },
+  {
+    "ruta": "20261106/roles/orange_consulta_formativa.xml",
+    "sha256": "aabc2bc441f4c03dd2a90243c120683b3e97ec99786389c994608c8baca2d5c3",
+    "bytes": 34170
+  },
+  {
+    "ruta": "20261106/roles/orange_seguimiento.xml",
+    "sha256": "6819b594e430fb675cc599fbfaf7a64dbe5f8884d098b32a477a24ebade68a06",
+    "bytes": 34177
+  },
+  {
+    "ruta": "20261106/roles/orange_publicador.xml",
+    "sha256": "bc22b3441184d3c94a4bdf9142587f59e27021267abe3707f9e37a810ff5dcb0",
+    "bytes": 34159
+  },
+  {
+    "ruta": "20261106/roles/orange_gestorcategorias.xml",
+    "sha256": "c2c020750edee9fcfc156ebfd5889e38064751f949bd2c716fc79e27b2d8975e",
+    "bytes": 34204
+  },
+  {
+    "ruta": "20261106/roles/SHA256SUMS.txt",
+    "sha256": "87606f766b716cff8c279bf45c7d7bc949b3a2d9f9b53a7b4a998f1c207c5bad",
+    "bytes": 900
+  },
+  {
+    "ruta": "20261106/roles/orange_creadorcontenidos.xml",
+    "sha256": "6457d232fba07fd0b82fad58c58f9c52d73b5b0a0c5e99f0be31c4b30935a895",
+    "bytes": 34203
+  },
+  {
+    "ruta": "20261106/fuentes/02_Coordinadores_Orange.html",
+    "sha256": "a52c20441ce2c513ab5b6d5776312dfba9864d1859f943b31efafe153522f4e1",
+    "bytes": 18531
+  },
+  {
+    "ruta": "20261106/fuentes/04_Administradores_Orange.html",
+    "sha256": "e4abddd54355e4323d75136f1924f81cba033d2758b09c2df5e356ccd7c03e1f",
+    "bytes": 31581
+  },
+  {
+    "ruta": "20261106/fuentes/01_Agentes_Orange.html",
+    "sha256": "267cfde59c7ba662d466490a58744e204bd0fe2a51d28c4cf9cd54bc156f9eda",
+    "bytes": 14458
+  },
+  {
+    "ruta": "20261106/fuentes/03_Formadores_Orange.html",
+    "sha256": "7a09634f395b31f5bfa9fa46badcf90e07ca22de5cf6388551a2b855523ed447",
+    "bytes": 24273
+  },
+  {
+    "ruta": "20261106/fuentes/manifest.json",
+    "sha256": "071ebda0c235179ef8211436b1af7762b914aa91b9f89b168960d51ff86e8b41",
+    "bytes": 523
+  },
+  {
+    "ruta": "20261106/fuentes/validacion.json",
+    "sha256": "2b292a654c52e76d2b9aec72b5d9452c876d9df2811e735c71a0ae2b917f2cde",
+    "bytes": 1001
+  },
+  {
+    "ruta": "20261106/fuentes/05_Administradores_Generales_Moodle.html",
+    "sha256": "539a89a7edf1bbd449b3b0ca94d8773b0c985f00939a1492afe80f29eb8035a2",
+    "bytes": 33507
+  },
+  {
+    "ruta": "20261106/fuentes/contenido_manuales.py",
+    "sha256": "bb698dbff0eb350399ddc2a8b91eee8b4f3950399b064fcf377a81e2b72306e2",
+    "bytes": 71965
+  },
+  {
+    "ruta": "produccion-20261110/Manual_pase_a_produccion_Portal_Orange.docx",
+    "sha256": "8e7560808439294fe7491520e395cdfdf72d50ff4998257b9aabade1528ed266",
+    "bytes": 55957
+  },
+  {
+    "ruta": "produccion-20261110/Manual_pase_a_produccion_Portal_Orange.pdf",
+    "sha256": "44a8e707c1853d2a09642800f87eb5c22210dd54ec0e3dad1e27746458b8d301",
+    "bytes": 472579
+  },
+  {
+    "ruta": "produccion-20261110/Manual_pase_a_produccion_Portal_Orange.doc",
+    "sha256": "b8f06b3cf829ce5e6d1d5615946779e04d048ff913f10fc9b1d144061d28264a",
+    "bytes": 133120
+  },
+  {
+    "ruta": "produccion-20261110/fuentes/manifest.json",
+    "sha256": "6848da79a02b6297f988f71cbbac94ceff95bf71fb424a89183a6aa33c3d41ce",
+    "bytes": 127
+  },
+  {
+    "ruta": "produccion-20261110/fuentes/Manual_pase_a_produccion_Portal_Orange.html",
+    "sha256": "3d95533fbcf2ecc07aaf1f3a0bb608fa3bbc413e5eae4d567ff8e5b0787a92db",
+    "bytes": 55254
+  },
+  {
+    "ruta": "produccion-20261110/fuentes/validacion.json",
+    "sha256": "8f9fdb5d9000d8acd70318c64068b4b90566d593f08ec85e2f19a846accbb910",
+    "bytes": 376
+  },
+  {
+    "ruta": "teams-20261110/Manual_configuracion_y_revision_Teams_Orange.pdf",
+    "sha256": "4651241e0023072852a5b745bff007b3a5ca8e7b4a88c21e3e8785ab71029581",
+    "bytes": 317353
+  },
+  {
+    "ruta": "teams-20261110/.DS_Store",
+    "sha256": "0b85cb3c7a305a095fd807e5df560fe564640c600205fae302719452e002261d",
+    "bytes": 6148
+  },
+  {
+    "ruta": "teams-20261110/Manual_configuracion_y_revision_Teams_Orange.docx",
+    "sha256": "18e1aefb8c2dfff52b2dfa3905dbb565fa90f86faad6c457f8053aa02844ba93",
+    "bytes": 46156
+  },
+  {
+    "ruta": "teams-20261110/Manual_configuracion_y_revision_Teams_Orange.doc",
+    "sha256": "4b36e8f7b83bc5d7e13b042c01b71c5505cb185c021f39e6da3c03ac29032744",
+    "bytes": 68608
+  },
+  {
+    "ruta": "teams-20261110/fuentes/manifest.json",
+    "sha256": "b6cee8f2735a51efb522dcd0638740beb81d321ab7bb4f4de3dff33f3ad02dac",
+    "bytes": 150
+  },
+  {
+    "ruta": "teams-20261110/fuentes/Manual_configuracion_y_revision_Teams_Orange.html",
+    "sha256": "174e4ea7741741bbfd1f1e7f5b1d98147d5004b3db35bd3d75ea2df5f61c1b57",
+    "bytes": 25101
+  },
+  {
+    "ruta": "teams-20261110/fuentes/validacion.json",
+    "sha256": "1aaa339012c45d6892834f74d3aaab7e15068ef185cfff9208d3d98afed7ffcd",
+    "bytes": 832
+  }
+]

@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "site_url": "https://SUSTITUIR_POR_EL_CAMPUS",
+  "php_cli": "/usr/bin/php",
+  "allow_scope_change": false,
+  "portal": {
+    "enabled": true,
+    "library": {
+      "idnumber": "orange_pre_library",
+      "name": "Biblioteca Orange",
+      "create": true
+    },
+    "training": {
+      "idnumber": "orange_pre_training",
+      "name": "Formaciones Orange",
+      "create": true
+    },
+    "audience": {
+      "idnumber": "orange_portal_users",
+      "name": "Usuarios Orange",
+      "create": true
+    },
+    "managedcohorts": [],
+    "landingsection": "library",
+    "automaticalerts": true
+  },
+  "theme": {
+    "apply_to_cohort": true,
+    "enable_cohort_themes": true
+  },
+  "teams": {
+    "enabled": false,
+    "url_file": null,
+    "types": [
+      "incidents",
+      "notifications",
+      "library",
+      "courses"
+    ],
+    "actions": [
+      "created",
+      "updated"
+    ]
+  },
+  "catalog_file": null,
+  "administrators": []
+}

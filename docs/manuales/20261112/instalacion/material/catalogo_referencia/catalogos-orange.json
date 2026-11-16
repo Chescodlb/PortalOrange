@@ -1,0 +1,1628 @@
+{
+  "format": 1,
+  "generated": "2026-10-22",
+  "roots": {
+    "librarycategory": {
+      "sourceid": 2,
+      "categories": [
+        {
+          "sourceid": 2,
+          "parent": 0,
+          "name": "Biblioteca",
+          "idnumber": "orange_b718f1354f7247312eca086d9a024afe",
+          "visible": 1,
+          "sortorder": 20000,
+          "depth": 1
+        },
+        {
+          "sourceid": 3,
+          "parent": 2,
+          "name": "RPV",
+          "idnumber": "orange_1847b5b6c419ceef50d4276125c8d4b9",
+          "visible": 1,
+          "sortorder": 30000,
+          "depth": 2
+        },
+        {
+          "sourceid": 174,
+          "parent": 2,
+          "name": "CENTREX",
+          "idnumber": null,
+          "visible": 1,
+          "sortorder": 1690000,
+          "depth": 2
+        },
+        {
+          "sourceid": 5,
+          "parent": 3,
+          "name": "QUIENES SOMOS",
+          "idnumber": "orange_a81400e4767df8b547ada0094b0b93d2",
+          "visible": 1,
+          "sortorder": 40000,
+          "depth": 3
+        },
+        {
+          "sourceid": 10,
+          "parent": 3,
+          "name": "ORANGE",
+          "idnumber": "orange_6e6831720b47e9136c0f216582a1f5ae",
+          "visible": 1,
+          "sortorder": 90000,
+          "depth": 3
+        },
+        {
+          "sourceid": 13,
+          "parent": 3,
+          "name": "ALTA",
+          "idnumber": "orange_bf10e996d943309c7db2c9e866951aa7",
+          "visible": 1,
+          "sortorder": 120000,
+          "depth": 3
+        },
+        {
+          "sourceid": 26,
+          "parent": 3,
+          "name": "PORTABILIDAD",
+          "idnumber": "orange_55daa527420885d71bb5bc68958b3e1d",
+          "visible": 1,
+          "sortorder": 250000,
+          "depth": 3
+        },
+        {
+          "sourceid": 41,
+          "parent": 3,
+          "name": "POSTVENTA DE SERVICIOS",
+          "idnumber": "orange_f89417d02d829ac2e5ce9f4b626ead52",
+          "visible": 1,
+          "sortorder": 400000,
+          "depth": 3
+        },
+        {
+          "sourceid": 70,
+          "parent": 3,
+          "name": "POSTVENTAS ADMINISTRATIVAS",
+          "idnumber": "orange_96a6ab9510945c155bd6d5e4fa214859",
+          "visible": 1,
+          "sortorder": 690000,
+          "depth": 3
+        },
+        {
+          "sourceid": 82,
+          "parent": 3,
+          "name": "GESTIÓN DE PEDIDOS",
+          "idnumber": "orange_351f0dad6075c237a320e6ac2c3622dc",
+          "visible": 1,
+          "sortorder": 810000,
+          "depth": 3
+        },
+        {
+          "sourceid": 96,
+          "parent": 3,
+          "name": "POSTVENTA DE TERMINALES",
+          "idnumber": "orange_8ab504e660a261860235fc8ccb45cec1",
+          "visible": 1,
+          "sortorder": 950000,
+          "depth": 3
+        },
+        {
+          "sourceid": 100,
+          "parent": 3,
+          "name": "BAJAS, SUSPENSIONES, PENALIZACIONES",
+          "idnumber": "orange_80adb8f6b5ad8567a3223cadf49eda29",
+          "visible": 1,
+          "sortorder": 990000,
+          "depth": 3
+        },
+        {
+          "sourceid": 105,
+          "parent": 3,
+          "name": "FACTURACION/COBROS",
+          "idnumber": "orange_b6e88e0e55ade6f448c584930b92b247",
+          "visible": 1,
+          "sortorder": 1040000,
+          "depth": 3
+        },
+        {
+          "sourceid": 110,
+          "parent": 3,
+          "name": "GESTIÓN DE INCIDENCIAS",
+          "idnumber": "orange_7ce8933f05993c7bd7c0412dd6e463a6",
+          "visible": 1,
+          "sortorder": 1090000,
+          "depth": 3
+        },
+        {
+          "sourceid": 117,
+          "parent": 3,
+          "name": "LOCALIZACIÓN DE DATOS",
+          "idnumber": "orange_38de4db9d125b28328fee057aad80967",
+          "visible": 1,
+          "sortorder": 1160000,
+          "depth": 3
+        },
+        {
+          "sourceid": 133,
+          "parent": 3,
+          "name": "INFORMES (Procedimiento)",
+          "idnumber": "orange_38044623b2170efdf878817e6c080dad",
+          "visible": 1,
+          "sortorder": 1320000,
+          "depth": 3
+        },
+        {
+          "sourceid": 141,
+          "parent": 3,
+          "name": "Procedimientos operativos",
+          "idnumber": "orange_a49d03047b4cc69f6e8f15c72027cff4",
+          "visible": 1,
+          "sortorder": 1400000,
+          "depth": 3
+        },
+        {
+          "sourceid": 153,
+          "parent": 3,
+          "name": "PORTALES DE AUTOGESTIÓN",
+          "idnumber": "orange_8c1b92d6f0027f10babeffba6e7feda4",
+          "visible": 1,
+          "sortorder": 1520000,
+          "depth": 3
+        },
+        {
+          "sourceid": 6,
+          "parent": 5,
+          "name": "Presentación Abai / Orange (Servicio Primera Línea, Funciones/Roles, Matriz de escalado…)",
+          "idnumber": "orange_19a078b94f072ded7e04f6ccb52f3a00",
+          "visible": 1,
+          "sortorder": 50000,
+          "depth": 4
+        },
+        {
+          "sourceid": 7,
+          "parent": 5,
+          "name": "Decálogo del gestor / OC",
+          "idnumber": "orange_7eb69d9dd9dff8e44675bf6dfe8a1d53",
+          "visible": 1,
+          "sortorder": 60000,
+          "depth": 4
+        },
+        {
+          "sourceid": 8,
+          "parent": 5,
+          "name": "Gestor Personal",
+          "idnumber": "orange_33819e4d63ff88403e0d934035b9b0cc",
+          "visible": 1,
+          "sortorder": 70000,
+          "depth": 4
+        },
+        {
+          "sourceid": 9,
+          "parent": 5,
+          "name": "Funciones agentes GP / OC",
+          "idnumber": "orange_89f3215e0af231c07283dded86b10ce0",
+          "visible": 1,
+          "sortorder": 80000,
+          "depth": 4
+        },
+        {
+          "sourceid": 11,
+          "parent": 10,
+          "name": "Servicios Orange",
+          "idnumber": "orange_239c5cccfd595d883e907c6222272a76",
+          "visible": 1,
+          "sortorder": 100000,
+          "depth": 4
+        },
+        {
+          "sourceid": 12,
+          "parent": 10,
+          "name": "Oferta comercial",
+          "idnumber": "orange_8b2e32f2ed03a7e501b8181b7f74a75d",
+          "visible": 1,
+          "sortorder": 110000,
+          "depth": 4
+        },
+        {
+          "sourceid": 14,
+          "parent": 13,
+          "name": "Alta con terminal",
+          "idnumber": "orange_4226313eb03bd252e6b05f5d13253ba7",
+          "visible": 1,
+          "sortorder": 130000,
+          "depth": 4
+        },
+        {
+          "sourceid": 19,
+          "parent": 13,
+          "name": "Alta sin terminal",
+          "idnumber": "orange_387349227a5ae793c42ef31801310dc2",
+          "visible": 1,
+          "sortorder": 180000,
+          "depth": 4
+        },
+        {
+          "sourceid": 24,
+          "parent": 13,
+          "name": "Alta Comunica SMS",
+          "idnumber": "orange_d50cf77429b60616331f01f6000cc397",
+          "visible": 1,
+          "sortorder": 230000,
+          "depth": 4
+        },
+        {
+          "sourceid": 27,
+          "parent": 26,
+          "name": "Preportabilidad / OC",
+          "idnumber": "orange_f224f32818182b0f97e8d8702a01524d",
+          "visible": 1,
+          "sortorder": 260000,
+          "depth": 4
+        },
+        {
+          "sourceid": 29,
+          "parent": 26,
+          "name": "Portabilidad entrante con terminal",
+          "idnumber": "orange_b01d1e957715fb917aeabd4e76b727fa",
+          "visible": 1,
+          "sortorder": 280000,
+          "depth": 4
+        },
+        {
+          "sourceid": 34,
+          "parent": 26,
+          "name": "Portabilidad entrante sin terminal",
+          "idnumber": "orange_2f5063e59107dd21e00bc94b18a6b56c",
+          "visible": 1,
+          "sortorder": 330000,
+          "depth": 4
+        },
+        {
+          "sourceid": 39,
+          "parent": 26,
+          "name": "Portabiliad Saliente",
+          "idnumber": "orange_70d3e4b833e06011671e8bc2a672e0a7",
+          "visible": 1,
+          "sortorder": 380000,
+          "depth": 4
+        },
+        {
+          "sourceid": 42,
+          "parent": 41,
+          "name": "Cambios de tarifa",
+          "idnumber": "orange_1e3028f6ccc7775bfb38e5764cda0cc6",
+          "visible": 1,
+          "sortorder": 410000,
+          "depth": 4
+        },
+        {
+          "sourceid": 44,
+          "parent": 41,
+          "name": "Activación/desactivación Roaming",
+          "idnumber": "orange_e513220094f56064a9482cd3893a0efd",
+          "visible": 1,
+          "sortorder": 430000,
+          "depth": 4
+        },
+        {
+          "sourceid": 46,
+          "parent": 41,
+          "name": "Activación/desactivación buzón de voz",
+          "idnumber": "orange_e6276be8c0444a27422e7657a573142c",
+          "visible": 1,
+          "sortorder": 450000,
+          "depth": 4
+        },
+        {
+          "sourceid": 48,
+          "parent": 41,
+          "name": "Activación/desactivación Superbono",
+          "idnumber": "orange_8a34c8ba1c0a43b2f7325da510be73af",
+          "visible": 1,
+          "sortorder": 470000,
+          "depth": 4
+        },
+        {
+          "sourceid": 50,
+          "parent": 41,
+          "name": "Alta/Cambio APN privado o público",
+          "idnumber": "orange_30db0d705d29914704d860e533043a90",
+          "visible": 1,
+          "sortorder": 490000,
+          "depth": 4
+        },
+        {
+          "sourceid": 52,
+          "parent": 41,
+          "name": "Activación/desactivación llamadas especiales",
+          "idnumber": "orange_0ac8f3ad8cff0541cb9bdbda6b441dd4",
+          "visible": 1,
+          "sortorder": 510000,
+          "depth": 4
+        },
+        {
+          "sourceid": 54,
+          "parent": 41,
+          "name": "Activación/desactivación Desvío de llamadas",
+          "idnumber": "orange_b724b004c391526baffd8cf3abed0c6c",
+          "visible": 1,
+          "sortorder": 530000,
+          "depth": 4
+        },
+        {
+          "sourceid": 56,
+          "parent": 41,
+          "name": "Activación/desactivación Bonos de datos individuales (1.5GB, 6GB)",
+          "idnumber": "orange_f97a4d15b28f7721abcfbd9944c10b57",
+          "visible": 1,
+          "sortorder": 550000,
+          "depth": 4
+        },
+        {
+          "sourceid": 58,
+          "parent": 41,
+          "name": "Activación/desactivación Bonos compartidos",
+          "idnumber": "orange_d9b512f23fd59b8c1f4201fab5b3da8a",
+          "visible": 1,
+          "sortorder": 570000,
+          "depth": 4
+        },
+        {
+          "sourceid": 60,
+          "parent": 41,
+          "name": "Activación/desactivación TDR",
+          "idnumber": "orange_16dc397c7d14c128c37f205a81f45089",
+          "visible": 1,
+          "sortorder": 590000,
+          "depth": 4
+        },
+        {
+          "sourceid": 62,
+          "parent": 41,
+          "name": "Activación/desactivación MMS",
+          "idnumber": "orange_47c9d96b6ba1b4aa9846c085cafe3ead",
+          "visible": 1,
+          "sortorder": 610000,
+          "depth": 4
+        },
+        {
+          "sourceid": 64,
+          "parent": 41,
+          "name": "Activación/desactivación Servicios Fijo",
+          "idnumber": "orange_091ccbf7fdd3331c2d0f462426e782ad",
+          "visible": 1,
+          "sortorder": 630000,
+          "depth": 4
+        },
+        {
+          "sourceid": 66,
+          "parent": 41,
+          "name": "Activación/desactivación/modificación Servicios 90X",
+          "idnumber": "orange_fb7134fa75df188b5f819dcfe04233b1",
+          "visible": 1,
+          "sortorder": 650000,
+          "depth": 4
+        },
+        {
+          "sourceid": 68,
+          "parent": 41,
+          "name": "Servicio de Branded Calls",
+          "idnumber": "orange_cfd58f85fa49017d8f8b7d5b5ef75670",
+          "visible": 1,
+          "sortorder": 670000,
+          "depth": 4
+        },
+        {
+          "sourceid": 69,
+          "parent": 41,
+          "name": "CBT 2.0",
+          "idnumber": "orange_00cdc3d685c0fbd17a3c2bda431877f6",
+          "visible": 1,
+          "sortorder": 680000,
+          "depth": 4
+        },
+        {
+          "sourceid": 71,
+          "parent": 70,
+          "name": "Cambio de titular",
+          "idnumber": "orange_804e4303811c0d2262f85a0580f1fd3c",
+          "visible": 1,
+          "sortorder": 700000,
+          "depth": 4
+        },
+        {
+          "sourceid": 72,
+          "parent": 70,
+          "name": "Cambio de dominación social manteniendo el CIF",
+          "idnumber": "orange_9da166e97b9872289a71d97448fe3c27",
+          "visible": 1,
+          "sortorder": 710000,
+          "depth": 4
+        },
+        {
+          "sourceid": 74,
+          "parent": 70,
+          "name": "Modificación numeración principal",
+          "idnumber": "orange_2c81244eb5f84edaaf2e65ef0562a6fd",
+          "visible": 1,
+          "sortorder": 730000,
+          "depth": 4
+        },
+        {
+          "sourceid": 76,
+          "parent": 70,
+          "name": "Cambio de cuenta bancaria,cambio de dirección,cambio de forma de pago",
+          "idnumber": "orange_dafbb29ab2fcb913c082223982ace53f",
+          "visible": 1,
+          "sortorder": 750000,
+          "depth": 4
+        },
+        {
+          "sourceid": 78,
+          "parent": 70,
+          "name": "Takeover (grupo mismo CIF). A tener en cuenta si tiene superbono (activación/desactivación superbono)",
+          "idnumber": "orange_de89044f925a4bd994eb63b54eee51fc",
+          "visible": 1,
+          "sortorder": 770000,
+          "depth": 4
+        },
+        {
+          "sourceid": 80,
+          "parent": 70,
+          "name": "Clientes Mixtos",
+          "idnumber": "orange_6cac0a2985cf8cbabced4336b5aaefbf",
+          "visible": 1,
+          "sortorder": 790000,
+          "depth": 4
+        },
+        {
+          "sourceid": 83,
+          "parent": 82,
+          "name": "Gestión de SIM (no envío)",
+          "idnumber": "orange_b56d1ffcb24bf1f15b1a1ceb73746e87",
+          "visible": 1,
+          "sortorder": 820000,
+          "depth": 4
+        },
+        {
+          "sourceid": 91,
+          "parent": 82,
+          "name": "Gestión de terminales",
+          "idnumber": "orange_6a1ee5dce73c9cbe7a422d402644880e",
+          "visible": 1,
+          "sortorder": 900000,
+          "depth": 4
+        },
+        {
+          "sourceid": 97,
+          "parent": 96,
+          "name": "Reparaciones",
+          "idnumber": "orange_341996b3ab4097cc81577d612b796d64",
+          "visible": 1,
+          "sortorder": 960000,
+          "depth": 4
+        },
+        {
+          "sourceid": 98,
+          "parent": 96,
+          "name": "Sustituciones",
+          "idnumber": "orange_ce5e833544c6aa37fa322e9ca2712b0f",
+          "visible": 1,
+          "sortorder": 970000,
+          "depth": 4
+        },
+        {
+          "sourceid": 99,
+          "parent": 96,
+          "name": "Postventa especial (bolsa especial fuera de garantía)",
+          "idnumber": "orange_e5dc79a66ad8b92743b591572fd9b147",
+          "visible": 1,
+          "sortorder": 980000,
+          "depth": 4
+        },
+        {
+          "sourceid": 101,
+          "parent": 100,
+          "name": "Bajas (total, con fecha futura,",
+          "idnumber": "orange_8e8659800c0716dc22374b2bd01e6a76",
+          "visible": 1,
+          "sortorder": 1000000,
+          "depth": 4
+        },
+        {
+          "sourceid": 102,
+          "parent": 100,
+          "name": "Suspensiones (temporal, por impago)",
+          "idnumber": "orange_fea99e92658af8bea27bbd9943e1b4ed",
+          "visible": 1,
+          "sortorder": 1010000,
+          "depth": 4
+        },
+        {
+          "sourceid": 103,
+          "parent": 100,
+          "name": "Penalizaciones (por permanencia, por incumplimiento contractual)",
+          "idnumber": "orange_39ab7e9d6214b10c7d355d67be4dcdd8",
+          "visible": 1,
+          "sortorder": 1020000,
+          "depth": 4
+        },
+        {
+          "sourceid": 104,
+          "parent": 100,
+          "name": "Reactivaciones",
+          "idnumber": "orange_f88d52ff2846b9f971229d8a10c6ce12",
+          "visible": 1,
+          "sortorder": 1030000,
+          "depth": 4
+        },
+        {
+          "sourceid": 106,
+          "parent": 105,
+          "name": "Facturación (consultas al equipo de facturación (Dynamics), peticiones al BO de facturación (Siebel)",
+          "idnumber": "orange_de6d1a9ed021adbfc16be1919a221a96",
+          "visible": 1,
+          "sortorder": 1050000,
+          "depth": 4
+        },
+        {
+          "sourceid": 107,
+          "parent": 105,
+          "name": "Refacturación (abonos, ajustes…)",
+          "idnumber": "orange_948e71508f988836891c287eb7afa6b3",
+          "visible": 1,
+          "sortorder": 1060000,
+          "depth": 4
+        },
+        {
+          "sourceid": 108,
+          "parent": 105,
+          "name": "Inclusión Bill Review",
+          "idnumber": "orange_f0f24f52430b0174ce93b56aabcc0a2f",
+          "visible": 1,
+          "sortorder": 1070000,
+          "depth": 4
+        },
+        {
+          "sourceid": 109,
+          "parent": 105,
+          "name": "Cobros (Dynamics, deuda)",
+          "idnumber": "orange_34a502f4eb314a59562d18b8146bccd7",
+          "visible": 1,
+          "sortorder": 1080000,
+          "depth": 4
+        },
+        {
+          "sourceid": 111,
+          "parent": 110,
+          "name": "Gestión incidencias Redes (Móvil)",
+          "idnumber": "orange_d7dfda6fe4b057ae291c09051e41db68",
+          "visible": 1,
+          "sortorder": 1100000,
+          "depth": 4
+        },
+        {
+          "sourceid": 112,
+          "parent": 110,
+          "name": "Gestión Sistemas (Móvil)",
+          "idnumber": "orange_dc05b4a869bbc2c78524513fe45cdb67",
+          "visible": 1,
+          "sortorder": 1110000,
+          "depth": 4
+        },
+        {
+          "sourceid": 113,
+          "parent": 110,
+          "name": "Gestión incidencias Fijo",
+          "idnumber": "orange_7c74d60ba25ecc6e5324e62a8620faed",
+          "visible": 1,
+          "sortorder": 1120000,
+          "depth": 4
+        },
+        {
+          "sourceid": 114,
+          "parent": 110,
+          "name": "Gestión incidencias Centrex",
+          "idnumber": "orange_04eefb154a17459df69ffa115f4c65b8",
+          "visible": 1,
+          "sortorder": 1130000,
+          "depth": 4
+        },
+        {
+          "sourceid": 115,
+          "parent": 110,
+          "name": "Consulta de incidencias",
+          "idnumber": "orange_cfe736e4725c1b25e690395bf4f3a452",
+          "visible": 1,
+          "sortorder": 1140000,
+          "depth": 4
+        },
+        {
+          "sourceid": 116,
+          "parent": 110,
+          "name": "Matriz de escalado / KRT",
+          "idnumber": "orange_f7b6bafea4c741aaa8ea6cae09b0e250",
+          "visible": 1,
+          "sortorder": 1150000,
+          "depth": 4
+        },
+        {
+          "sourceid": 118,
+          "parent": 117,
+          "name": "BSCS (Cliente, tipo de cliente, tarifas, productos, custcode)",
+          "idnumber": "orange_13e100d355246174da34b5037935fe24",
+          "visible": 1,
+          "sortorder": 1170000,
+          "depth": 4
+        },
+        {
+          "sourceid": 119,
+          "parent": 117,
+          "name": "Siebel (Cliente, tipo de cliente, tarifas, productos, estado…)",
+          "idnumber": "orange_5bc24d69ce361e61cd8a6f97dc083ebb",
+          "visible": 1,
+          "sortorder": 1180000,
+          "depth": 4
+        },
+        {
+          "sourceid": 120,
+          "parent": 117,
+          "name": "ALCE",
+          "idnumber": "orange_e2fae69b2ea222c785a85eadd914e244",
+          "visible": 1,
+          "sortorder": 1190000,
+          "depth": 4
+        },
+        {
+          "sourceid": 121,
+          "parent": 117,
+          "name": "CONSOLA DE ACTIVACIONES",
+          "idnumber": "orange_d4c44a923be38d437b4cf6e0cd7b3e95",
+          "visible": 1,
+          "sortorder": 1200000,
+          "depth": 4
+        },
+        {
+          "sourceid": 122,
+          "parent": 117,
+          "name": "GED (FILENET)",
+          "idnumber": "orange_2cff774a8fcc2113f36a792f4d476135",
+          "visible": 1,
+          "sortorder": 1210000,
+          "depth": 4
+        },
+        {
+          "sourceid": 123,
+          "parent": 117,
+          "name": "OCEANE",
+          "idnumber": "orange_ed18da7c2590a59b1cd1547e65fb6060",
+          "visible": 1,
+          "sortorder": 1220000,
+          "depth": 4
+        },
+        {
+          "sourceid": 124,
+          "parent": 117,
+          "name": "SGF",
+          "idnumber": "orange_b544f5eeebb9893422511771f6633fb4",
+          "visible": 1,
+          "sortorder": 1230000,
+          "depth": 4
+        },
+        {
+          "sourceid": 125,
+          "parent": 117,
+          "name": "ADMIN SMS",
+          "idnumber": "orange_06c9a4c36c39c8c9094d1efdd7b04f4c",
+          "visible": 1,
+          "sortorder": 1240000,
+          "depth": 4
+        },
+        {
+          "sourceid": 126,
+          "parent": 117,
+          "name": "ICP",
+          "idnumber": "orange_c9181a800e861a0b6d95802e6b9156b2",
+          "visible": 1,
+          "sortorder": 1250000,
+          "depth": 4
+        },
+        {
+          "sourceid": 127,
+          "parent": 117,
+          "name": "Eunomia",
+          "idnumber": "orange_c962b04502f73349c0a769dab93f9516",
+          "visible": 1,
+          "sortorder": 1260000,
+          "depth": 4
+        },
+        {
+          "sourceid": 128,
+          "parent": 117,
+          "name": "Elena",
+          "idnumber": "orange_fb2905b4b63d6134e729fcbca6298d5b",
+          "visible": 1,
+          "sortorder": 1270000,
+          "depth": 4
+        },
+        {
+          "sourceid": 129,
+          "parent": 117,
+          "name": "SGP",
+          "idnumber": "orange_1c090e0d65740ee884bb293d3768546d",
+          "visible": 1,
+          "sortorder": 1280000,
+          "depth": 4
+        },
+        {
+          "sourceid": 130,
+          "parent": 117,
+          "name": "SGRT (bloqueo/desbloqueo imei)",
+          "idnumber": "orange_831e018f15b42e9786c26f177c3418cd",
+          "visible": 1,
+          "sortorder": 1290000,
+          "depth": 4
+        },
+        {
+          "sourceid": 131,
+          "parent": 117,
+          "name": "CNOR",
+          "idnumber": "orange_f02847460158016db8d494f06fafdc2f",
+          "visible": 1,
+          "sortorder": 1300000,
+          "depth": 4
+        },
+        {
+          "sourceid": 132,
+          "parent": 117,
+          "name": "BO (Business Object)",
+          "idnumber": "orange_87e95e35cb5247d110f59560d8ba87e3",
+          "visible": 1,
+          "sortorder": 1310000,
+          "depth": 4
+        },
+        {
+          "sourceid": 134,
+          "parent": 133,
+          "name": "Estadísticas 90X",
+          "idnumber": "orange_a168d6f7d43d498a40fb0e38755e46d6",
+          "visible": 1,
+          "sortorder": 1330000,
+          "depth": 4
+        },
+        {
+          "sourceid": 135,
+          "parent": 133,
+          "name": "Call Analytics",
+          "idnumber": "orange_53e2d9ca7a4a6873f36091ce76ff253b",
+          "visible": 1,
+          "sortorder": 1340000,
+          "depth": 4
+        },
+        {
+          "sourceid": 136,
+          "parent": 133,
+          "name": "Lineas Activadas, consumo de líneas (QLIKVIEW, Business Objects) /",
+          "idnumber": "orange_88ae1573db86e88e18d0d37c4aeb4081",
+          "visible": 1,
+          "sortorder": 1350000,
+          "depth": 4
+        },
+        {
+          "sourceid": 137,
+          "parent": 133,
+          "name": "Gestión bolsa de terminales",
+          "idnumber": "orange_80145dc5adb45c12075a39d11ae62800",
+          "visible": 1,
+          "sortorder": 1360000,
+          "depth": 4
+        },
+        {
+          "sourceid": 138,
+          "parent": 133,
+          "name": "Informe de penalizaciones",
+          "idnumber": "orange_3aeb221d1cd7e8e37ebeb685a5499200",
+          "visible": 1,
+          "sortorder": 1370000,
+          "depth": 4
+        },
+        {
+          "sourceid": 139,
+          "parent": 133,
+          "name": "Gestión bolsa de reparaciones (POSTVENTA ESPECIAL)",
+          "idnumber": "orange_f076d592c53f429214e7dd6b842f4b43",
+          "visible": 1,
+          "sortorder": 1380000,
+          "depth": 4
+        },
+        {
+          "sourceid": 140,
+          "parent": 133,
+          "name": "Informe de Cotizaciones solicitadas por el KAM",
+          "idnumber": "orange_03e8c2b367c55bf6297b3866fef8b80c",
+          "visible": 1,
+          "sortorder": 1390000,
+          "depth": 4
+        },
+        {
+          "sourceid": 142,
+          "parent": 141,
+          "name": "Procedimiento Elena",
+          "idnumber": "orange_62bddee55850b95df34f580b8cf056ba",
+          "visible": 1,
+          "sortorder": 1410000,
+          "depth": 4
+        },
+        {
+          "sourceid": 143,
+          "parent": 141,
+          "name": "Procedimiento Dashboard facturación",
+          "idnumber": "orange_4a7c3fe24d442e18f7c3bababea84de9",
+          "visible": 1,
+          "sortorder": 1420000,
+          "depth": 4
+        },
+        {
+          "sourceid": 144,
+          "parent": 141,
+          "name": "Procedimiento Liberación SIM",
+          "idnumber": "orange_8a883dc6aece5f48c1ea924c00eadb99",
+          "visible": 1,
+          "sortorder": 1430000,
+          "depth": 4
+        },
+        {
+          "sourceid": 145,
+          "parent": 141,
+          "name": "Procedimiento gestión de usuarios",
+          "idnumber": "orange_78aaadd5189694352863454da43185b1",
+          "visible": 1,
+          "sortorder": 1440000,
+          "depth": 4
+        },
+        {
+          "sourceid": 146,
+          "parent": 141,
+          "name": "Proceso Colombo Banco Santander",
+          "idnumber": "orange_d61c5fe10cb745d23b9c9bb1de7000a7",
+          "visible": 1,
+          "sortorder": 1450000,
+          "depth": 4
+        },
+        {
+          "sourceid": 147,
+          "parent": 141,
+          "name": "Canal Ajuntaments",
+          "idnumber": "orange_1d7f234391fac5d98ce3fca5350de803",
+          "visible": 1,
+          "sortorder": 1460000,
+          "depth": 4
+        },
+        {
+          "sourceid": 148,
+          "parent": 141,
+          "name": "Procedimiento BO Facturación",
+          "idnumber": "orange_f1308709740ae321febd2e9e98c3f23f",
+          "visible": 1,
+          "sortorder": 1470000,
+          "depth": 4
+        },
+        {
+          "sourceid": 149,
+          "parent": 141,
+          "name": "Procedimiento BO Jaén Gestión de pedidos",
+          "idnumber": "orange_29e70b8d30973c160ff757878088c5d5",
+          "visible": 1,
+          "sortorder": 1480000,
+          "depth": 4
+        },
+        {
+          "sourceid": 150,
+          "parent": 141,
+          "name": "BO informes",
+          "idnumber": "orange_e9e952853452852169db0bc5ddbd96e7",
+          "visible": 1,
+          "sortorder": 1490000,
+          "depth": 4
+        },
+        {
+          "sourceid": 151,
+          "parent": 141,
+          "name": "BO Infancia",
+          "idnumber": "orange_85234dbc531412bf7d73e018da133438",
+          "visible": 1,
+          "sortorder": 1500000,
+          "depth": 4
+        },
+        {
+          "sourceid": 152,
+          "parent": 141,
+          "name": "ITACA",
+          "idnumber": "orange_ff672ccf05a2e27cf5af36b5d3b071f6",
+          "visible": 1,
+          "sortorder": 1510000,
+          "depth": 4
+        },
+        {
+          "sourceid": 154,
+          "parent": 153,
+          "name": "Paco",
+          "idnumber": "orange_12a7b618708086cb702b1c61acb16dc0",
+          "visible": 1,
+          "sortorder": 1530000,
+          "depth": 4
+        },
+        {
+          "sourceid": 158,
+          "parent": 153,
+          "name": "Egeo",
+          "idnumber": "orange_75cf3ad245ac6d08daabf4ecf0a0a8b8",
+          "visible": 1,
+          "sortorder": 1570000,
+          "depth": 4
+        },
+        {
+          "sourceid": 15,
+          "parent": 14,
+          "name": "SIM Física",
+          "idnumber": "orange_349a25e172cc1fbda9b3e54c1d215620",
+          "visible": 1,
+          "sortorder": 140000,
+          "depth": 5
+        },
+        {
+          "sourceid": 16,
+          "parent": 14,
+          "name": "Sim física + multisim",
+          "idnumber": "orange_71b625b042333defbc6e4aeed739ca41",
+          "visible": 1,
+          "sortorder": 150000,
+          "depth": 5
+        },
+        {
+          "sourceid": 17,
+          "parent": 14,
+          "name": "Sim virtual (Esim)",
+          "idnumber": "orange_a9c7a76a9b0c2553442ae75a598ca5b3",
+          "visible": 1,
+          "sortorder": 160000,
+          "depth": 5
+        },
+        {
+          "sourceid": 18,
+          "parent": 14,
+          "name": "SIM Virtual (esim) + multisim",
+          "idnumber": "orange_d7803f988c1198efbc7d92c0089b2eec",
+          "visible": 1,
+          "sortorder": 170000,
+          "depth": 5
+        },
+        {
+          "sourceid": 20,
+          "parent": 19,
+          "name": "SIM Física",
+          "idnumber": "orange_01b4c969e609014822ab0ab1e4a61e26",
+          "visible": 1,
+          "sortorder": 190000,
+          "depth": 5
+        },
+        {
+          "sourceid": 21,
+          "parent": 19,
+          "name": "Sim física + multisim",
+          "idnumber": "orange_e278534771fc4559db454738436411fe",
+          "visible": 1,
+          "sortorder": 200000,
+          "depth": 5
+        },
+        {
+          "sourceid": 22,
+          "parent": 19,
+          "name": "SIM Virtual (esim)",
+          "idnumber": "orange_7d3e7f6746ebf49e78d1d916a5ef8c6b",
+          "visible": 1,
+          "sortorder": 210000,
+          "depth": 5
+        },
+        {
+          "sourceid": 23,
+          "parent": 19,
+          "name": "SIM Virtual (esim) + multisim",
+          "idnumber": "orange_ddb59f62b6dce100f971c4f3e3d9fdd8",
+          "visible": 1,
+          "sortorder": 220000,
+          "depth": 5
+        },
+        {
+          "sourceid": 25,
+          "parent": 24,
+          "name": "Alta comunica SMS",
+          "idnumber": "orange_e375684e6f93ad3d0d54dba1049bf9df",
+          "visible": 1,
+          "sortorder": 240000,
+          "depth": 5
+        },
+        {
+          "sourceid": 28,
+          "parent": 27,
+          "name": "Preportabilidad / OC",
+          "idnumber": "orange_23d07d98a4bd85f44c5d00e203f2efe6",
+          "visible": 1,
+          "sortorder": 270000,
+          "depth": 5
+        },
+        {
+          "sourceid": 30,
+          "parent": 29,
+          "name": "SIM Física",
+          "idnumber": "orange_36fed0a31a287abe9ce1edf095ce5b18",
+          "visible": 1,
+          "sortorder": 290000,
+          "depth": 5
+        },
+        {
+          "sourceid": 31,
+          "parent": 29,
+          "name": "Sim física + multisim",
+          "idnumber": "orange_a1f72e2ebbad7da9f0b4b31348001372",
+          "visible": 1,
+          "sortorder": 300000,
+          "depth": 5
+        },
+        {
+          "sourceid": 32,
+          "parent": 29,
+          "name": "SIM Virtual (esim)",
+          "idnumber": "orange_d17881c84cd7215a602153b235e0e0d9",
+          "visible": 1,
+          "sortorder": 310000,
+          "depth": 5
+        },
+        {
+          "sourceid": 33,
+          "parent": 29,
+          "name": "SIM Virtual (esim) + multisim",
+          "idnumber": "orange_c334f3922bbae0b53eaf66576b472c3f",
+          "visible": 1,
+          "sortorder": 320000,
+          "depth": 5
+        },
+        {
+          "sourceid": 35,
+          "parent": 34,
+          "name": "SIM Física",
+          "idnumber": "orange_dd11d599d03a741f7a793ce6d15617a4",
+          "visible": 1,
+          "sortorder": 340000,
+          "depth": 5
+        },
+        {
+          "sourceid": 36,
+          "parent": 34,
+          "name": "Sim física + multisim",
+          "idnumber": "orange_619478d6e50caace07207b6d6300473e",
+          "visible": 1,
+          "sortorder": 350000,
+          "depth": 5
+        },
+        {
+          "sourceid": 37,
+          "parent": 34,
+          "name": "SIM Virtual (esim)",
+          "idnumber": "orange_8a5ff81856806725e5fa01d51c37c828",
+          "visible": 1,
+          "sortorder": 360000,
+          "depth": 5
+        },
+        {
+          "sourceid": 38,
+          "parent": 34,
+          "name": "SIM Virtual (esim) + multisim",
+          "idnumber": "orange_f64e2315c84188225419865706f750d8",
+          "visible": 1,
+          "sortorder": 370000,
+          "depth": 5
+        },
+        {
+          "sourceid": 40,
+          "parent": 39,
+          "name": "Reseller (proceso portabilidad saliente)",
+          "idnumber": "orange_53715211139b4e772f7acc49eb59e8b5",
+          "visible": 1,
+          "sortorder": 390000,
+          "depth": 5
+        },
+        {
+          "sourceid": 43,
+          "parent": 42,
+          "name": "Tarifas GGCC",
+          "idnumber": "orange_79ce02ac3fcb7f874feec269386fbedd",
+          "visible": 1,
+          "sortorder": 420000,
+          "depth": 5
+        },
+        {
+          "sourceid": 45,
+          "parent": 44,
+          "name": "Roaming",
+          "idnumber": "orange_273bed7e027df1b3a2b1619e34bd0948",
+          "visible": 1,
+          "sortorder": 440000,
+          "depth": 5
+        },
+        {
+          "sourceid": 47,
+          "parent": 46,
+          "name": "Buzón de voz",
+          "idnumber": "orange_0b5cd17c4aee5a952aad7dd13d8bf1c6",
+          "visible": 1,
+          "sortorder": 460000,
+          "depth": 5
+        },
+        {
+          "sourceid": 49,
+          "parent": 48,
+          "name": "Superbono",
+          "idnumber": "orange_273ab49cf6642bd4504affcbb23cd6f3",
+          "visible": 1,
+          "sortorder": 480000,
+          "depth": 5
+        },
+        {
+          "sourceid": 51,
+          "parent": 50,
+          "name": "APN privado o público",
+          "idnumber": "orange_f3642f820b4d960de29cf714bb98383b",
+          "visible": 1,
+          "sortorder": 500000,
+          "depth": 5
+        },
+        {
+          "sourceid": 53,
+          "parent": 52,
+          "name": "Llamadas especiales",
+          "idnumber": "orange_c11e262a9c7fea0fff1c2ebb1e164edb",
+          "visible": 1,
+          "sortorder": 520000,
+          "depth": 5
+        },
+        {
+          "sourceid": 55,
+          "parent": 54,
+          "name": "Desvió de llamadas",
+          "idnumber": "orange_08afd18bafe93471eb058523f9c3473f",
+          "visible": 1,
+          "sortorder": 540000,
+          "depth": 5
+        },
+        {
+          "sourceid": 57,
+          "parent": 56,
+          "name": "Bonos de datos individuales (1.5GB, 6GB)",
+          "idnumber": "orange_8c5a3b354d81e3a52eeaec1faa95c8f3",
+          "visible": 1,
+          "sortorder": 560000,
+          "depth": 5
+        },
+        {
+          "sourceid": 59,
+          "parent": 58,
+          "name": "Bonos compartidos",
+          "idnumber": "orange_a3b0c7a50d73dbc2a1666312bd05e775",
+          "visible": 1,
+          "sortorder": 580000,
+          "depth": 5
+        },
+        {
+          "sourceid": 61,
+          "parent": 60,
+          "name": "TDR",
+          "idnumber": "orange_0a62f68f788de18de7132a9cd3018a7a",
+          "visible": 1,
+          "sortorder": 600000,
+          "depth": 5
+        },
+        {
+          "sourceid": 63,
+          "parent": 62,
+          "name": "MMS",
+          "idnumber": "orange_1b4626ed8b8aab9ff09800278e736d33",
+          "visible": 1,
+          "sortorder": 620000,
+          "depth": 5
+        },
+        {
+          "sourceid": 65,
+          "parent": 64,
+          "name": "Servicios Fijo",
+          "idnumber": "orange_2f3fef0ad98fd93f3965ce42d801294c",
+          "visible": 1,
+          "sortorder": 640000,
+          "depth": 5
+        },
+        {
+          "sourceid": 67,
+          "parent": 66,
+          "name": "Activación/desactivación Proceso Modificaciones Servicios 90X",
+          "idnumber": "orange_1c59bbe5f3e6658e65be5c0e7258a904",
+          "visible": 1,
+          "sortorder": 660000,
+          "depth": 5
+        },
+        {
+          "sourceid": 73,
+          "parent": 72,
+          "name": "Cambio de denominación",
+          "idnumber": "orange_6bfa0081afba96e7a5463281d9c02052",
+          "visible": 1,
+          "sortorder": 720000,
+          "depth": 5
+        },
+        {
+          "sourceid": 75,
+          "parent": 74,
+          "name": "Númeración principal",
+          "idnumber": "orange_b23007dc6f95fbc4114667694329463b",
+          "visible": 1,
+          "sortorder": 740000,
+          "depth": 5
+        },
+        {
+          "sourceid": 77,
+          "parent": 76,
+          "name": "Cambios",
+          "idnumber": "orange_3e8a874deec85e23a91dbe170fa5b4d2",
+          "visible": 1,
+          "sortorder": 760000,
+          "depth": 5
+        },
+        {
+          "sourceid": 79,
+          "parent": 78,
+          "name": "Takeover",
+          "idnumber": "orange_9ed3915774339e956a36d399e744a5bd",
+          "visible": 1,
+          "sortorder": 780000,
+          "depth": 5
+        },
+        {
+          "sourceid": 81,
+          "parent": 80,
+          "name": "Clientes mixtos",
+          "idnumber": "orange_6ba2b326d93a9aca7a8354ad58c8a13b",
+          "visible": 1,
+          "sortorder": 800000,
+          "depth": 5
+        },
+        {
+          "sourceid": 84,
+          "parent": 83,
+          "name": "Activación/desactivación SIM Física",
+          "idnumber": "orange_a813cdac92b79639948e5d6e860336af",
+          "visible": 1,
+          "sortorder": 830000,
+          "depth": 5
+        },
+        {
+          "sourceid": 85,
+          "parent": 83,
+          "name": "Activación/desactivación SIM Virtual (esim)",
+          "idnumber": "orange_9fbed0360fc3ecb45fc625b245a7a385",
+          "visible": 1,
+          "sortorder": 840000,
+          "depth": 5
+        },
+        {
+          "sourceid": 86,
+          "parent": 83,
+          "name": "Activación/desactivación Multisim con Sim física/Esim",
+          "idnumber": "orange_f4d010361c934421c8009ebcb629acd8",
+          "visible": 1,
+          "sortorder": 850000,
+          "depth": 5
+        },
+        {
+          "sourceid": 87,
+          "parent": 83,
+          "name": "Activación/desactivación SIM/MultiSIM de eSIM para SmartWatch",
+          "idnumber": "orange_733045791fedd6ee5374f9b1cb2712d4",
+          "visible": 1,
+          "sortorder": 860000,
+          "depth": 5
+        },
+        {
+          "sourceid": 88,
+          "parent": 83,
+          "name": "Duplicado de SIM física",
+          "idnumber": "orange_4c3e399b53bbd7b06797ceebbce62eff",
+          "visible": 1,
+          "sortorder": 870000,
+          "depth": 5
+        },
+        {
+          "sourceid": 89,
+          "parent": 83,
+          "name": "Duplicado de Sim virtual (eSIM)",
+          "idnumber": "orange_e4ea6beba9b11aa56a55c83026e276ec",
+          "visible": 1,
+          "sortorder": 880000,
+          "depth": 5
+        },
+        {
+          "sourceid": 90,
+          "parent": 83,
+          "name": "Duplicado multisim",
+          "idnumber": "orange_de3a2a0da0586b0e99d869a747a7b0c3",
+          "visible": 1,
+          "sortorder": 890000,
+          "depth": 5
+        },
+        {
+          "sourceid": 92,
+          "parent": 91,
+          "name": "SRC (alta/renove)",
+          "idnumber": "orange_86de29a534235dff0fb7986e5adfc1c7",
+          "visible": 1,
+          "sortorder": 910000,
+          "depth": 5
+        },
+        {
+          "sourceid": 93,
+          "parent": 91,
+          "name": "VdH (alta/renove)",
+          "idnumber": "orange_fceb674ece47e867d4fd4473e1b96c04",
+          "visible": 1,
+          "sortorder": 920000,
+          "depth": 5
+        },
+        {
+          "sourceid": 94,
+          "parent": 91,
+          "name": "VAP",
+          "idnumber": "orange_ce8a68484f59427c471ffea9ebd669a3",
+          "visible": 1,
+          "sortorder": 930000,
+          "depth": 5
+        },
+        {
+          "sourceid": 95,
+          "parent": 91,
+          "name": "Proceso Colombo ***",
+          "idnumber": "orange_628050a49a166db5aab8840ba696e799",
+          "visible": 1,
+          "sortorder": 940000,
+          "depth": 5
+        },
+        {
+          "sourceid": 155,
+          "parent": 154,
+          "name": "Manual Agente",
+          "idnumber": "orange_b046e42f0d8907de6cb16f589d75ed8c",
+          "visible": 1,
+          "sortorder": 1540000,
+          "depth": 5
+        },
+        {
+          "sourceid": 156,
+          "parent": 154,
+          "name": "Manual Cliente",
+          "idnumber": "orange_9d4aa11c418bdade3ffdebbd4139229f",
+          "visible": 1,
+          "sortorder": 1550000,
+          "depth": 5
+        },
+        {
+          "sourceid": 157,
+          "parent": 154,
+          "name": "Infografía",
+          "idnumber": "orange_bb8e538ea5b16137dd6ea5e753977360",
+          "visible": 1,
+          "sortorder": 1560000,
+          "depth": 5
+        },
+        {
+          "sourceid": 159,
+          "parent": 158,
+          "name": "Manual EGEO Agente",
+          "idnumber": "orange_3d132f7059dff49c6de331bd35bc8b39",
+          "visible": 1,
+          "sortorder": 1580000,
+          "depth": 5
+        },
+        {
+          "sourceid": 160,
+          "parent": 158,
+          "name": "Manual EGEO Cliente",
+          "idnumber": "orange_e4df10a66a3f1bb18d1455fd6ea74b30",
+          "visible": 1,
+          "sortorder": 1590000,
+          "depth": 5
+        },
+        {
+          "sourceid": 161,
+          "parent": 158,
+          "name": "Manual Autorizado Digital",
+          "idnumber": "orange_c3fe114bb6b008f5975d181116a723d4",
+          "visible": 1,
+          "sortorder": 1600000,
+          "depth": 5
+        },
+        {
+          "sourceid": 162,
+          "parent": 158,
+          "name": "Manual Acceso Cliente 2FA",
+          "idnumber": "orange_44460f60f40e5d6c7524dfe60485e3c8",
+          "visible": 1,
+          "sortorder": 1610000,
+          "depth": 5
+        },
+        {
+          "sourceid": 163,
+          "parent": 158,
+          "name": "Manual Gestión de SIM",
+          "idnumber": "orange_6453358303a81141f953d27fc152b934",
+          "visible": 1,
+          "sortorder": 1620000,
+          "depth": 5
+        },
+        {
+          "sourceid": 164,
+          "parent": 158,
+          "name": "Manual Superbono",
+          "idnumber": "orange_173a1a40eca740548a7062125d5be6a1",
+          "visible": 1,
+          "sortorder": 1630000,
+          "depth": 5
+        },
+        {
+          "sourceid": 165,
+          "parent": 158,
+          "name": "Manual Bonos Travel Data",
+          "idnumber": "orange_6d27e9b44eb52abbbef08500b2367306",
+          "visible": 1,
+          "sortorder": 1640000,
+          "depth": 5
+        },
+        {
+          "sourceid": 166,
+          "parent": 158,
+          "name": "Manual Infovista Código Wom",
+          "idnumber": "orange_722d7ae29efcc7bd7d21b9aa56207a59",
+          "visible": 1,
+          "sortorder": 1650000,
+          "depth": 5
+        },
+        {
+          "sourceid": 167,
+          "parent": 158,
+          "name": "Infografía",
+          "idnumber": "orange_81cdb8716ec6b742ae56cc561bb8a48b",
+          "visible": 1,
+          "sortorder": 1660000,
+          "depth": 5
+        },
+        {
+          "sourceid": 168,
+          "parent": 158,
+          "name": "Manual (slide) Marca/ Idioma en Dynamics",
+          "idnumber": "orange_c34e79c663ee60de9762243f216d7cd5",
+          "visible": 1,
+          "sortorder": 1670000,
+          "depth": 5
+        },
+        {
+          "sourceid": 169,
+          "parent": 158,
+          "name": "Gestión de incidencias - Infografía",
+          "idnumber": "orange_c59ed625bada339b37da6558393a18d3",
+          "visible": 1,
+          "sortorder": 1680000,
+          "depth": 5
+        }
+      ]
+    },
+    "coursescategory": {
+      "sourceid": 4,
+      "categories": [
+        {
+          "sourceid": 4,
+          "parent": 0,
+          "name": "Cursos",
+          "idnumber": "orange_c2fb788c7deedbeaa296e424d4c2921b",
+          "visible": 1,
+          "sortorder": 1700000,
+          "depth": 1
+        },
+        {
+          "sourceid": 193,
+          "parent": 4,
+          "name": "Formación inicial",
+          "idnumber": "orange_training_initial",
+          "visible": 1,
+          "sortorder": 1710000,
+          "depth": 2
+        },
+        {
+          "sourceid": 194,
+          "parent": 4,
+          "name": "Formación continua",
+          "idnumber": "orange_training_continuous",
+          "visible": 1,
+          "sortorder": 1720000,
+          "depth": 2
+        }
+      ]
+    }
+  },
+  "catalogs": {
+    "states": {
+      "open": {
+        "name": "Abierta",
+        "active": true
+      },
+      "progress": {
+        "name": "En seguimiento",
+        "active": false,
+        "closed": false
+      },
+      "closed": {
+        "name": "Cerrada",
+        "active": true
+      }
+    },
+    "impacts": {
+      "normal": {
+        "name": "Normal",
+        "active": true
+      },
+      "high": {
+        "name": "Alto",
+        "active": true
+      },
+      "critical": {
+        "name": "Crítico",
+        "active": true
+      },
+      "customjcifedemhgna": {
+        "name": "Bajo",
+        "active": true
+      }
+    }
+  },
+  "noticecategories": [
+    {
+      "id": "3",
+      "kind": "incidents",
+      "parentid": "0",
+      "name": "Red móvil"
+    },
+    {
+      "id": "1",
+      "kind": "incidents",
+      "parentid": "0",
+      "name": "Sistemas"
+    },
+    {
+      "id": "2",
+      "kind": "incidents",
+      "parentid": "1",
+      "name": "Centrex"
+    },
+    {
+      "id": "22",
+      "kind": "incidents",
+      "parentid": "2",
+      "name": "Alta"
+    },
+    {
+      "id": "23",
+      "kind": "incidents",
+      "parentid": "22",
+      "name": "Sin Terminal"
+    },
+    {
+      "id": "6",
+      "kind": "notifications",
+      "parentid": "0",
+      "name": "Comunicado"
+    }
+  ]
+}

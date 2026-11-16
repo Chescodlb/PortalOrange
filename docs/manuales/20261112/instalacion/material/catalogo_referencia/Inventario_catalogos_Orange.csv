@@ -1,0 +1,14 @@
+﻿Tipo;Codigo;Nombre;Activo;Cierre_o_padre
+states;open;Abierta;True;False
+states;progress;En seguimiento;False;False
+states;closed;Cerrada;True;True
+impacts;normal;Normal;True;
+impacts;high;Alto;True;
+impacts;critical;Crítico;True;
+impacts;customjcifedemhgna;Bajo;True;
+incidents;3;Red móvil;;0
+incidents;1;Sistemas;;0
+incidents;2;Centrex;;1
+incidents;22;Alta;;2
+incidents;23;Sin Terminal;;22
+notifications;6;Comunicado;;0

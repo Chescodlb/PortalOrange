@@ -8,6 +8,8 @@ Añadir el usuario a la cohorte de sistema **Usuarios Orange** y seguir [el proc
 
 ## Crear y modificar usuarios
 
+Desde la versión **2026111100**, Administración Orange también puede crear cuentas y asignar Agente, Formador, Formador sin edición, Coordinación o Calidad desde **Administración > Usuarios Orange**, con selección de cursos/colecciones y ámbito de creación. Consultar el [procedimiento dentro del portal](11-administrador-orange.md#asignar-perfiles-desde-orange-2026111100). La actualización crea los roles que falten; no es necesario importar XML para este flujo. Los administradores siguen asignándose desde Moodle general.
+
 Abrir **Administración > Usuarios > Cuentas > Agregar un usuario**. Para editar, suspender o consultar cuentas existentes, usar **Examinar lista de usuarios**. La carga general por CSV es nativa de Moodle. Administración Orange dispone además de [una carga de agentes limitada al portal](11-administrador-orange.md#importar-agentes-desde-csv), sin permisos globales ni asignación de roles privilegiados.
 
 ## Roles y responsabilidades

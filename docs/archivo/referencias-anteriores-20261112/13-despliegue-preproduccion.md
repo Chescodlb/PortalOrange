@@ -1,5 +1,61 @@
 # Despliegue del portal Orange a preproducción
 
+## Activar cron cada minuto mediante script
+
+Entregar también `scripts/activar-cron-pre.sh` a Sistemas, por ejemplo en `/tmp/activar-cron-pre.sh`. En un servidor Linux con cron/crond activo, ejecutarlo **como el usuario del servicio Moodle**, sustituyendo `www-data` si es otro usuario. El directorio del log debe quedar fuera del directorio web y existir con permisos para ese usuario:
+
+```bash
+sudo mkdir -p /var/log/moodle-pre
+sudo chown www-data:www-data /var/log/moodle-pre
+sudo chmod 750 /var/log/moodle-pre
+sudo -u www-data bash /tmp/activar-cron-pre.sh
+```
+
+Detecta Moodle en el directorio actual, junto al script y buscando archivos `admin/cli/cron.php` en `/var/www`, `/srv`, `/opt`, `/usr/share/nginx/html` y `/home`; exige también un `config.php` legible y elimina rutas duplicadas. La búsqueda queda limitada a los directorios accesibles para ese usuario. Detecta PHP desde `PATH` o ejecutables habituales y comprueba que sea CLI. Si hay varias instalaciones, permite elegir en una terminal; en ejecución sin terminal se detiene y solicita la opción correspondiente. Muestra las rutas elegidas antes de habilitar cron. Para ubicaciones no detectadas o para seleccionar explícitamente un campus o versión PHP, se mantienen `--moodle /ruta/campus` y `--php /ruta/php`. El log predeterminado es `/var/log/moodle-pre/cron.log`, modificable con `--log`.
+
+El script habilita el cron en Moodle con `--enable` e instala `* * * * *` en el crontab de ese usuario, conservando las demás entradas. Se puede previsualizar con `--dry-run`. Repetirlo reemplaza su propia entrada. Si detecta otra entrada para esa ruta en el crontab del usuario o en los archivos legibles de `/etc/crontab` y `/etc/cron.d`, se detiene para evitar duplicarla. Sistemas debe revisar también cron de otros usuarios, timers, contenedores o planificadores externos. Este script está destinado a la instalación directa en servidor, no al Docker local.
+
+Desde el siguiente minuto se procesan las tareas pendientes de **todo Moodle**, incluidos los avisos Teams autorizados. La integración Teams debe estar activa y tener la URL de pre correcta. Cada tarea tiene su espera inicial y posibles reintentos: programar cron cada minuto no garantiza una entrega exacta en 60 segundos ni reenvía mensajes ya completados.
+
+Para comprobar programación y salida:
+
+```bash
+sudo -u www-data crontab -l
+sudo -u www-data tail -f /var/log/moodle-pre/cron.log
+```
+
+La salida incluye los mensajes de diagnóstico de Teams cuando se ejecutan sus tareas. También se pueden consultar en **Administración del sitio → Servidor → Tareas → Registros de tareas**. Configurar rotación del log en el servidor, conservando propietario y permisos `600`, porque puede contener el contenido de los avisos y las respuestas del flujo. No se ejecuta ninguna tarea ni se cambia la configuración Teams durante la instalación del script; los envíos comienzan al ejecutarse el cron programado.
+
+## Alternativa de configuración automatizada — 2026111007
+
+Después de actualizar el código y Moodle, se pueden resolver o crear raíces/cohorte, asignar sus IDs, configurar PHP CLI, tema Orange y Teams, e importar el catálogo inicial desde un archivo privado, sin alternar consola y portal. Consultar [Configuración automática](17-configuracion-automatica.md). La vía web de esta guía se conserva como alternativa y como referencia de comprobación. Cron se programa en el servidor dentro del mismo pase de Sistemas.
+
+## Pasos completos para la actualización 2026111006
+
+1. Guardar respaldo del código y la base de datos del servidor.
+2. Copiar `local/orangeportal/` completo a la instalación de Moodle. Esta actualización no cambia `theme/orange`.
+3. Desde la raíz de Moodle, como usuario del servicio, ejecutar:
+
+```bash
+php admin/cli/upgrade.php --non-interactive
+php admin/cli/purge_caches.php
+```
+
+4. Ejecutar `command -v php` en el entorno del servidor que ejecuta Moodle. Guardar la ruta obtenida en **Administración del sitio → Servidor → Rutas del sistema → Ruta hacia PHP CLI**.
+5. Revisar **Portal Orange → Mensajería Teams**: URL del ambiente, activación y tipos de aviso.
+6. **Sistemas comprueba que el cron de esta instalación está programado cada minuto. Si ya existe, no crear otro; si falta, configurarlo con el usuario, PHP y rutas reales. Este paso forma parte del despliegue.**
+7. Con la configuración del ambiente revisada, se puede comprobar una ejecución desde la raíz de Moodle:
+
+```bash
+php admin/cli/cron.php --keep-alive=0
+```
+
+Esta ejecución procesa tareas pendientes del campus y puede enviar mensajes reales. Ejecutarla una vez no programa ejecuciones futuras. Para una prueba de un único aviso, ejecutar solo su tarea desde Moodle.
+
+8. Verificar que un aviso autorizado pasa de pendiente a ejecutado automáticamente y revisar su log. La subida no está validada para Teams mientras las tareas sigan pendientes por falta de cron.
+
+Los apartados siguientes conservan las instrucciones de instalación inicial y las actualizaciones anteriores.
+
 Guía del 22 de octubre de 2026 para añadir Orange a una **copia del campus existente**, conservando su tema, usuarios y configuración. La primera versión servirá para validación restringida; los pendientes funcionales y las entregas están en el [plan de desarrollo](12-plan-desarrollo-entregas.md).
 
 ## Versiones y dependencia de Moove

@@ -62,7 +62,7 @@ Un timeout puede ocurrir después de que el flujo haya aceptado el mensaje. La c
 
 ## Desplegar esta actualización
 
-1. Copiar la versión completa y actual de `local/orangeportal/`, comprobando que `version.php` contiene `2026110602`. Esta integración no requiere cambios en el tema.
+1. Copiar la versión completa y actual de `local/orangeportal/`, comprobando que `version.php` contiene `2026111006`. Esta integración no requiere cambios en el tema.
 2. Desde la raíz de Moodle ejecutar:
 
 ```bash
